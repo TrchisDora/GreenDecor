@@ -18,7 +18,6 @@
     <!-- Custom styles for this template-->
     <!-- Visit 'codeastro' for more projects -->
     <link href="{{asset('backend/css/sb-admin-2.css')}}" rel="stylesheet">
-    <link href="{{asset('backend/css/vertical-layout-light/style.css')}}" rel="stylesheet">
     @stack('styles')
   
 </head>
