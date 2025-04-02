@@ -6,7 +6,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Ecommerce Laravel || DASHBOARD</title>
+    <title>Green Store || Admin</title>
+
+    <!-- logo website -->
+    <link rel="icon" type="image/x-icon" href="">
   
     <!-- Custom fonts for this template-->
     <link href="{{asset('backend/vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">
@@ -15,6 +18,7 @@
     <!-- Custom styles for this template-->
     <!-- Visit 'codeastro' for more projects -->
     <link href="{{asset('backend/css/sb-admin-2.css')}}" rel="stylesheet">
+    <link href="{{asset('backend/css/vertical-layout-light/style.css')}}" rel="stylesheet">
     @stack('styles')
   
 </head>

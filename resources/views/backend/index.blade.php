@@ -5,13 +5,18 @@
     @include('backend.layouts.notification')
     <!-- Page Heading -->
     <!-- Visit 'codeastro' for more projects -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-      <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+     <div class="row"> 
+      <div class="col-md-12 grid-margin stretch-card">
+          <div class="card">
+            <div class="card-body">
+            <h3 class="font-weight-bold">Welcome {{Auth()->user()->name}} to Dashboard</span></h3>
+                <h6 class="font-weight-normal mb-0">Chào mừng bạn đến với trang quản trị <span class="text-primary">GreenDecor</span></h6>
+            </div>
+          </div>
+      </div>
     </div>
-
     <!-- Content Row -->
     <div class="row">
-
       <!-- Order -->
       <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-info shadow h-100 py-2">
