@@ -1,82 +1,74 @@
 @extends('backend.layouts.master')
 
 @section('main-content')
- <!-- DataTales Example -->
- <div class="card shadow mb-4">
-     <div class="row">
-         <div class="col-md-12">
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
             @include('backend.layouts.notification')
-         </div>
-     </div>
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary float-left">Shipping List</h6>
-      <a href="{{route('shipping.create')}}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="Add User"><i class="fas fa-plus"></i> Add Shipping</a>
+        </div>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        @if(count($shippings)>0)
-        <table class="table table-bordered table-hover" id="banner-dataTable" width="100%" cellspacing="0">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach($shippings as $shipping)   
-                <tr>
-                    <td>{{$shipping->id}}</td>
-                    <td>{{$shipping->type}}</td>
-                    <td>${{$shipping->price}}</td>
-                    <td>
-                        @if($shipping->status=='active')
-                            <span class="badge badge-success">{{$shipping->status}}</span>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Danh sách Vận chuyển</h6>
+                    <a href="{{route('shipping.create')}}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="Thêm vận chuyển"><i class="fas fa-plus"></i> Thêm Vận chuyển</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body-table">
+                    <div class="table-responsive">
+                        @if(count($shippings) > 0)
+                            <table class="table table-striped table-borderless" id="banner-dataTable" width="100%" cellspacing="0">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tiêu đề</th>
+                                        <th>Giá</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($shippings as $shipping)
+                                        <tr>
+                                            <td>{{$shipping->id}}</td>
+                                            <td>{{$shipping->type}}</td>
+                                            <td>${{$shipping->price}}</td>
+                                            <td>
+                                                @if($shipping->status == 'active')
+                                                    <span class="badge badge-success">Hoạt động</span>
+                                                @else
+                                                    <span class="badge badge-warning">Không hoạt động</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{route('shipping.edit',$shipping->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px" data-toggle="tooltip" title="Chỉnh sửa" data-placement="bottom"><i class="fas fa-edit"></i></a>
+                                                <form method="POST" action="{{route('shipping.destroy',[$shipping->id])}}">
+                                                    @csrf 
+                                                    @method('delete')
+                                                    <button class="btn btn-danger btn-sm dltBtn" data-id={{$shipping->id}} style="height:30px; width:30px" data-toggle="tooltip" data-placement="bottom" title="Xóa"><i class="fas fa-trash-alt"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <span style="float:right">{{$shippings->links()}}</span>
                         @else
-                            <span class="badge badge-warning">{{$shipping->status}}</span>
+                            <h6 class="text-center">Không có vận chuyển nào! Vui lòng thêm vận chuyển mới.</h6>
                         @endif
-                    </td>
-                    <td>
-                        <a href="{{route('shipping.edit',$shipping->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="edit" data-placement="bottom"><i class="fas fa-edit"></i></a>
-                        <form method="POST" action="{{route('shipping.destroy',[$shipping->id])}}">
-                          @csrf 
-                          @method('delete')
-                              <button class="btn btn-danger btn-sm dltBtn" data-id={{$shipping->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                    </td>
-                    {{-- Delete Modal --}}
-                    {{-- <div class="modal fade" id="delModal{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="#delModal{{$user->id}}Label" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="#delModal{{$user->id}}Label">Delete user</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body">
-                              <form method="post" action="{{ route('banners.destroy',$user->id) }}">
-                                @csrf 
-                                @method('delete')
-                                <button type="submit" class="btn btn-danger" style="margin:auto; text-align:center">Parmanent delete user</button>
-                              </form>
-                            </div>
-                          </div>
-                        </div>
-                    </div> --}}
-                </tr>  
-            @endforeach
-          </tbody>
-        </table>
-        <span style="float:right">{{$shippings->links()}}</span>
-        @else
-          <h6 class="text-center">No shippings found!!! Please create shipping</h6>
-        @endif
-      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 @endsection
 
 @push('styles')
@@ -85,13 +77,6 @@
   <style>
       div.dataTables_wrapper div.dataTables_paginate{
           display: none;
-      }
-      .zoom {
-        transition: transform .2s; /* Animation */
-      }
-
-      .zoom:hover {
-        transform: scale(3.2);
       }
   </style>
 @endpush

@@ -1,76 +1,86 @@
 @extends('backend.layouts.master')
 
 @section('main-content')
- <!-- DataTales Example -->
- <div class="card shadow mb-4">
-     <div class="row">
-         <div class="col-md-12">
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
             @include('backend.layouts.notification')
-         </div>
-     </div>
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary float-left">Review Lists</h6>
+        </div>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        @if(count($reviews)>0)
-        <table class="table table-bordered table-hover" id="order-dataTable" width="100%" cellspacing="0">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Review By</th>
-              <th>Product</th>
-              <th>Review</th>
-              <th>Rate</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          
-          <tbody>
-            @foreach($reviews as $review)
-                <tr>
-                    <td>{{$review->id}}</td>
-                    <td>{{$review->user_info['name']}}</td>
-                    <td>{{ $review->product ? $review->product->title : 'Product Not Found' }}</td>
-                    <td>{{$review->review}}</td>
-                    <td>
-                     <ul style="list-style:none">
-                          @for($i=1; $i<=5;$i++)
-                          @if($review->rate >=$i)
-                            <li style="float:left;color:#F7941D;"><i class="fa fa-star"></i></li>
-                          @else
-                            <li style="float:left;color:#F7941D;"><i class="far fa-star"></i></li>
-                          @endif
-                        @endfor
-                     </ul>
-                    </td>
-                    <td>{{$review->created_at->format('M d D, Y g: i a')}}</td>
-                    <td>
-                        @if($review->status=='active')
-                          <span class="badge badge-success">{{$review->status}}</span>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Danh sách Đánh Giá</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body-table">
+                    <div class="table-responsive">
+                        @if(count($reviews) > 0)
+                        <table class="table table-striped table-borderless" id="review-dataTable" width="100%" cellspacing="0">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Người Đánh Giá</th>
+                                    <th>Sản Phẩm</th>
+                                    <th>Nội Dung</th>
+                                    <th>Đánh Giá</th>
+                                    <th>Ngày</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($reviews as $review)
+                                <tr>
+                                    <td>{{$review->id}}</td>
+                                    <td>{{$review->user_info['name']}}</td>
+                                    <td>{{ $review->product ? $review->product->title : 'Không tìm thấy' }}</td>
+                                    <td>{{$review->review}}</td>
+                                    <td>
+                                        <ul class="rating-stars">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <li class="{{ $review->rate >= $i ? 'filled' : '' }}"><i class="fa fa-star"></i></li>
+                                            @endfor
+                                        </ul>
+                                    </td>
+                                    <td>{{$review->created_at->format('d-m-Y H:i')}}</td>
+                                    <td>
+                                        @if($review->status == 'active')
+                                        <span class="badge badge-success">Hoạt động</span>
+                                        @else
+                                        <span class="badge badge-warning">Không hoạt động</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{route('review.edit', $review->id)}}" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="POST" action="{{route('review.destroy', [$review->id])}}" class="d-inline delete-form">
+                                            @csrf
+                                            @method('delete')
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="{{$review->id}}" title="Xóa">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <span style="float:right">{{$reviews->links()}}</span>
                         @else
-                          <span class="badge badge-warning">{{$review->status}}</span>
+                        <h6 class="text-center">Không có đánh giá nào!</h6>
                         @endif
-                    </td>
-                    <td>
-                        <a href="{{route('review.edit',$review->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="edit" data-placement="bottom"><i class="fas fa-edit"></i></a>
-                        <form method="POST" action="{{route('review.destroy',[$review->id])}}">
-                          @csrf
-                          @method('delete')
-                              <button class="btn btn-danger btn-sm dltBtn" data-id={{$review->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-          </tbody>
-        </table>
-        <span style="float:right">{{$reviews->links()}}</span>
-        @else
-          <h6 class="text-center">No reviews found!!!</h6>
-        @endif
-      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

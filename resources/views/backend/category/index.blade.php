@@ -2,78 +2,93 @@
 
 @section('main-content')
  <!-- DataTales Example -->
- <div class="card shadow mb-4">
-     <div class="row">
-         <div class="col-md-12">
+ <div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
             @include('backend.layouts.notification')
-         </div>
-     </div>
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary float-left">Category Lists</h6>
-      <a href="{{route('category.create')}}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="Add User"><i class="fas fa-plus"></i> Add Category</a>
+        </div>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        @if(count($categories)>0)
-        <table class="table table-bordered table-hover" id="banner-dataTable" width="100%" cellspacing="0">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Slug</th>
-              <th>Is Parent</th>
-              <th>Parent Category</th>
-              <th>Photo</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-
-            @foreach($categories as $category)
-              @php
-              @endphp
-                <tr>
-                    <td>{{$category->id}}</td>
-                    <td>{{$category->title}}</td>
-                    <td>{{$category->slug}}</td>
-                    <td>{{(($category->is_parent==1)? 'Yes': 'No')}}</td>
-                    <td>
-                        {{$category->parent_info->title ?? ''}}
-                    </td>
-                    <td>
-                        @if($category->photo)
-                            <img src="{{$category->photo}}" class="img-fluid" style="max-width:80px" alt="{{$category->photo}}">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Danh sách Danh mục</h6>
+                    <a href="{{ route('category.create') }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="Thêm danh mục">
+                        <i class="fas fa-plus"></i> Thêm danh mục
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body-table">
+                    <div class="table-responsive">
+                        @if(count($categories) > 0)
+                        <table class="table table-striped table-borderless" id="banner-dataTable" width="100%" cellspacing="0">
+                        <thead class="table-success">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tiêu đề</th>
+                                        <th>Slug</th>
+                                        <th>Là danh mục cha</th>
+                                        <th>Danh mục cha</th>
+                                        <th>Hình ảnh</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($categories as $category)
+                                        <tr>
+                                            <td>{{ $category->id }}</td>
+                                            <td>{{ $category->title }}</td>
+                                            <td>{{ $category->slug }}</td>
+                                            <td>{{ $category->is_parent == 1 ? 'Có' : 'Không' }}</td>
+                                            <td>{{ $category->parent_info->title ?? '—' }}</td>
+                                            <td>
+                                                @if($category->photo)
+                                                    <img src="{{ $category->photo }}" class="img-fluid zoom" style="max-width:80px" alt="{{ $category->photo }}">
+                                                @else
+                                                    <img src="{{ asset('backend/img/thumbnail-default.jpg') }}" class="img-fluid zoom" style="max-width:80px" alt="avatar.png">
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($category->status == 'active')
+                                                    <span class="badge badge-success">Hoạt động</span>
+                                                @else
+                                                    <span class="badge badge-warning">Không hoạt động</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('category.edit', $category->id) }}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px" data-toggle="tooltip" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="POST" action="{{ route('category.destroy', $category->id) }}">
+                                                    @csrf
+                                                    @method('delete')
+                                                    <button class="btn btn-danger btn-sm dltBtn" data-id="{{ $category->id }}" style="height:30px; width:30px" data-toggle="tooltip" title="Xóa">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <span style="float:right">{{ $categories->links() }}</span>
                         @else
-                            <img src="{{asset('backend/img/thumbnail-default.jpg')}}" class="img-fluid" style="max-width:80px" alt="avatar.png">
+                            <h6 class="text-center">Không có danh mục nào! Vui lòng thêm danh mục mới.</h6>
                         @endif
-                    </td>
-                    <td>
-                        @if($category->status=='active')
-                            <span class="badge badge-success">{{$category->status}}</span>
-                        @else
-                            <span class="badge badge-warning">{{$category->status}}</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{route('category.edit',$category->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="edit" data-placement="bottom"><i class="fas fa-edit"></i></a>
-                    <form method="POST" action="{{route('category.destroy',[$category->id])}}">
-                      @csrf
-                      @method('delete')
-                          <button class="btn btn-danger btn-sm dltBtn" data-id={{$category->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-          </tbody>
-        </table>
-        <span style="float:right">{{$categories->links()}}</span>
-        @else
-          <h6 class="text-center">No Categories found!!! Please create Category</h6>
-        @endif
-      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 @endsection
 
 @push('styles')
@@ -83,6 +98,18 @@
       div.dataTables_wrapper div.dataTables_paginate{
           display: none;
       }
+    div.dataTables_wrapper div.dataTables_paginate {
+    display: none;
+    }
+
+    .zoom {
+    transition: transform .2s;
+    /* Animation */
+    }
+
+    .zoom:hover {
+    transform: scale(3.2);
+    }
   </style>
 @endpush
 
