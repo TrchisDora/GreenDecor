@@ -13,8 +13,7 @@
             <div class="card">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h6 class="m-0">Danh sách Đơn hàng</h6>
-                    <a href="{{ route('order.create') }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip"
-                    data-placement="bottom" title="Thêm Đơn hàng"><i class="fas fa-plus"></i> Thêm Đơn hàng</a>
+                    <a href="#" class="btn btn btn-sm float-right" data-toggle="tooltip"data-placement="bottom" title=""><i class="fas fa-star"></i></a>
                 </div>
             </div>
         </div>

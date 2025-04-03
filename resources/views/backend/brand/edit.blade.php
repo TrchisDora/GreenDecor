@@ -2,35 +2,66 @@
 @section('title','Ecommerce Laravel || Brand Edit')
 @section('main-content')
 
-<div class="card">
-    <h5 class="card-header">Edit Brand</h5>
-    <div class="card-body">
-      <form method="post" action="{{route('brand.update',$brand->id)}}">
-        @csrf 
-        @method('PATCH')
-        <div class="form-group">
-          <label for="inputTitle" class="col-form-label">Title <span class="text-danger">*</span></label>
-        <input id="inputTitle" type="text" name="title" placeholder="Enter title"  value="{{$brand->title}}" class="form-control">
-        @error('title')
-        <span class="text-danger">{{$message}}</span>
-        @enderror
-        </div>        
-        <div class="form-group">
-          <label for="status" class="col-form-label">Status <span class="text-danger">*</span></label>
-          <select name="status" class="form-control">
-            <option value="active" {{(($brand->status=='active') ? 'selected' : '')}}>Active</option>
-            <option value="inactive" {{(($brand->status=='inactive') ? 'selected' : '')}}>Inactive</option>
-          </select>
-          @error('status')
-          <span class="text-danger">{{$message}}</span>
-          @enderror
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
         </div>
-        <div class="form-group mb-3">
-           <button class="btn btn-success" type="submit">Update</button>
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Sửa Thương Hiệu</h6>
+                    <a href="{{ route('brand.index') }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip"
+                        data-placement="bottom" title="Quay lại danh sách thương hiệu">
+                        <i class="fas fa-back"></i> Quay lại
+                    </a>
+                </div>
+            </div>
         </div>
-      </form>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-header">Thông Tin Thương Hiệu</h5>
+                    <form method="post" action="{{ route('brand.update', $brand->id) }}">
+                        @csrf
+                        @method('PATCH')
+
+                        <!-- Tiêu đề -->
+                        <div class="form-group mb-3">
+                            <label for="inputTitle" class="col-form-label">Tiêu Đề <span class="text-danger">*</span></label>
+                            <input id="inputTitle" type="text" name="title" placeholder="Nhập tiêu đề" value="{{ $brand->title }}" class="form-control">
+                            @error('title')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="form-group mb-3">
+                            <label for="status" class="col-form-label">Trạng Thái <span class="text-danger">*</span></label>
+                            <select name="status" class="form-control">
+                                <option value="active" {{ $brand->status == 'active' ? 'selected' : '' }}>Kích hoạt</option>
+                                <option value="inactive" {{ $brand->status == 'inactive' ? 'selected' : '' }}>Không kích hoạt</option>
+                            </select>
+                            @error('status')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Nút submit -->
+                        <div class="form-group mb-3 d-flex justify-content-center">
+                            <button class="btn btn-success mx-2" type="submit">Cập nhật</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 
 @endsection
 

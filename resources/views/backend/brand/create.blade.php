@@ -2,36 +2,66 @@
 @section('title','Ecommerce Laravel || Brand Create')
 @section('main-content')
 
-<div class="card">
-    <h5 class="card-header">Add Brand</h5>
-    <div class="card-body">
-      <form method="post" action="{{route('brand.store')}}">
-        {{csrf_field()}}
-        <div class="form-group">
-          <label for="inputTitle" class="col-form-label">Title <span class="text-danger">*</span></label>
-        <input id="inputTitle" type="text" name="title" placeholder="Enter title"  value="{{old('title')}}" class="form-control">
-        @error('title')
-        <span class="text-danger">{{$message}}</span>
-        @enderror
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
         </div>
-        
-        <div class="form-group">
-          <label for="status" class="col-form-label">Status <span class="text-danger">*</span></label>
-          <select name="status" class="form-control">
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-          </select>
-          @error('status')
-          <span class="text-danger">{{$message}}</span>
-          @enderror
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Thêm Thương Hiệu</h6>
+                    <a href="{{ route('brand.index') }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip"
+                        data-placement="bottom" title="Quay lại danh sách thương hiệu">
+                        <i class="fas fa-back"></i> Quay lại
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="form-group mb-3">
-          <button type="reset" class="btn btn-warning">Reset</button>
-           <button class="btn btn-success" type="submit">Submit</button>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-header">Thông Tin Thương Hiệu</h5>
+                    <form method="post" action="{{ route('brand.store') }}">
+                        {{ csrf_field() }}
+
+                        <!-- Tiêu đề -->
+                        <div class="form-group mb-3">
+                            <label for="inputTitle" class="col-form-label">Tiêu Đề <span class="text-danger">*</span></label>
+                            <input id="inputTitle" type="text" name="title" placeholder="Nhập tiêu đề" value="{{ old('title') }}" class="form-control">
+                            @error('title')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="form-group mb-3">
+                            <label for="status" class="col-form-label">Trạng Thái <span class="text-danger">*</span></label>
+                            <select name="status" class="form-control">
+                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Kích hoạt</option>
+                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Không kích hoạt</option>
+                            </select>
+                            @error('status')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Nút submit và reset -->
+                        <div class="form-group mb-3 d-flex justify-content-center">
+                            <button type="reset" class="btn btn-warning mx-2">Đặt lại</button>
+                            <button class="btn btn-success mx-2" type="submit">Lưu</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
         </div>
-      </form>
     </div>
 </div>
+
 
 @endsection
 

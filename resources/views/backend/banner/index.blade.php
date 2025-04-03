@@ -1,11 +1,11 @@
 @extends('backend.layouts.master')
 @section('main-content')
 <div class="container-fluid">
-    <div class="row mb-3">
-      <div class="col-md-12">
-        @include('backend.layouts.notification')
-      </div>
-    </div>
+     <div class="row  mb-3">
+         <div class="col-md-12">
+            @include('backend.layouts.notification')
+         </div>
+     </div>
     <div class="row">
       <div class="col-md-12 grid-margin stretch-card">
         <div class="card">

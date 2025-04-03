@@ -3,32 +3,67 @@
 @section('title','Review Edit')
 
 @section('main-content')
-<div class="card">
-  <h5 class="card-header">Review Edit</h5>
-  <div class="card-body">
-    <form action="{{route('review.update',$review->id)}}" method="POST">
-      @csrf
-      @method('PATCH')
-      <div class="form-group">
-        <label for="name">Review By:</label>
-        <input type="text" disabled class="form-control" value="{{$review->user_info->name}}">
-      </div>
-      <div class="form-group">
-        <label for="review">Review</label>
-      <textarea name="review" id="" cols="20" rows="10" class="form-control">{{$review->review}}</textarea>
-      </div>
-      <div class="form-group">
-        <label for="status">Status :</label>
-        <select name="status" id="" class="form-control">
-          <option value="">--Select Status--</option>
-          <option value="active" {{(($review->status=='active')? 'selected' : '')}}>Active</option>
-          <option value="inactive" {{(($review->status=='inactive')? 'selected' : '')}}>Inactive</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary">Update</button>
-    </form>
-  </div>
-</div><!-- Visit 'codeastro' for more projects -->
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Chỉnh Sửa Đánh Giá</h6>
+                    <a href="{{ route('review.index') }}" class="btn btn-danger btn-sm float-right" data-toggle="tooltip"
+                        data-placement="bottom" title="Quay lại danh sách đánh giá">
+                        <i class="fas fa-back"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-header">Thông Tin Đánh Giá</h5>
+                    <form action="{{ route('review.update', $review->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+
+                        <!-- Người đánh giá -->
+                        <div class="form-group mb-3">
+                            <label for="name">Người đánh giá:</label>
+                            <input type="text" disabled class="form-control" value="{{ $review->user_info->name }}">
+                        </div>
+
+                        <!-- Đánh giá -->
+                        <div class="form-group mb-3">
+                            <label for="review">Nội dung đánh giá</label>
+                            <textarea name="review" disabled id="" cols="20" rows="10" class="form-control">{{ $review->review }}</textarea>
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="form-group mb-3">
+                            <label for="status">Trạng thái:</label>
+                            <select name="status" id="" class="form-control">
+                                <option value="">--Chọn trạng thái--</option>
+                                <option value="active" {{ $review->status == 'active' ? 'selected' : '' }}>Kích hoạt</option>
+                                <option value="inactive" {{ $review->status == 'inactive' ? 'selected' : '' }}>Không kích hoạt</option>
+                            </select>
+                        </div>
+
+                        <!-- Nút submit -->
+                        <div class="form-group mb-3 d-flex justify-content-center">
+                            <button type="submit" class="btn btn-success mx-2">Cập nhật</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('styles')

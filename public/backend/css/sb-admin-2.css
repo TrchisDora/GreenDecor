@@ -170,12 +170,14 @@ a:hover {
 }
 
 a:not([href]) {
-  color: inherit;
+  color: white;
   text-decoration: none;
 }
 
 a:not([href]):hover {
-  color: inherit;
+  color: #4e73df;
+  border-color:#4e73df ;
+  background-color: white;
   text-decoration: none;
 }
 
@@ -5069,9 +5071,9 @@ a.badge-dark:focus, a.badge-dark.focus {
 }
 
 .alert-success {
-  color: #0f6848;
-  background-color: #55AC49;
-  border-color: #bff0de;
+  color: #55AC49;
+  background-color: #f4fef1;
+  border-color: #55AC49;
 }
 
 .alert-success hr {
