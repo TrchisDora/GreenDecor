@@ -17,7 +17,7 @@
           <div class="card-body">
             <div class="table-responsive">
               @if(count($postTags) > 0)
-                <table class="table table-striped table-borderless" id="post-category-dataTable" width="100%" cellspacing="0">
+                <table class="table table-striped table-borderless" id="post-tag-dataTable" width="100%" cellspacing="0">
                   <thead class="table-success">
                     <tr>
                       <th>#</th>
@@ -45,7 +45,7 @@
                           <form method="POST" action="{{route('post-tag.destroy', [$data->id])}}">
                             @csrf
                             @method('delete')
-                            <button class="btn btn-danger btn-sm float-left" style="height:30px; width:30px" data-toggle="tooltip" data-placement="bottom" title="Xóa"><i class="fas fa-trash-alt"></i></button>
+                            <button class="btn btn-danger btn-sm dltBtn" style="height:30px; width:30px" data-toggle="tooltip" data-placement="bottom" title="Xóa"><i class="fas fa-trash-alt"></i></button>
                           </form>
                         </td>
                       </tr>
@@ -66,70 +66,46 @@
 @endsection
 
 @push('styles')
-  <link href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+  <link href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
-  <style>
-      div.dataTables_wrapper div.dataTables_paginate{
-          display: none;
-      }
-  </style>
 @endpush
 
 @push('scripts')
-
-  <!-- Page level plugins -->
-  <script src="{{asset('backend/vendor/datatables/jquery.dataTables.min.js')}}"></script>
-  <script src="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+  <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
-  <!-- Page level custom scripts -->
-  <script src="{{asset('backend/js/demo/datatables-demo.js')}}"></script>
-
-  <!-- Script tùy chỉnh cấp trang -->
-  <script src="{{asset('backend/js/demo/datatables-demo.js')}}"></script>
   <script>
-      $('#post-category-dataTable').DataTable( {
-            "columnDefs":[
-                {
-                    "orderable":false,
-                    "targets":[3,4]
-                }
-            ]
-        } );
+      $(document).ready(function() {
+          $('#post-tag-dataTable').DataTable({
+              "columnDefs": [
+                  {
+                      "orderable": false,
+                      "targets": [4] // Cột hành động không thể sắp xếp
+                  }
+              ]
+          });
 
-      // Sweet alert
-      function deleteData(id){
-        // Custom delete logic (currently empty)
-      }
-  </script>
-
-  <script>
-    $(document).ready(function(){
-      $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
+          // Sweet alert xác nhận xóa
+          $(document).on('click', '.dltBtn', function(e) {
+              var form = $(this).closest('form');
+              var dataID = $(this).data('id');
+              e.preventDefault();
+              swal({
+                  title: "Bạn có chắc chắn?",
+                  text: "Sau khi xóa, bạn sẽ không thể khôi phục dữ liệu này!",
+                  icon: "warning",
+                  buttons: ["Hủy", "Xóa ngay"],
+                  dangerMode: true,
+              })
+              .then((willDelete) => {
+                  if (willDelete) {
+                      form.submit();
+                  } else {
+                      swal("Dữ liệu của bạn vẫn an toàn!");
+                  }
+              });
+          });
       });
-      $('.dltBtn').click(function(e){
-        var form=$(this).closest('form');
-        var dataID=$(this).data('id');
-        // alert(dataID);
-        e.preventDefault();
-        swal({
-          title: "Bạn chắc chắn chứ?",
-          text: "Sau khi xóa, bạn sẽ không thể khôi phục lại dữ liệu này!",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((willDelete) => {
-          if (willDelete) {
-             form.submit();
-          } else {
-              swal("Dữ liệu của bạn vẫn an toàn!");
-          }
-        });
-      });
-    })
   </script>
 @endpush

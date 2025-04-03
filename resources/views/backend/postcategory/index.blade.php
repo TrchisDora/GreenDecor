@@ -49,13 +49,13 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{route('post-category.edit', $data->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px; border-radius:50%" data-toggle="tooltip" title="Chỉnh sửa" data-placement="bottom">
+                                                <a href="{{route('post-category.edit', $data->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px" data-toggle="tooltip" title="Chỉnh sửa" data-placement="bottom">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <form method="POST" action="{{route('post-category.destroy',[$data->id])}}">
                                                     @csrf
                                                     @method('delete')
-                                                    <button class="btn btn-danger btn-sm dltBtn" data-id={{$data->id}} style="height:30px; width:30px; border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Xóa">
+                                                    <button class="btn btn-danger btn-sm dltBtn" data-id={{$data->id}} style="height:30px; width:30px" data-toggle="tooltip" data-placement="bottom" title="Xóa">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
@@ -79,68 +79,46 @@
 @endsection
 
 @push('styles')
-  <link href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+  <link href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
-  <style>
-      div.dataTables_wrapper div.dataTables_paginate{
-          display: none;
-      }
-  </style>
 @endpush
 
 @push('scripts')
-
-  <!-- Page level plugins -->
-  <script src="{{asset('backend/vendor/datatables/jquery.dataTables.min.js')}}"></script>
-  <script src="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+  <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
-  <!-- Page level custom scripts -->
-  <script src="{{asset('backend/js/demo/datatables-demo.js')}}"></script>
   <script>
-      
-      $('#post-category-dataTable').DataTable( {
-            "columnDefs":[
-                {
-                    "orderable":false,
-                    "targets":[3,4]
-                }
-            ]
-        } );
+      $(document).ready(function() {
+          $('#post-category-dataTable').DataTable({
+              "columnDefs": [
+                  {
+                      "orderable": false,
+                      "targets": [4] // Cột hành động không thể sắp xếp
+                  }
+              ]
+          });
 
-        // Sweet alert
-
-        function deleteData(id){
-            
-        }
-  </script>
-  <script>
-      $(document).ready(function(){
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-          $('.dltBtn').click(function(e){
-            var form=$(this).closest('form');
-              var dataID=$(this).data('id');
-              // alert(dataID);
+          // Sweet alert xác nhận xóa
+          $(document).on('click', '.dltBtn', function(e) {
+              var form = $(this).closest('form');
+              var dataID = $(this).data('id');
               e.preventDefault();
               swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this data!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                })
-                .then((willDelete) => {
-                    if (willDelete) {
-                       form.submit();
-                    } else {
-                        swal("Your data is safe!");
-                    }
-                });
-          })
-      })
+                  title: "Bạn có chắc chắn?",
+                  text: "Sau khi xóa, bạn sẽ không thể khôi phục dữ liệu này!",
+                  icon: "warning",
+                  buttons: ["Hủy", "Xóa ngay"],
+                  dangerMode: true,
+              })
+              .then((willDelete) => {
+                  if (willDelete) {
+                      form.submit();
+                  } else {
+                      swal("Dữ liệu của bạn vẫn an toàn!");
+                  }
+              });
+          });
+      });
   </script>
 @endpush

@@ -7,17 +7,19 @@
             @include('backend.layouts.notification')
         </div>
     </div>
+    
     <div class="row">
         <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h6 class="m-0">Danh sách Đơn hàng</h6>
-                    <a href="{{route('order.create')}}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip"
+                    <a href="{{ route('order.create') }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip"
                     data-placement="bottom" title="Thêm Đơn hàng"><i class="fas fa-plus"></i> Thêm Đơn hàng</a>
                 </div>
             </div>
         </div>
     </div>
+    
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow-sm">
@@ -41,20 +43,16 @@
                                 <tbody>
                                     @foreach($orders as $order)
                                         @php
-                                            $shipping_charge = DB::table('shippings')->where('id', $order->shipping_id)->pluck('price');
+                                            $shipping_charge = DB::table('shippings')->where('id', $order->shipping_id)->value('price');
                                         @endphp
-                                        <tr>
-                                            <td>{{$order->id}}</td>
-                                            <td>{{$order->order_number}}</td>
-                                            <td>{{$order->first_name}} {{$order->last_name}}</td>
-                                            <td>{{$order->email}}</td>
-                                            <td>{{$order->quantity}}</td>
-                                            <td>
-                                                @foreach($shipping_charge as $data) 
-                                                    $ {{number_format($data, 2)}} 
-                                                @endforeach
-                                            </td>
-                                            <td>${{number_format($order->total_amount, 2)}}</td>
+                                        <tr id="order-{{ $order->id }}">
+                                            <td>{{ $order->id }}</td>
+                                            <td>{{ $order->order_number }}</td>
+                                            <td>{{ $order->first_name }} {{ $order->last_name }}</td>
+                                            <td>{{ $order->email }}</td>
+                                            <td>{{ $order->quantity }}</td>
+                                            <td>$ {{ number_format($shipping_charge, 2) }}</td>
+                                            <td>$ {{ number_format($order->total_amount, 2) }}</td>
                                             <td>
                                                 @if($order->status == 'new')
                                                     <span class="badge badge-primary">Mới</span>
@@ -63,23 +61,18 @@
                                                 @elseif($order->status == 'delivered')
                                                     <span class="badge badge-success">Đã giao</span>
                                                 @else
-                                                    <span class="badge badge-danger">{{$order->status}}</span>
+                                                    <span class="badge badge-danger">{{ $order->status }}</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{route('order.show', $order->id)}}" class="btn btn-warning btn-sm float-left mr-1" style="height:30px; width:30px data-toggle="tooltip" title="Xem" data-placement="bottom"><i class="fas fa-eye"></i></a>
-                                                <a href="{{route('order.edit', $order->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px data-toggle="tooltip" title="Chỉnh sửa" data-placement="bottom"><i class="fas fa-edit"></i></a>
-                                                <form method="POST" action="{{route('order.destroy', [$order->id])}}">
-                                                    @csrf 
-                                                    @method('delete')
-                                                    <button class="btn btn-danger btn-sm dltBtn" data-id={{$order->id}} style="height:30px; width:30px data-toggle="tooltip" data-placement="bottom" title="Xóa"><i class="fas fa-trash-alt"></i></button>
-                                                </form>
+                                                <a href="{{ route('order.show', $order->id) }}" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Xem"><i class="fas fa-eye"></i></a>
+                                                <a href="{{ route('order.edit', $order->id) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
+                                                <button class="btn btn-danger btn-sm delete-order" data-id="{{ $order->id }}" data-toggle="tooltip" title="Xóa"><i class="fas fa-trash-alt"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                            <span style="float:right">{{$orders->links()}}</span>
                         @else
                             <h6 class="text-center">Không có đơn hàng nào! Vui lòng đặt hàng sản phẩm.</h6>
                         @endif
@@ -89,73 +82,69 @@
         </div>
     </div>
 </div>
-
 @endsection
 
-
 @push('styles')
-  <link href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
-  <style>
-      div.dataTables_wrapper div.dataTables_paginate{
-          display: none;
-      }
-  </style>
+<link href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
 @endpush
 
 @push('scripts')
+<script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
-  <!-- Page level plugins -->
-  <script src="{{asset('backend/vendor/datatables/jquery.dataTables.min.js')}}"></script>
-  <script src="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-
-  <!-- Page level custom scripts -->
-  <script src="{{asset('backend/js/demo/datatables-demo.js')}}"></script>
-  <script>
-      
-      $('#order-dataTable').DataTable( {
-            "columnDefs":[
-                {
-                    "orderable":false,
-                    "targets":[8]
-                }
-            ]
-        } );
-
-        // Sweet alert
-
-        function deleteData(id){
-            
-        }
-  </script>
-  <script>
-      $(document).ready(function(){
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+<script>
+    $(document).ready(function () {
+        $('#order-dataTable').DataTable({
+            "columnDefs": [{
+                "orderable": false,
+                "targets": [8]
+            }]
         });
-          $('.dltBtn').click(function(e){
-            var form=$(this).closest('form');
-              var dataID=$(this).data('id');
-              // alert(dataID);
-              e.preventDefault();
-              swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this data!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                })
-                .then((willDelete) => {
-                    if (willDelete) {
-                       form.submit();
-                    } else {
-                        swal("Your data is safe!");
-                    }
-                });
-          })
-      })
-  </script>
+
+        $('.delete-order').click(function () {
+            var order_id = $(this).data('id');
+            var row = $("#order-" + order_id);
+            
+            swal({
+                title: "Bạn có chắc chắn?",
+                text: "Sau khi xóa, bạn không thể khôi phục đơn hàng này!",
+                icon: "warning",
+                buttons: ["Hủy", "Xóa ngay"],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: '{{ route("order.destroy", ":id") }}'.replace(':id', order_id),
+                        type: 'POST',
+                        data: {
+                            _method: 'DELETE',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (response) {
+                            if (response.status == 'success') {
+                                row.fadeOut(500, function () {
+                                    row.remove();
+                                });
+                                swal("Xóa thành công!", {
+                                    icon: "success",
+                                });
+                            } else {
+                                swal("Lỗi khi xóa!", {
+                                    icon: "error",
+                                });
+                            }
+                        },
+                        error: function () {
+                            swal("Đã xảy ra lỗi, vui lòng thử lại!", {
+                                icon: "error",
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endpush
