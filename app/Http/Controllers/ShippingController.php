@@ -15,7 +15,7 @@ class ShippingController extends Controller
      */
     public function index()
     {
-        $shipping=Shipping::orderBy('id','DESC')->get();
+        $shipping=Shipping::orderBy('id','DESC')->paginate();
         return view('backend.shipping.index')->with('shippings',$shipping);
     }
 

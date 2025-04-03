@@ -13,10 +13,10 @@ class ProductReview extends Model
     }
 
     public static function getAllReview(){
-        return ProductReview::with('user_info')->get();
+        return ProductReview::with('user_info')->paginate();
     }
     public static function getAllUserReview(){
-        return ProductReview::where('user_id',auth()->user()->id)->with('user_info')->get();
+        return ProductReview::where('user_id',auth()->user()->id)->with('user_info')->paginate();
     }
 
     public function product(){

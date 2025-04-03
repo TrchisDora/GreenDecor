@@ -20,7 +20,7 @@ class Post extends Model
         return $this->hasOne('App\User','id','added_by');
     }
     public static function getAllPost(){
-        return Post::with(['cat_info','author_info'])->orderBy('id','DESC');
+        return Post::with(['cat_info','author_info'])->orderBy('id','DESC')->paginate();
     }
     // public function get_comments(){
     //     return $this->hasMany('App\Models\PostComment','post_id','id');
