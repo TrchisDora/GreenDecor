@@ -13,7 +13,7 @@
                     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <h6 class="m-0">Danh sách Đánh Giá</h6>
                         
-                    <a href="#" class="btn btn btn-sm float-right" data-toggle="tooltip"data-placement="bottom" title=""><i class="fas fa-star"></i></a>
+                    <a href="#" class="btn btn btn-sm float-right" data-toggle="tooltip"data-placement="bottom" title=""><i class="fas fa-star" style="color:#55AC49;"></i></a>
                     </div>
                 </div>
             </div>
