@@ -12,7 +12,7 @@ class Category extends Model
         return $this->hasOne('App\Models\Category','id','parent_id');
     }
     public static function getAllCategory(){
-        return  Category::orderBy('id','DESC')->with('parent_info')->paginate(10);
+        return  Category::orderBy('id','DESC')->with('parent_info')->get();
     }
 
     public static function shiftChild($cat_id){
@@ -37,7 +37,7 @@ class Category extends Model
     public static function getProductByCat($slug){
         // dd($slug);
         return Category::with('products')->where('slug',$slug)->first();
-        // return Product::where('cat_id',$id)->where('child_cat_id',null)->paginate(10);
+        // return Product::where('cat_id',$id)->where('child_cat_id',null)->get();
     }
     public static function getProductBySubCat($slug){
         // return $slug;
