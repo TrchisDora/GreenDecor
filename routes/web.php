@@ -124,6 +124,8 @@ Route::group(['prefix'=>'/admin','middleware'=>['auth','admin']],function(){
     Route::resource('/message','MessageController');
     Route::get('/message/five','MessageController@messageFive')->name('messages.five');
 
+    Route::post('/order/bulk-update', 'OrderController@bulkUpdate')->name('order.bulkUpdate');
+
     // Order
     Route::resource('/order','OrderController');
     // Shipping
