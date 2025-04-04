@@ -253,27 +253,6 @@ class OrderController extends Controller
     {
         return view('frontend.pages.order-track');
     }
-
-    // Phương thức cập nhật trạng thái cho nhiều đơn hàng cùng lúc
-    public function bulkUpdate(Request $request)
-    {
-        // Lấy các ID đơn hàng được chọn và trạng thái mới
-        $orderIds = $request->input('order_ids');
-        $status = $request->input('status');
-
-        // Kiểm tra nếu có đơn hàng được chọn và trạng thái hợp lệ
-        if ($orderIds && $status) {
-            // Cập nhật trạng thái cho các đơn hàng đã chọn
-            Order::whereIn('id', $orderIds)->update(['status' => $status]);
-
-            // Trả về thông báo thành công
-            return redirect()->route('order.index')->with('success', 'Cập nhật trạng thái thành công!');
-        }
-
-        // Trả về thông báo lỗi nếu không có đơn hàng hoặc trạng thái không hợp lệ
-        return redirect()->route('order.index')->with('error', 'Không có đơn hàng được chọn hoặc trạng thái không hợp lệ.');
-    }
-
     public function productTrackOrder(Request $request)
     {
         $order = Order::where('user_id', auth()->user()->id)
