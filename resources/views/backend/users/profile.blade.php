@@ -33,25 +33,29 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="card">
-                                    <div class="image">
-                                        @if($profile->photo)
-                                            <img class="card-img-top img-fluid rounded-circle mt-4 zoom"
-                                                style="border-radius:50%;height:80px;width:80px;margin:auto;"
-                                                src="{{ $profile->photo }}" alt="profile picture">
-                                        @else
-                                            <img class="card-img-top img-fluid rounded-circle mt-4"
-                                                style="border-radius:50%;height:80px;width:80px;margin:auto;"
-                                                src="{{ asset('backend/img/avatar.png') }}" alt="profile picture">
-                                        @endif
-                                    </div>
-                                    <div class="card-body mt-4 ml-2">
-                                        <h5 class="card-title text-left"><small><i class="fas fa-user"></i>
-                                                {{ $profile->name }}</small></h5>
-                                        <p class="card-text text-left"><small><i class="fas fa-envelope"></i>
-                                                {{ $profile->email }}</small></p>
-                                        <p class="card-text text-left"><small class="text-muted"><i
-                                                    class="fas fa-hammer"></i> {{ $profile->role }}</small></p>
+                                <div class="card shadow-sm rounded-4 border-0 text-center p-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-center">
+                                            @if($profile->photo)
+                                                <img src="{{ $profile->photo }}" alt="profile picture"
+                                                    class="rounded-circle shadow"
+                                                    style="height: 250px; width: 250px; object-fit: cover;">
+                                            @else
+                                                <img src="{{ asset('backend/img/avatar.png') }}" alt="default profile picture"
+                                                    class="rounded-circle shadow"
+                                                    style="height: 250px; width: 250px; object-fit: cover;">
+                                            @endif
+                                        </div>
+
+                                        <h5 class="mt-3 mb-2">
+                                            <i class="fas fa-user me-1 text-primary"></i> {{ $profile->name }}
+                                        </h5>
+                                        <p class="mb-2">
+                                            <i class="fas fa-envelope me-1 text-secondary"></i> {{ $profile->email }}
+                                        </p>
+                                        <p class="text-muted mb-0">
+                                            <i class="fas fa-hammer me-1 text-warning"></i> {{ $profile->role }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -116,8 +120,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
     </div>
 @endsection
 

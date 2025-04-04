@@ -11,7 +11,7 @@
             <div class="card">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h6 class="m-0">Chỉnh sửa Người dùng</h6>
-                    <a href="{{ route('users.index') }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip"
+                    <a href="{{ route('users.index') }}" class="btn btn-danger btn-sm float-right" data-toggle="tooltip"
                         data-placement="bottom" title="Quay lại danh sách người dùng">
                         <i class="fas fa-back"></i> Quay lại
                     </a>
