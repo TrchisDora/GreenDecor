@@ -170,10 +170,21 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order=Order::find($id);
-        // return $order;
-        return view('backend.order.show')->with('order',$order);
+        // Lấy thông tin đơn hàng với ID và các sản phẩm trong giỏ hàng liên quan
+        $order = Order::with('carts')->find($id);
+    
+        // Kiểm tra nếu không có đơn hàng
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found');
+        }
+    
+        return view('backend.order.show')->with('order', $order);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
+
 
     /**
      * Show the form for editing the specified resource.
@@ -280,15 +291,19 @@ class OrderController extends Controller
         }
     }
 
-    // PDF generate
     public function pdf(Request $request){
-        $order=Order::getAllOrder($request->id);
-        // return $order;
-        $file_name=$order->order_number.'-'.$order->first_name.'.pdf';
-        // return $file_name;
-        $pdf=PDF::loadview('backend.order.pdf',compact('order'));
+        $order = Order::getAllOrder($request->id);
+        $file_name = $order->order_number . '-' . $order->first_name . '.pdf';
+    
+        $pdf = PDF::loadView('backend.order.pdf', compact('order'));
+    
+        // ➕ Cấu hình khổ giấy kiểu máy in hóa đơn (ví dụ khổ 58mm x chiều dài tùy)
+        $pdf->setPaper([0, 0, 226.77, 1000], 'portrait'); 
+        // 226.77 = 80mm, bạn có thể đổi thành 164.41 nếu là 58mm
+    
         return $pdf->download($file_name);
     }
+    
     // Income chart
     public function incomeChart(Request $request){
         $year=\Carbon\Carbon::now()->year;

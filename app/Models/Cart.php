@@ -18,7 +18,9 @@ class Cart extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
-    public function order(){
-        return $this->belongsTo(Order::class,'order_id');
-    }
+     // Mối quan hệ với bảng Order (Cart thuộc một Order)
+     public function order()
+     {
+         return $this->belongsTo(Order::class, 'order_id', 'id');
+     }
 }

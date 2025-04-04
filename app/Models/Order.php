@@ -47,6 +47,11 @@ class Order extends Model
         $data = Order::where('status', 'cancel')->count();
         return $data;
     }
+     // Mối quan hệ với bảng Cart (Order có nhiều Cart)
+     public function carts()
+     {
+         return $this->hasMany(Cart::class, 'order_id', 'id');
+     }
     
 
 }
