@@ -204,27 +204,50 @@ class OrderController extends Controller
     public function update(Request $request, $id)
     {
         $order = Order::find($id);
+    
+        // Kiểm tra nếu không tìm thấy đơn hàng
+        if (!$order) {
+            request()->session()->flash('error', 'Đơn hàng không tồn tại.');
+            return redirect()->route('order.index');
+        }
+    
+        // Validate dữ liệu từ form
         $this->validate($request, [
             'status' => 'required|in:new,process,shipping,delivered,cancel_requested,cancelled,failed_delivery,out_of_stock,store_payment'
         ]);
+    
+        // Lấy tất cả dữ liệu từ request
         $data = $request->all();
-        // return $request->status;
+    
+        // Kiểm tra trạng thái và cập nhật sản phẩm trong kho khi trạng thái là 'delivered'
         if ($request->status == 'delivered') {
             foreach ($order->cart as $cart) {
                 $product = $cart->product;
-                // return $product;
+                // Giảm số lượng sản phẩm trong kho theo số lượng đã bán
                 $product->stock -= $cart->quantity;
                 $product->save();
             }
+    
+            // Cập nhật payment_status thành 'paid' khi giao hàng thành công
+            $order->payment_status = 'paid';
         }
-        $status = $order->fill($data)->save();
+    
+        // Cập nhật trạng thái đơn hàng
+        $order->status = $request->status;
+    
+        // Lưu lại thông tin đơn hàng
+        $status = $order->save();
+    
+        // Thông báo kết quả và quay lại trang danh sách đơn hàng
         if ($status) {
-            request()->session()->flash('success', 'Successfully updated order');
+            request()->session()->flash('success', 'Cập nhật đơn hàng thành công');
         } else {
-            request()->session()->flash('error', 'Error while updating order');
+            request()->session()->flash('error', 'Đã có lỗi khi cập nhật đơn hàng');
         }
+    
         return redirect()->route('order.index');
     }
+    
 
     /**
      * Remove the specified resource from storage.
@@ -253,61 +276,56 @@ class OrderController extends Controller
     {
         return view('frontend.pages.order-track');
     }
+    
     public function productTrackOrder(Request $request)
     {
         $order = Order::where('user_id', auth()->user()->id)
-            ->where('order_number', $request->order_number)
-            ->first();
-
+                      ->where('order_number', $request->order_number)
+                      ->first();
+    
         if (!$order) {
-            request()->session()->flash('error', 'Mã đơn hàng không hợp lệ. Vui lòng thử lại!');
+            session()->flash('error', 'Mã đơn hàng không hợp lệ. Vui lòng thử lại!');
             return back();
         }
-
-        // Kiểm tra nếu trạng thái đã là kết thúc, không cho phép thay đổi
-        if (in_array($order->status, ['delivered', 'store_payment', 'cancelled', 'failed_delivery', 'out_of_stock'])) {
-            request()->session()->flash('error', 'Đơn hàng đã ở trạng thái kết thúc và không thể thay đổi nữa.');
+    
+        $validStatuses = ['new', 'process', 'shipping', 'delivered', 'cancel_requested', 'cancelled', 'failed_delivery', 'out_of_stock', 'store_payment'];
+        $status = $request->input('status');
+    
+        if (!in_array($status, $validStatuses)) {
+            session()->flash('error', 'Trạng thái không hợp lệ.');
             return back();
         }
-
-        // Logic chuyển trạng thái
-        if ($order->status == 'new') {
-            // Trạng thái mới, chỉ có thể chuyển thành "Đã xử lý đơn hàng" hoặc "Hết hàng"
-            $statusMessage = 'Trạng thái đơn hàng: Chờ xử lý đơn hàng. Bạn có thể chuyển sang "Đã xử lý đơn hàng" hoặc "Hết hàng".';
-        } elseif ($order->status == 'cancel_requested') {
-            // Trạng thái yêu cầu hủy, chỉ có thể chọn "Xác nhận yêu cầu hủy đơn"
-            $statusMessage = 'Trạng thái đơn hàng: Bạn đã yêu cầu hủy đơn hàng. Bạn chỉ có thể chọn "Xác nhận yêu cầu hủy đơn".';
-        } elseif ($order->status == 'process') {
-            // Đã xử lý, chỉ có thể chuyển sang "Đang giao hàng"
-            $statusMessage = 'Trạng thái đơn hàng: Đơn hàng đã được xử lý. Bạn có thể chuyển sang "Đang giao hàng".';
-        } elseif ($order->status == 'shipping') {
-            // Đang giao hàng, có thể chuyển sang "Giao hàng thành công" hoặc "Giao hàng thất bại"
-            $statusMessage = 'Trạng thái đơn hàng: Đơn hàng đang giao. Bạn có thể chuyển sang "Giao hàng thành công" hoặc "Giao hàng thất bại".';
-        } elseif ($order->status == 'delivered') {
-            // Giao hàng thành công, kết thúc
-            $statusMessage = 'Trạng thái đơn hàng: Giao hàng thành công. Cảm ơn bạn đã mua hàng!';
-            $order->payment_status = 'paid';  // Đổi payment_status thành "paid"
-            $order->save();
-        } elseif ($order->status == 'failed_delivery') {
-            // Giao hàng thất bại, kết thúc
-            $statusMessage = 'Trạng thái đơn hàng: Giao hàng thất bại.';
-        } elseif ($order->status == 'out_of_stock') {
-            // Hết hàng, kết thúc
-            $statusMessage = 'Trạng thái đơn hàng: Hết hàng.';
-        } elseif ($order->status == 'store_payment') {
-            // Thanh toán tại cửa hàng, kết thúc
-            $statusMessage = 'Trạng thái đơn hàng: Thanh toán tại cửa hàng.';
-            $order->payment_status = 'paid';  // Đổi payment_status thành "paid"
-            $order->save();
-        } elseif ($order->status == 'cancelled') {
-            // Đơn hàng đã hủy, kết thúc
-            $statusMessage = 'Trạng thái đơn hàng: Đơn hàng đã bị hủy.';
+    
+        // Xử lý theo trạng thái hiện tại của đơn hàng
+        $statusChanges = [
+            'new' => ['process', 'out_of_stock'],
+            'cancel_requested' => ['cancel_requested'],
+            'process' => ['shipping'],
+            'shipping' => ['delivered', 'failed_delivery']
+        ];
+    
+        // Kiểm tra trạng thái hợp lệ dựa trên trạng thái hiện tại
+        if (isset($statusChanges[$order->status]) && !in_array($status, $statusChanges[$order->status])) {
+            $errorMessages = [
+                'new' => 'Trạng thái không hợp lệ từ trạng thái "Mới".',
+                'cancel_requested' => 'Chỉ có thể xác nhận yêu cầu hủy đơn.',
+                'process' => 'Trạng thái "Đã xử lý" chỉ có thể chuyển sang "Đang giao hàng".',
+                'shipping' => 'Trạng thái "Đang giao hàng" chỉ có thể chuyển sang "Giao hàng thành công" hoặc "Giao hàng thất bại".'
+            ];
+    
+            session()->flash('error', $errorMessages[$order->status] ?? 'Không thể thay đổi trạng thái nữa.');
+            return back();
         }
-
-        request()->session()->flash('success', $statusMessage);
+    
+        // Cập nhật trạng thái
+        $order->status = $status;
+        $order->save();
+    
+        // Hiển thị thông báo thành công
+        session()->flash('success', 'Trạng thái đơn hàng đã được cập nhật.');
         return redirect()->route('home');
     }
-
+    
 
     public function pdf(Request $request)
     {

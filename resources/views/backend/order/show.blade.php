@@ -13,8 +13,8 @@
       <div class="card">
       <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
         <h6 class="m-0">Thông tin đơn hàng</h6>
-        <a href="{{ route('order.pdf', $order->id) }}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom"
-        title=""><i class="fas fa-download"></i> Xuất PDF</a>
+        <a href="{{ route('order.pdf', $order->id) }}" class="btn btn-primary btn-sm float-right"
+        data-toggle="tooltip" data-placement="bottom" title=""><i class="fas fa-download"></i> Xuất PDF</a>
       </div>
       </div>
     </div>
@@ -47,15 +47,29 @@
         <td>${{ $order->shipping->price }}</td>
         <td>${{ number_format($order->total_amount, 2) }}</td>
         <td>
+        
         @if($order->status == 'new')
-      <span class="badge badge-primary">MỚI</span>
+      <span class="badge badge-primary">Mới</span>
     @elseif($order->status == 'process')
-    <span class="badge badge-warning">ĐANG XỬ LÝ</span>
-  @elseif($order->status == 'delivered')
-  <span class="badge badge-success">ĐÃ GIAO</span>
+    <span class="badge badge-warning">Xác nhận đơn hàng</span>
+  @elseif($order->status == 'shipping')
+  <span class="badge badge-info">Đang giao hàng</span>
+@elseif($order->status == 'delivered')
+  <span class="badge badge-success">Đã giao</span>
+@elseif($order->status == 'cancel_requested')
+  <span class="badge badge-secondary">Yêu cầu hủy đơn hàng</span>
+@elseif($order->status == 'cancelled')
+  <span class="badge badge-danger">Đã hủy</span>
+@elseif($order->status == 'failed_delivery')
+  <span class="badge badge-danger">Giao hàng thất bại</span>
+@elseif($order->status == 'out_of_stock')
+  <span class="badge badge-dark">Hết hàng</span>
+@elseif($order->status == 'store_payment')
+  <span class="badge badge-info">Thanh toán tại cửa hàng</span>
 @else
-  <span class="badge badge-danger">{{ $order->status }}</span>
+  <span class="badge badge-secondary">{{ $order->status }}</span>
 @endif
+       
         </td>
         <td class="d-flex">
         <a href="{{ route('order.edit', $order->id) }}" class="btn btn-sm btn-info me-2" title="Chỉnh sửa">
@@ -175,130 +189,130 @@
   </div>
 
   <div class="container-fluid">
-  <div class="row">
+    <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
       <div class="card">
-        <div class="card-body">
-          
-          <!-- Logo + Header -->
-          <div class="row mt-5 mb-3">
-            <div class="col-md-12 text-center">
-              @php
-                $settings = DB::table('settings')->get();
-              @endphp
-              @foreach($settings as $data)
-                <img src="{{ $data->logo }}" alt="logo" width="150" height="150">
-              @endforeach
-              <h2 class="display-4 font-weight-bold">GREEN STORE</h2>
-              <h4 class="h3 text-muted">CHI TIẾT ĐƠN HÀNG</h4>
-            </div>
-          </div>
+      <div class="card-body">
 
-          <!-- Thông tin đơn hàng & khách hàng -->
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <h5 class="mb-3">Thông tin đơn hàng</h5>
-              <p><strong>Mã đơn hàng:</strong> {{ $order->order_number }}</p>
-              <p><strong>Ngày đặt hàng:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
-              <p><strong>Phương thức thanh toán:</strong> 
-                @if($order->payment_method == 'cod') Thanh toán khi nhận hàng
-                @elseif($order->payment_method == 'paypal') PayPal
-                @elseif($order->payment_method == 'cardpay') Thẻ tín dụng
-                @endif
-              </p>
-              <p><strong>Trạng thái thanh toán:</strong>
-                @if($order->payment_status == 'paid') Đã thanh toán
-                @elseif($order->payment_status == 'unpaid') Chưa thanh toán
-                @else {{ $order->payment_status }}
-                @endif
-              </p>
-            </div>
-
-            @if($order->user)
-              <div class="col-md-6">
-                <h5 class="mb-3">Thông tin khách hàng</h5>
-                <p><strong>Họ và tên:</strong> 
-                  <span style="text-transform: capitalize;">{{ $order->user->name }}</span>
-                </p>
-                <p><strong>Email:</strong> 
-                  <span style="text-transform: lowercase;">{{ $order->user->email }}</span>
-                </p>
-                <p><strong>SĐT:</strong> {{ $order->user->phone ?? 'Chưa có' }}</p>
-              </div>
-            @endif
-          </div>
-
-          <!-- Thông tin giao hàng -->
-          <div class="row mb-3">
-            <div class="col-md-12">
-              <div class="border p-4 rounded shadow-sm badge-light">
-                <h5 class="mb-3">Thông tin giao hàng</h5>
-                <p><strong>Họ và tên:</strong> {{ $order->first_name }} {{ $order->last_name }}</p>
-                <p><strong>SĐT:</strong> {{ $order->phone }}</p>
-                <p><strong>Địa chỉ:</strong> {{ $order->address1 }}, {{ $order->address2 }}</p>
-                <p><strong>Quốc gia:</strong> {{ $order->country }}</p>
-                <p><strong>Mã bưu điện:</strong> {{ $order->post_code }}</p>
-                <p><strong>Phí vận chuyển:</strong> ${{ $order->shipping->price }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Danh sách sản phẩm -->
-          <div class="row mb-3">
-            <div class="col-md-12">
-              <div class="table-responsive">
-                <h5 class="mb-3">Sản phẩm trong đơn</h5>
-                <table class="table table-bordered table-striped">
-                  <thead class="thead-dark">
-                    <tr>
-                      <th>Tên sản phẩm</th>
-                      <th>Số lượng</th>
-                      <th>Giá</th>
-                      <th>Tổng</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach($order->carts as $cart)
-                      <tr>
-                        <td>{{ $cart->product->title }}</td>
-                        <td>{{ $cart->quantity }}</td>
-                        <td>${{ number_format($cart->price, 0, ',', '.') }}</td>
-                        <td>${{ number_format($cart->amount, 0, ',', '.') }}</td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tổng hóa đơn -->
-          <div class="row mb-4">
-            <div class="col-md-12 d-flex justify-content-between align-items-center">
-              <div>
-                <h4 class="font-weight-bold">Tổng hóa đơn: ${{ number_format($order->total_amount, 0, ',', '.') }}</h4>
-                <em style="color: #555;">(Tổng hóa đơn bao gồm phí vận chuyển)</em>
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div class="row pt-4 border-top badge-light">
-            <div class="col-md-12 text-center">
-              <h5>Green Store cam kết chịu trách nhiệm từ việc lập đơn, đóng gói đến vận chuyển hàng hóa.</h5>
-              <p class="text-muted">
-                Liên hệ qua số điện thoại: <strong>0788781116</strong> hoặc địa chỉ: 
-                <strong>12 Lương Định Của, TP. Cần Thơ</strong>
-              </p>
-              <small class="text-muted">&copy; {{ date('Y') }} Green Store. All Rights Reserved.</small>
-            </div>
-          </div>
-
+        <!-- Logo + Header -->
+        <div class="row mt-5 mb-3">
+        <div class="col-md-12 text-center">
+          @php
+        $settings = DB::table('settings')->get();
+      @endphp
+          @foreach($settings as $data)
+        <img src="{{ $data->logo }}" alt="logo" width="150" height="150">
+      @endforeach
+          <h2 class="display-4 font-weight-bold">GREEN STORE</h2>
+          <h4 class="h3 text-muted">CHI TIẾT ĐƠN HÀNG</h4>
         </div>
+        </div>
+
+        <!-- Thông tin đơn hàng & khách hàng -->
+        <div class="row mb-3">
+        <div class="col-md-6">
+          <h5 class="mb-3">Thông tin đơn hàng</h5>
+          <p><strong>Mã đơn hàng:</strong> {{ $order->order_number }}</p>
+          <p><strong>Ngày đặt hàng:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
+          <p><strong>Phương thức thanh toán:</strong>
+          @if($order->payment_method == 'cod') Thanh toán khi nhận hàng
+      @elseif($order->payment_method == 'paypal') PayPal
+    @elseif($order->payment_method == 'cardpay') Thẻ tín dụng
+    @endif
+          </p>
+          <p><strong>Trạng thái thanh toán:</strong>
+          @if($order->payment_status == 'paid') Đã thanh toán
+      @elseif($order->payment_status == 'unpaid') Chưa thanh toán
+    @else {{ $order->payment_status }}
+    @endif
+          </p>
+        </div>
+
+        @if($order->user)
+      <div class="col-md-6">
+        <h5 class="mb-3">Thông tin khách hàng</h5>
+        <p><strong>Họ và tên:</strong>
+        <span style="text-transform: capitalize;">{{ $order->user->name }}</span>
+        </p>
+        <p><strong>Email:</strong>
+        <span style="text-transform: lowercase;">{{ $order->user->email }}</span>
+        </p>
+        <p><strong>SĐT:</strong> {{ $order->user->phone ?? 'Chưa có' }}</p>
+      </div>
+    @endif
+        </div>
+
+        <!-- Thông tin giao hàng -->
+        <div class="row mb-3">
+        <div class="col-md-12">
+          <div class="border p-4 rounded shadow-sm badge-light">
+          <h5 class="mb-3">Thông tin giao hàng</h5>
+          <p><strong>Họ và tên:</strong> {{ $order->first_name }} {{ $order->last_name }}</p>
+          <p><strong>SĐT:</strong> {{ $order->phone }}</p>
+          <p><strong>Địa chỉ:</strong> {{ $order->address1 }}, {{ $order->address2 }}</p>
+          <p><strong>Quốc gia:</strong> {{ $order->country }}</p>
+          <p><strong>Mã bưu điện:</strong> {{ $order->post_code }}</p>
+          <p><strong>Phí vận chuyển:</strong> ${{ $order->shipping->price }}</p>
+          </div>
+        </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="row mb-3">
+        <div class="col-md-12">
+          <div class="table-responsive">
+          <h5 class="mb-3">Sản phẩm trong đơn</h5>
+          <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+            <tr>
+              <th>Tên sản phẩm</th>
+              <th>Số lượng</th>
+              <th>Giá</th>
+              <th>Tổng</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($order->carts as $cart)
+        <tr>
+          <td>{{ $cart->product->title }}</td>
+          <td>{{ $cart->quantity }}</td>
+          <td>${{ number_format($cart->price, 0, ',', '.') }}</td>
+          <td>${{ number_format($cart->amount, 0, ',', '.') }}</td>
+        </tr>
+      @endforeach
+            </tbody>
+          </table>
+          </div>
+        </div>
+        </div>
+
+        <!-- Tổng hóa đơn -->
+        <div class="row mb-4">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+          <div>
+          <h4 class="font-weight-bold">Tổng hóa đơn: ${{ number_format($order->total_amount, 0, ',', '.') }}</h4>
+          <em style="color: #555;">(Tổng hóa đơn bao gồm phí vận chuyển)</em>
+          </div>
+        </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="row pt-4 border-top badge-light">
+        <div class="col-md-12 text-center">
+          <h5>Green Store cam kết chịu trách nhiệm từ việc lập đơn, đóng gói đến vận chuyển hàng hóa.</h5>
+          <p class="text-muted">
+          Liên hệ qua số điện thoại: <strong>0788781116</strong> hoặc địa chỉ:
+          <strong>12 Lương Định Của, TP. Cần Thơ</strong>
+          </p>
+          <small class="text-muted">&copy; {{ date('Y') }} Green Store. All Rights Reserved.</small>
+        </div>
+        </div>
+
+      </div>
       </div>
     </div>
+    </div>
   </div>
-</div>
 
 @endsection
 @push('styles')

@@ -53,16 +53,29 @@
                                             <td>$ {{ number_format($shipping_charge, 2) }}</td>
                                             <td>$ {{ number_format($order->total_amount, 2) }}</td>
                                             <td>
-                                                @if($order->status == 'new')
-                                                    <span class="badge badge-primary">Mới</span>
-                                                @elseif($order->status == 'process')
-                                                    <span class="badge badge-warning">Đang xử lý</span>
-                                                @elseif($order->status == 'delivered')
-                                                    <span class="badge badge-success">Đã giao</span>
-                                                @else
-                                                    <span class="badge badge-danger">{{ $order->status }}</span>
-                                                @endif
-                                            </td>
+    @if($order->status == 'new')
+        <span class="badge badge-primary">Mới</span>
+    @elseif($order->status == 'process')
+        <span class="badge badge-warning">Xác nhận đơn hàng</span>
+    @elseif($order->status == 'shipping')
+        <span class="badge badge-info">Đang giao hàng</span>
+    @elseif($order->status == 'delivered')
+        <span class="badge badge-success">Đã giao</span>
+    @elseif($order->status == 'cancel_requested')
+        <span class="badge badge-secondary">Yêu cầu hủy đơn hàng</span>
+    @elseif($order->status == 'cancelled')
+        <span class="badge badge-danger">Đã hủy</span>
+    @elseif($order->status == 'failed_delivery')
+        <span class="badge badge-danger">Giao hàng thất bại</span>
+    @elseif($order->status == 'out_of_stock')
+        <span class="badge badge-dark">Hết hàng</span>
+    @elseif($order->status == 'store_payment')
+        <span class="badge badge-info">Thanh toán tại cửa hàng</span>
+    @else
+        <span class="badge badge-secondary">{{ $order->status }}</span>
+    @endif
+</td>
+
                                             <td>
                                                 <a href="{{ route('order.show', $order->id) }}" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Xem"><i class="fas fa-eye"></i></a>
                                                 <a href="{{ route('order.edit', $order->id) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
