@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Settings;
+use App\Models\Product;
 use App\User;
 use App\Rules\MatchOldPassword;
 use Hash;
@@ -12,20 +13,47 @@ use Spatie\Activitylog\Models\Activity;
 class AdminController extends Controller
 {
     public function index(){
-        $data = User::select(\DB::raw("COUNT(*) as count"), \DB::raw("DAYNAME(created_at) as day_name"), \DB::raw("DAY(created_at) as day"))
-        ->where('created_at', '>', Carbon::today()->subDay(6))
-        ->groupBy('day_name','day')
-        ->orderBy('day')
-        ->get();
-     $array[] = ['Name', 'Number'];
-     foreach($data as $key => $value)
-     {
-       $array[++$key] = [$value->day_name, $value->count];
-     }
-    //  return $data;
-     return view('backend.index')->with('users', json_encode($array));
+        // Code cũ giữ nguyên...
+        $data = User::select(
+                \DB::raw("COUNT(*) as count"),
+                \DB::raw("DAYNAME(created_at) as day_name"),
+                \DB::raw("DAY(created_at) as day")
+            )
+            ->where('created_at', '>', Carbon::today()->subDay(6))
+            ->groupBy('day_name','day')
+            ->orderBy('day')
+            ->get();
+    
+        $array[] = ['Name', 'Number'];
+        foreach($data as $key => $value)
+        {
+            $array[++$key] = [$value->day_name, $value->count];
+        }
+    
+        $statusCounts = [
+            'new' => \App\Models\Order::where('status', 'new')->count(),
+            'processed' => \App\Models\Order::where('status', 'processed')->count(),
+            'shipping' => \App\Models\Order::where('status', 'shipping')->count(),
+            'delivered' => \App\Models\Order::where('status', 'delivered')->count(),
+            'cancel_request' => \App\Models\Order::where('status', 'cancel_request')->count(),
+            'canceled' => \App\Models\Order::where('status', 'canceled')->count(),
+            'failed' => \App\Models\Order::where('status', 'failed')->count(),
+            'out_of_stock' => \App\Models\Order::where('status', 'out_of_stock')->count(),
+            'store_pickup' => \App\Models\Order::where('status', 'store_pickup')->count(),
+        ];
+    
+        // 🔽 Thêm sản phẩm gần hết hàng
+        $products = Product::select('title', 'stock')
+                    ->orderBy('stock', 'asc')
+                    ->take(6)
+                    ->get();
+    
+        return view('backend.index', [
+            'users' => json_encode($array),
+            'statusCounts' => $statusCounts,
+            'products' => $products, // Truyền sang view
+        ]);
     }
-
     public function profile(){
         $profile=Auth()->user();
         // return $profile;
