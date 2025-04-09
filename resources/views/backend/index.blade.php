@@ -244,9 +244,9 @@
       <div class="card-body">
         <div class="row mt-4">
         @foreach ($products as $product)
-      <div class="col-md-4"  style="width:100%px; height:250px;">
+      <div class="col-md-4" style="width:100%px; height:250px;">
         <h6>{{ $product->title }}</h6>
-        <canvas id="chart-{{ $loop->index }}"></canvas>
+        <canvas id="chart-{{ $loop->index }}" style="max-width: 200px; max-height: 200px;"></canvas>
       </div>
     @endforeach
         </div>
@@ -473,42 +473,42 @@
     });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const chartData = @json($products);
+    <script>
+    const chartData = @json($products);
 
-chartData.forEach((product, index) => {
-  const ctx = document.getElementById(`chart-${index}`).getContext('2d');
-  const total = 20;
-  const stock = product.stock;
-  const sold = Math.max(total - stock, 0); // đã bán
+    chartData.forEach((product, index) => {
+      const ctx = document.getElementById(`chart-${index}`).getContext('2d');
+      const total = 20;
+      const stock = product.stock;
+      const sold = Math.max(total - stock, 0); // đã bán
 
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Đã bán', 'Còn lại'],
-      datasets: [{
+      new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Đã bán', 'Còn lại'],
+        datasets: [{
         data: [sold, stock],
         backgroundColor: ['#dc3545', '#28a745'] // đỏ là đã bán, xanh là còn lại
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
         legend: {
           display: false
         },
         tooltip: {
           callbacks: {
-            label: function (context) {
-              return `${context.label}: ${context.raw}`;
-            }
+          label: function (context) {
+            return `${context.label}: ${context.raw}`;
+          }
           }
         }
+        }
       }
-    }
-  });
-});
-</script>
+      });
+    });
+    </script>
 
 
 
