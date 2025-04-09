@@ -49,19 +49,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-12">
-                    <!-- Logo -->
-<div class="logo">
-    @php
-        $settings = DB::table('settings')->get();
-    @endphp                    
-    <a href="{{ route('home') }}">
-        @foreach($settings as $data)
-            <img src="{{ $data->logo }}" alt="logo" width="50" height="50">
-        @endforeach
-    </a>
-</div>
-
-                    <!--/ End Logo -->
                     <!-- Search Form -->
                     <div class="search-top">
                         <div class="top-search"><a href="#0"><i class="ti-search"></i></a></div>

@@ -2,7 +2,51 @@
 @section('title','Ecommerce Laravel || HOME PAGE')
 @section('main-content')
 <!-- Slider Area -->
-@if(count($banners)>0)
+<div class="container-fluid mb-4 mt-4">
+    <div class="row px-xl-5">
+       <!-- Cột trái: Danh mục sản phẩm -->
+<div class="col-lg-3 d-none d-lg-block">
+    <div class="shop-sidebar">
+                                <!-- Single Widget -->
+                                <div class="single-widget category">
+                                    <ul class="categor-list">
+										@php
+											// $category = new Category();
+											$menu=App\Models\Category::getAllParentWithChild();
+										@endphp
+										@if($menu)
+										<li>
+											@foreach($menu as $cat_info)
+													@if($cat_info->child_cat->count()>0)
+														<li><a href="{{route('product-cat',$cat_info->slug)}}">{{$cat_info->title}}</a>
+															<ul>
+																@foreach($cat_info->child_cat as $sub_menu)
+																	<li><a href="{{route('product-sub-cat',[$cat_info->slug,$sub_menu->slug])}}">{{$sub_menu->title}}</a></li>
+																@endforeach
+															</ul>
+														</li>
+													@else
+														<li><a href="{{route('product-cat',$cat_info->slug)}}">{{$cat_info->title}}</a></li>
+													@endif
+											@endforeach
+										</li>
+										@endif
+                                        {{-- @foreach(Helper::productCategoryList('products') as $cat)
+                                            @if($cat->is_parent==1)
+												<li><a href="{{route('product-cat',$cat->slug)}}">{{$cat->title}}</a></li>
+											@endif
+                                        @endforeach --}}
+                                    </ul>
+                                </div>
+                                <!--/ End Single Widget -->
+                              
+                               
+    </div>
+</div>
+
+        <!-- Cột phải: Carousel slider -->
+        <div class="col-lg-9">
+        @if(count($banners)>0)
     <section id="Gslider" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
             @foreach($banners as $key=>$banner)
@@ -32,12 +76,16 @@
         </a>
     </section>
 @endif
+        </div>
+    </div>
+</div>
+
 
 <!--/ End Slider Area -->
 
 <!-- Start Small Banner  -->
 <section class="small-banner section">
-    <div class="container-fluid">
+    <div class="container-fluid mb-4 mt-4">
         <div class="row">
             @php
             $category_lists=DB::table('categories')->where('status','active')->limit(3)->get();
