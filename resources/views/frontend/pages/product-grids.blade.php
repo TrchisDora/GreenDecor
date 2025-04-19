@@ -32,18 +32,18 @@
                             @foreach($menu as $cat_info)
                                 @if($cat_info->child_cat->count() > 0)
                                     <li class="list-group-item">
-                                        <a href="{{ route('product-cat-grids', $cat_info->slug) }}" class="font-weight-bold d-block">{{ $cat_info->title }}</a>
+                                        <a href="{{ route('product-cat', $cat_info->slug) }}" class="font-weight-bold d-block">{{ $cat_info->title }}</a>
                                         <ul class="pl-3 mt-1">
                                             @foreach($cat_info->child_cat as $sub_menu)
                                                 <li>
-                                                    <a href="{{ route('product-sub-cat-grids', [$cat_info->slug, $sub_menu->slug]) }}">{{ $sub_menu->title }}</a>
+                                                    <a href="{{ route('product-sub-cat', [$cat_info->slug, $sub_menu->slug]) }}">{{ $sub_menu->title }}</a>
                                                 </li>
                                             @endforeach
                                         </ul>
                                     </li>
                                 @else
                                     <li class="list-group-item">
-                                        <a href="{{ route('product-cat-grids', $cat_info->slug) }}">{{ $cat_info->title }}</a>
+                                        <a href="{{ route('product-cat', $cat_info->slug) }}">{{ $cat_info->title }}</a>
                                     </li>
                                 @endif
                             @endforeach
