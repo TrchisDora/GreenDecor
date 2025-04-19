@@ -198,42 +198,42 @@
     <!-- Navbar Start -->
     <div class="container-fluid mb-5">
         <div class="row border-top px-xl-5">
-           <div class="col-lg-3 d-none d-lg-block position-relative">
-            <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100"
-            data-toggle="collapse"
-            href="#navbar-vertical"
-            style="height: 65px; margin-top: -1px; padding: 0 30px;">
-                <h6 class="m-0">Danh mục sản phẩm</h6>
-                <i class="fa fa-angle-down text-dark"></i>
-            </a>
-            <nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 position-absolute w-100 bg-white {{ Request::is('/') ? 'show' : '' }}"
-                id="navbar-vertical"
-                style="z-index: 999; top: 100%; left: 0;">
-                <div class="navbar-nav w-100 overflow-hidden" style="height: 410px;">
-                    @php
-                        $categories = App\Models\Category::whereNull('parent_id')->get();
-                    @endphp
-                    @foreach($categories as $category)
-                        <div class="nav-item dropdown d-flex align-items-center justify-content-between">
-                            <a href="{{ route('product-grids-cat', $category->slug) }}" class="nav-link">
-                                {{ $category->title }}
-                            </a>
-                            <a href="#" class="nav-link px-1" data-toggle="dropdown">
-                                        <i class="fa fa-angle-down"></i>
-                                    </a>
-                            <div class="dropdown-menu position-absolute border-0 rounded-0 w-100 m-0">
-                                @foreach($category->child_cat as $sub_category)
-                                    <a href="{{ route('product-grids-sub-cat', [$category->slug, $sub_category->slug]) }}" class="dropdown-item">
-                                        {{ $sub_category->title }}
-                                    </a>
-                                @endforeach
+           <div class="col-lg-3 px-0 d-none d-lg-block position-relative">
+                <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100"
+                data-toggle="collapse"
+                href="#navbar-vertical"
+                style="height: 65px; margin-top: -1px; padding: 0 30px;">
+                    <h6 class="m-0">Danh mục sản phẩm</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+                <nav class="collapse navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 position-absolute w-100 bg-white {{ Request::is('/') ? 'show' : '' }}"
+                    id="navbar-vertical"
+                    style="z-index: 999; top: 100%; left: 0;">
+                    <div class="navbar-nav w-100 overflow-hidden" style="height: 410px;">
+                        @php
+                            $categories = App\Models\Category::whereNull('parent_id')->get();
+                        @endphp
+                        @foreach($categories as $category)
+                            <div class="nav-item dropdown d-flex align-items-center justify-content-between px-4 py-2">
+                                <a href="{{ route('product-grids-cat', $category->slug) }}" class="nav-link">
+                                    {{ $category->title }}
+                                </a>
+                                <a href="#" class="nav-link px-1" data-toggle="dropdown">
+                                            <i class="fa fa-angle-down"></i>
+                                        </a>
+                                <div class="dropdown-menu position-absolute border-0 rounded-0 w-100 m-0">
+                                    @foreach($category->child_cat as $sub_category)
+                                        <a href="{{ route('product-grids-sub-cat', [$category->slug, $sub_category->slug]) }}" class="dropdown-item">
+                                            {{ $sub_category->title }}
+                                        </a>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
 
-                </div>
-            </nav>
-        </div>
+                    </div>
+                </nav>            
+            </div>
             <div class="col-lg-9">
                 <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
                     <div class="logo d-block d-lg-none">
