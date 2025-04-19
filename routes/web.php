@@ -38,7 +38,8 @@ Route::get('product-detail/{slug}','FrontendController@productDetail')->name('pr
 Route::post('/product/search','FrontendController@productSearch')->name('product.search');
 Route::get('/product-cat/{slug}','FrontendController@productCat')->name('product-cat');
 Route::get('/product-sub-cat/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-sub-cat');
-Route::get('/product-brand/{slug}','FrontendController@productBrand')->name('product-brand');
+Route::get('/product-lists/{slug}', 'FrontendController@productBrand')->name('product-lists-brand');
+Route::get('/product-grids/{slug}', 'FrontendController@productBrand')->name('product-grids-brand');
 // Cart section
 Route::get('/add-to-cart/{slug}','CartController@addToCart')->name('add-to-cart')->middleware('user');
 Route::post('/add-to-cart','CartController@singleAddToCart')->name('single-add-to-cart')->middleware('user');
