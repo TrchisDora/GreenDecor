@@ -36,10 +36,10 @@ Route::get('/contact','FrontendController@contact')->name('contact');
 Route::post('/contact/message','MessageController@store')->name('contact.store');
 Route::get('product-detail/{slug}','FrontendController@productDetail')->name('product-detail');
 Route::post('/product/search','FrontendController@productSearch')->name('product.search');
-Route::get('/product-cat/{slug}','FrontendController@productCat')->name('product-cat');
-Route::get('/product-sub-cat/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-sub-cat');
-Route::get('/product-lists/{slug}', 'FrontendController@productBrand')->name('product-lists-brand');
-Route::get('/product-grids/{slug}', 'FrontendController@productBrand')->name('product-grids-brand');
+Route::get('/product-lists/{slug}','FrontendController@productCat')->name('product-lists-cat');
+Route::get('/product-lists/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-lists-sub-cat');
+Route::get('/product-grids/{slug}','FrontendController@productCat')->name('product-grids-cat');
+Route::get('/product-grids/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-grids-sub-cat');
 // Cart section
 Route::get('/add-to-cart/{slug}','CartController@addToCart')->name('add-to-cart')->middleware('user');
 Route::post('/add-to-cart','CartController@singleAddToCart')->name('single-add-to-cart')->middleware('user');
@@ -73,7 +73,6 @@ Route::get('/blog/search','FrontendController@blogSearch')->name('blog.search');
 Route::post('/blog/filter','FrontendController@blogFilter')->name('blog.filter');
 Route::get('blog-cat/{slug}','FrontendController@blogByCategory')->name('blog.category');
 Route::get('blog-tag/{slug}','FrontendController@blogByTag')->name('blog.tag');
-
 // NewsLetter
 Route::post('/subscribe','FrontendController@subscribe')->name('subscribe');
 

@@ -17,9 +17,9 @@
 </div>
 <!-- Page Header End -->
     <!-- Shop Start -->
-    <div class="container-fluid pt-5">
-        <div class="row px-xl-5">
-		<div class="col-lg-2 col-md-4 col-12">
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+		<div class="col-lg-2 col-md-12 col-12">
             <aside class="shop-sidebar">
                 {{-- Categories --}}
                 <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
@@ -31,76 +31,96 @@
                         @if($menu)
                             @foreach($menu as $cat_info)
                                 @if($cat_info->child_cat->count() > 0)
-                                    <li class="list-group-item">
-                                        <a href="{{ route('product-cat', $cat_info->slug) }}" class="font-weight-bold d-block">{{ $cat_info->title }}</a>
+                                    <li class="list-group-item bg-secondary border-0">
+                                        <a href="{{ route('product-lists-cat', $cat_info->slug) }}" class="font-weight-bold d-block">{{ $cat_info->title }}</a>
                                         <ul class="pl-3 mt-1">
                                             @foreach($cat_info->child_cat as $sub_menu)
                                                 <li>
-                                                    <a href="{{ route('product-sub-cat', [$cat_info->slug, $sub_menu->slug]) }}">{{ $sub_menu->title }}</a>
+                                                    <a href="{{ route('product-lists-sub-cat', [$cat_info->slug, $sub_menu->slug]) }}">{{ $sub_menu->title }}</a>
                                                 </li>
                                             @endforeach
                                         </ul>
                                     </li>
                                 @else
-                                    <li class="list-group-item">
-                                        <a href="{{ route('product-cat', $cat_info->slug) }}">{{ $cat_info->title }}</a>
+                                    <li class="list-group-item bg-secondary border-0">
+                                        <a href="{{ route('product-lists-cat', $cat_info->slug) }}">{{ $cat_info->title }}</a>
                                     </li>
                                 @endif
                             @endforeach
                         @endif
                     </ul>
                 </div>
-
-            <!-- Shop by Price -->
-        <div class="card mb-4 shadow-sm border-0 rounded-lg bg-light text-dark">
-            <div class="card-header bg-primary text-white font-weight-bold rounded-top">
-                <i class="fa fa-dollar-sign"></i> Lọc theo giá
-            </div>
-            <div class="card-body">
-                <form method="GET" action="{{ route('shop.filter') }}">
-                    @php
-                        $selected = request()->get('price');
-                    @endphp
-
-                    <div class="custom-control custom-radio mb-2">
-                        <input type="radio" class="custom-control-input" id="price_all" name="price_range" value="" {{ empty($selected) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="price_all">Tất cả</label>
+                {{-- Brands --}}
+                <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fa fa-tags"></i> Brands
                     </div>
+                    <ul class="list-group list-group-flush">
+                        @php
+                            $brands = DB::table('brands')->where('status', 'active')->orderBy('title')->get();
+                            $currentBrands = request()->has('brand') ? explode(',', request()->brand) : [];
+                            $currentQuery = request()->except('brand');
+                        @endphp
+                        @foreach($brands as $brand)
+                            @php
+                                $updatedBrands = $currentBrands;
+                                if (in_array($brand->slug, $currentBrands)) {
+                                    $updatedBrands = array_diff($currentBrands, [$brand->slug]); 
+                                } else {
+                                    $updatedBrands[] = $brand->slug;
+                                }
 
-                    <div class="custom-control custom-radio mb-2">
-                        <input type="radio" class="custom-control-input" id="price_1" name="price_range" value="0-1000000" {{ $selected == '0-1000000' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="price_1">0 - 1 triệu</label>
-                    </div>
-
-                    <div class="custom-control custom-radio mb-2">
-                        <input type="radio" class="custom-control-input" id="price_2" name="price_range" value="1000000-3000000" {{ $selected == '1000000-3000000' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="price_2">1 - 3 triệu</label>
-                    </div>
-
-                    <div class="custom-control custom-radio mb-2">
-                        <input type="radio" class="custom-control-input" id="price_3" name="price_range" value="3000000-5000000" {{ $selected == '3000000-5000000' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="price_3">3 - 5 triệu</label>
-                    </div>
-
-                    <div class="custom-control custom-radio mb-2">
-                        <input type="radio" class="custom-control-input" id="price_4" name="price_range" value="5000000-10000000" {{ $selected == '5000000-10000000' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="price_4">5 - 10 triệu</label>
-                    </div>
-
-                    <div class="custom-control custom-radio mb-2">
-                        <input type="radio" class="custom-control-input" id="price_5" name="price_range" value="10000000-999999999" {{ $selected == '10000000-999999999' ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="price_5">Trên 10 triệu</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-success btn-block mt-3">Lọc</button>
-                </form>
-            </div>
-        </div>
-        <!-- End Shop by Price -->
-
-
-                {{-- Recently Added --}}
+                                // Chỉ thêm brand vào mà không thay đổi thứ tự
+                                $query = array_merge($currentQuery, ['brand' => implode(',', $updatedBrands)]);
+                            @endphp
+                            <li class="list-group-item bg-secondary border-0">
+                                <a href="{{ url()->current() . '?' . http_build_query($query) }}"
+                                    class="{{ in_array($brand->slug, $currentBrands) ? 'font-weight-bold text-info' : '' }}">
+                                    {{ $brand->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                {{-- Price --}}
                 <div class="card mb-4 shadow-sm border-0" style="border-radius: 20px;">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fa fa-tags"></i> Price
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @php
+                            // Lấy các mức giá lọc
+                            $priceRanges = [
+                                '0-100' => 'Under $100',
+                                '100-500' => '$100 - $500',
+                                '500-1000' => '$500 - $1000',
+                                '1000-5000' => '$1000 - $5000',
+                                '5000-10000' => '$5000 - $10000',
+                                '10000' => 'Above $10000'
+                            ];
+                            // Lấy mức giá hiện tại từ URL
+                            $currentPrice = request()->has('price') ? request()->price : null;
+                            $currentQuery = request()->except('price');
+                        @endphp
+
+                        @foreach($priceRanges as $range => $label)
+                            @php
+                                // Lấy phạm vi giá để lọc
+                                $priceFilter = $currentPrice == $range ? null : $range;
+                                // Cập nhật URL query string
+                                $query = array_merge($currentQuery, ['price' => $priceFilter]);
+                            @endphp
+                            <li class="list-group-item bg-secondary border-0">
+                                <a href="{{ url()->current() . '?' . http_build_query($query) }}"
+                                class="{{ $currentPrice == $range ? 'font-weight-bold text-info' : '' }}">
+                                    {{ $label }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                {{-- Recently Added --}}
+                <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
                     <div class="card-header bg-primary text-white font-weight-bold">
                         <i class="fa fa-clock"></i> Recently Added
                     </div>
@@ -123,67 +143,54 @@
                         @endforeach
                     </div>
                 </div>
-
-                {{-- Brands --}}
-                <div class="card mb-4 shadow-sm border-0 " style="border-radius: 20px;">
-                    <div class="card-header bg-primary text-white font-weight-bold">
-                        <i class="fa fa-tags"></i> Brands
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        @php
-                            $brands = DB::table('brands')->where('status', 'active')->orderBy('title')->get();
-                        @endphp
-                        @foreach($brands as $brand)
-                            <li class="list-group-item bg-secondary border-0">
-                                <a href="{{ route('product-grids-brand', $brand->slug) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}">
-                                    {{ $brand->title }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
             </aside>
         </div>
-			<div class="col-lg-10 col-md-8 col-12">
-                <form method="GET" action="{{ url()->current() }}">
-                    <div class="row mb-4">
-                        <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
-                            <div class="form-inline mb-2 mb-md-0">
-                                <label class="mr-2">Hiển thị:</label>
-                                <select class="form-control form-control-sm mr-3" name="show" onchange="this.form.submit();">
-                                    <option value="">Mặc định</option>
-                                    <option value="9" {{ request('show') == '9' ? 'selected' : '' }}>09</option>
-                                    <option value="15" {{ request('show') == '15' ? 'selected' : '' }}>15</option>
-                                    <option value="21" {{ request('show') == '21' ? 'selected' : '' }}>21</option>
-                                    <option value="30" {{ request('show') == '30' ? 'selected' : '' }}>30</option>
-                                </select>
+		<div class="col-lg-10 col-md-12 col-12">
+            <form method="GET" action="{{ url()->current() }}">
+                <div class="row mb-4">
+                    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
+                        <div class="form-inline mb-2 mb-md-0">
+                            <label class="mr-2">Hiển thị:</label>
+                            <select class="form-control form-control-sm mr-3" name="show" onchange="this.form.submit();">
+                                <option value="">Mặc định</option>
+                                <option value="9" {{ request('show') == '9' ? 'selected' : '' }}>09</option>
+                                <option value="15" {{ request('show') == '15' ? 'selected' : '' }}>15</option>
+                                <option value="21" {{ request('show') == '21' ? 'selected' : '' }}>21</option>
+                                <option value="30" {{ request('show') == '30' ? 'selected' : '' }}>30</option>
+                            </select>
 
-                                <label class="mr-2">Sắp xếp theo:</label>
-                                <select class="form-control form-control-sm" name="sortBy" onchange="this.form.submit();">
-                                    <option value="">Mặc định</option>
-                                    <option value="title" {{ request('sortBy') == 'title' ? 'selected' : '' }}>Tên</option>
-                                    <option value="price" {{ request('sortBy') == 'price' ? 'selected' : '' }}>Giá</option>
-                                    <option value="category" {{ request('sortBy') == 'category' ? 'selected' : '' }}>Danh mục</option>
-                                    <option value="brand" {{ request('sortBy') == 'brand' ? 'selected' : '' }}>Thương hiệu</option>
-                                </select>
-                            </div>
-
-                            <ul class="nav">
-                                <li class="nav-item">
-                                    <a href="javascript:void(0)" class="nav-link">
-                                        <i class="fa fa-th-large"></i>
-                                    </a>
-                                </li>
-                                <li class="nav-item active">
-                                    <a href="{{ route('product-lists') }}" class="nav-link">
-                                        <i class="fa fa-th-list"></i>
-                                    </a>
-                                </li>
-                            </ul>
+                            <label class="mr-2">Sắp xếp theo:</label>
+                            <select class="form-control form-control-sm" name="sortBy" onchange="this.form.submit();">
+                                <option value="">Mặc định</option>
+                                <option value="title" {{ request('sortBy') == 'title' ? 'selected' : '' }}>Tên</option>
+                                <option value="price" {{ request('sortBy') == 'price' ? 'selected' : '' }}>Giá</option>
+                                <option value="category" {{ request('sortBy') == 'category' ? 'selected' : '' }}>Danh mục</option>
+                                <option value="brand" {{ request('sortBy') == 'brand' ? 'selected' : '' }}>Thương hiệu</option>
+                            </select>
                         </div>
+                        @php
+                            $currentPath = request()->path();
+                            $gridPath = str_replace('product-grids', 'product-lists', $currentPath);
+                            $fullGridUrl = url($gridPath) . '?' . http_build_query(request()->query());
+                        @endphp
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a href="javascript:void(0)" class="nav-link">
+                                    <i class="fa fa-th-large"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item active">
+                                <a href="{{ $fullGridUrl }}" class="nav-link">
+                                    <i class="fa fa-th-list"></i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
+                </div>
+                <!-- Thêm các tham số khác vào form để giữ lại chúng -->
+                <input type="hidden" name="brand" value="{{ request('brand') }}">
+                <button type="submit" style="display: none;"></button>
                 </form>
-
                 <div class="row">
                 @if(count($products))
                     @foreach($products as $product)
@@ -243,22 +250,18 @@
                     @endforeach
                 @else
                     <div class="col-12 text-center">
-                        <h4 class="text-danger my-5">Rất tiếc, không tìm thấy sản phẩm nào phù hợp.</h4>
+                     <h4 class="text-danger my-5">Rất tiếc, không tìm thấy sản phẩm nào phù hợp.</h4>
                     </div>
                 @endif
             </div>
-
-
-<div class="row mt-4">
-    <div class="col-md-12 d-flex justify-content-center">
-        {{-- {{ $products->appends($_GET)->links() }} --}}
-    </div>
-</div>
-
-
+            <div class="row mt-4">
+                <div class="col-md-12 d-flex justify-content-center">
+                    {{-- {{ $products->appends($_GET)->links() }} --}}
+            </div>
         </div>
     </div>
-    <!-- Shop End -->
+</div>
+<!-- Shop End -->
 <!-- Phần modal tách riêng sau danh sách sản phẩm -->
 @foreach($products as $product)
     <!-- Quick View Modal -->

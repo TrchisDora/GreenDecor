@@ -75,7 +75,6 @@ class FrontendController extends Controller
         if (!empty($_GET['brand'])) {
             $slugs = explode(',', $_GET['brand']);
             $brand_ids = Brand::select('id')->whereIn('slug', $slugs)->pluck('id')->toArray();
-            return $brand_ids;
             $products->whereIn('brand_id', $brand_ids);
         }
         if (!empty($_GET['sortBy'])) {
@@ -159,50 +158,47 @@ class FrontendController extends Controller
     public function productFilter(Request $request)
     {
         $data = $request->all();
-        // return $data;
-        $showURL = "";
+        $queryParams = [];
+    
+        // Xử lý tham số 'show'
         if (!empty($data['show'])) {
-            $showURL .= '&show='.$data['show'];
+            $queryParams['show'] = $data['show'];
         }
-
-        $sortByURL = '';
+    
+        // Xử lý tham số 'sortBy'
         if (!empty($data['sortBy'])) {
-            $sortByURL .= '&sortBy='.$data['sortBy'];
+            $queryParams['sortBy'] = $data['sortBy'];
         }
-
-        $catURL = "";
+    
+        // Xử lý tham số 'category'
         if (!empty($data['category'])) {
-            foreach ($data['category'] as $category) {
-                if (empty($catURL)) {
-                    $catURL .= '&category='.$category;
-                } else {
-                    $catURL .= ','.$category;
-                }
-            }
+            $queryParams['category'] = implode(',', $data['category']);
         }
-
-        $brandURL = "";
+    
+        // Xử lý tham số 'brand'
         if (!empty($data['brand'])) {
-            foreach ($data['brand'] as $brand) {
-                if (empty($brandURL)) {
-                    $brandURL .= '&brand='.$brand;
-                } else {
-                    $brandURL .= ','.$brand;
-                }
-            }
+            $queryParams['brand'] = implode(',', $data['brand']);
         }
-        // return $brandURL;
-
-        $priceRangeURL = "";
+    
+        // ✅ Xử lý tham số 'price_range'
         if (!empty($data['price_range'])) {
-            $priceRangeURL .= '&price='.$data['price_range'];
+            $queryParams['price'] = $data['price_range'];
         }
-        if (request()->is('product-grids/*')) {
-            return redirect()->route('product-grids', $catURL.$brandURL.$priceRangeURL.$showURL.$sortByURL);
-        } else {
-            return redirect()->route('product-lists', $catURL.$brandURL.$priceRangeURL.$showURL.$sortByURL);
-        }
+    
+        // Tạo query string
+        $queryString = http_build_query($queryParams);
+    
+        // ✅ Lấy lại slug cha/con từ URL hiện tại
+        $segments = request()->segments(); // ví dụ: ['product-grids', 'mens-fashion', 'jeans-pants']
+        $baseRoute = $segments[0] ?? 'product-grids'; // đảm bảo không bị lỗi
+    
+        // Gắn route đúng với slug
+        $redirectUrl = url()->to(implode('/', $segments)) . '?' . $queryString;
+    
+        return redirect($redirectUrl);
     }
+    
+    
     public function productSearch(Request $request)
     {
         $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
@@ -215,11 +211,12 @@ class FrontendController extends Controller
                     ->paginate('9');
         return view('frontend.pages.product-grids')->with('products', $products)->with('recent_products', $recent_products);
     }
-    public function productBrand(Request $request)
+ 
+    public function productCat(Request $request)
     {
-        $products = Brand::getProductByBrand($request->slug);
+        $products = Category::getProductByCat($request->slug);
+        // return $request->slug;
         $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
-
         if (request()->is('product-grids/*')) {
             return view('frontend.pages.product-grids')
                 ->with('products', $products->products)
@@ -229,34 +226,24 @@ class FrontendController extends Controller
                 ->with('products', $products->products)
                 ->with('recent_products', $recent_products);
         }
-    }
-    
-    public function productCat(Request $request)
-    {
-        $products = Category::getProductByCat($request->slug);
-        // return $request->slug;
-        $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
-
-        if (request()->is('product-grids/*')) {
-            return view('frontend.pages.product-grids')->with('products', $products->products)->with('recent_products', $recent_products);
-        } else {
-            return view('frontend.pages.product-lists')->with('products', $products->products)->with('recent_products', $recent_products);
-        }
 
     }
     public function productSubCat(Request $request)
     {
         $products = Category::getProductBySubCat($request->sub_slug);
-        // return $products;
         $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
-
+    
         if (request()->is('product-grids/*')) {
-            return view('frontend.pages.product-grids')->with('products', $products->sub_products)->with('recent_products', $recent_products);
+            return view('frontend.pages.product-grids')
+                ->with('products', $products->sub_products)
+                ->with('recent_products', $recent_products);
         } else {
-            return view('frontend.pages.product-lists')->with('products', $products->sub_products)->with('recent_products', $recent_products);
+            return view('frontend.pages.product-lists')
+                ->with('products', $products->sub_products)
+                ->with('recent_products', $recent_products);
         }
-
     }
+        
 
     public function blog()
     {

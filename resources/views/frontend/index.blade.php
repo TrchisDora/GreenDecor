@@ -119,11 +119,11 @@
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 {{ $index >= 8 ? 'extra-category d-none' : '' }}">
                 <div class="cat-item d-flex flex-column border p-3 h-100 rounded-3 text-center">
                 <p class="text-muted mb-1">{{ $childCount }} loại, {{ $productCount }} sản phẩm</p>
-                    <a href="{{ route('product-cat', $cat->slug) }}" class="cat-img mb-3 d-block">
+                    <a href="{{ route('product-grids-cat', $cat->slug) }}" class="cat-img mb-3 d-block">
                         <img src="{{ $cat->photo ?? 'https://via.placeholder.com/600x370' }}" style="width: 100% ; height: 253px; overflow: hidden;" class="img-fluid rounded" alt="{{ $cat->title }}">
                     </a>
                     <h6 class="fw-semibold mb-2">{{ $cat->title }}</h6>
-                    <a href="{{ route('product-cat', $cat->slug) }}" class="btn btn-sm btn-outline-primary mx-auto">Khám phá ngay</a>
+                    <a href="{{ route('product-grids-cat', $cat->slug) }}" class="btn btn-sm btn-outline-primary mx-auto">Khám phá ngay</a>
                 </div>
             </div>
         @endforeach
