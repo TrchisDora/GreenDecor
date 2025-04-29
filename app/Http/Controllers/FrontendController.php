@@ -180,15 +180,13 @@ class FrontendController extends Controller
             $queryParams['brand'] = implode(',', $data['brand']);
         }
     
-        // ✅ Xử lý tham số 'price_range'
         if (!empty($data['price_range'])) {
             $queryParams['price'] = $data['price_range'];
         }
     
         // Tạo query string
         $queryString = http_build_query($queryParams);
-    
-        // ✅ Lấy lại slug cha/con từ URL hiện tại
+        
         $segments = request()->segments(); // ví dụ: ['product-grids', 'mens-fashion', 'jeans-pants']
         $baseRoute = $segments[0] ?? 'product-grids'; // đảm bảo không bị lỗi
     
