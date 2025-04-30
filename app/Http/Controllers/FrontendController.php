@@ -155,6 +155,20 @@ class FrontendController extends Controller
 
         return view('frontend.pages.product-lists')->with('products', $products)->with('recent_products', $recent_products);
     }
+    
+    public function productSearch(Request $request)
+    {
+        $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
+        $products = Product::orwhere('title', 'like', '%'.$request->search.'%')
+                    ->orwhere('slug', 'like', '%'.$request->search.'%')
+                    ->orwhere('description', 'like', '%'.$request->search.'%')
+                    ->orwhere('summary', 'like', '%'.$request->search.'%')
+                    ->orwhere('price', 'like', '%'.$request->search.'%')
+                    ->orderBy('id', 'DESC')
+                    ->paginate('9');
+        return view('frontend.pages.product-grids')->with('products', $products)->with('recent_products', $recent_products);
+    }
+
     public function productFilter(Request $request)
     {
         $data = $request->all();
@@ -195,54 +209,101 @@ class FrontendController extends Controller
     
         return redirect($redirectUrl);
     }
-    
-    
-    public function productSearch(Request $request)
-    {
-        $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
-        $products = Product::orwhere('title', 'like', '%'.$request->search.'%')
-                    ->orwhere('slug', 'like', '%'.$request->search.'%')
-                    ->orwhere('description', 'like', '%'.$request->search.'%')
-                    ->orwhere('summary', 'like', '%'.$request->search.'%')
-                    ->orwhere('price', 'like', '%'.$request->search.'%')
-                    ->orderBy('id', 'DESC')
-                    ->paginate('9');
-        return view('frontend.pages.product-grids')->with('products', $products)->with('recent_products', $recent_products);
-    }
  
     public function productCat(Request $request)
     {
-        $products = Category::getProductByCat($request->slug);
-        // return $request->slug;
-        $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
-        if (request()->is('product-grids/*')) {
-            return view('frontend.pages.product-grids')
-                ->with('products', $products->products)
-                ->with('recent_products', $recent_products);
-        } else {
-            return view('frontend.pages.product-lists')
-                ->with('products', $products->products)
-                ->with('recent_products', $recent_products);
+        $categoryData = Category::getProductByCat($request->slug);
+        $query = $categoryData->products(); // Eloquent query
+    
+        // Xử lý các bộ lọc (giống productFilter)
+        if (!empty($request->sortBy)) {
+            switch ($request->sortBy) {
+                case 'price':
+                    $query->orderBy('price', 'ASC');
+                    break;
+                case 'price-desc':
+                    $query->orderBy('price', 'DESC');
+                    break;
+                case 'title':
+                    $query->orderBy('title', 'ASC');
+                    break;
+            }
         }
-
-    }
-    public function productSubCat(Request $request)
-    {
-        $products = Category::getProductBySubCat($request->sub_slug);
+    
+        if (!empty($request->category)) {
+            $catIds = explode(',', $request->category);
+            $query->whereIn('cat_id', $catIds); // Hoặc 'category_id' nếu đúng cột
+        }
+        if (!empty($request->brand)) {
+            $brandSlugs = explode(',', $request->brand);
+            $brandIds = Brand::whereIn('slug', $brandSlugs)->pluck('id')->toArray();
+            $query->whereIn('brand_id', $brandIds);
+        }
+    
+        if (!empty($request->price)) {
+            $price = explode('-', $request->price);
+            if (count($price) == 2) {
+                $query->whereBetween('price', [$price[0], $price[1]]);
+            }
+        }
+    
+        $products = $query->paginate($request->show ?? 9);
         $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
     
         if (request()->is('product-grids/*')) {
-            return view('frontend.pages.product-grids')
-                ->with('products', $products->sub_products)
-                ->with('recent_products', $recent_products);
+            return view('frontend.pages.product-grids', compact('products', 'recent_products'));
         } else {
-            return view('frontend.pages.product-lists')
-                ->with('products', $products->sub_products)
-                ->with('recent_products', $recent_products);
+            return view('frontend.pages.product-lists', compact('products', 'recent_products'));
         }
     }
-        
-
+    
+    public function productSubCat(Request $request)
+    {
+        $categoryData = Category::getProductBySubCat($request->sub_slug);
+        $query = $categoryData->sub_products(); 
+    
+        // Bộ lọc y hệt như trên
+        if (!empty($request->sortBy)) {
+            switch ($request->sortBy) {
+                case 'price':
+                    $query->orderBy('price', 'ASC');
+                    break;
+                case 'price-desc':
+                    $query->orderBy('price', 'DESC');
+                    break;
+                case 'title':
+                    $query->orderBy('title', 'ASC');
+                    break;
+            }
+        }
+    
+        if (!empty($request->category)) {
+            $catIds = explode(',', $request->category);
+            $query->whereIn('cat_id', $catIds);
+        }
+        if (!empty($request->brand)) {
+            $brandSlugs = explode(',', $request->brand);
+            $brandIds = Brand::whereIn('slug', $brandSlugs)->pluck('id')->toArray();
+            $query->whereIn('brand_id', $brandIds);
+        }
+    
+        if (!empty($request->price)) {
+            $price = explode('-', $request->price);
+            if (count($price) == 2) {
+                $query->whereBetween('price', [$price[0], $price[1]]);
+            }
+        }
+    
+        $products = $query->paginate($request->show ?? 9);
+        $recent_products = Product::where('status', 'active')->orderBy('id', 'DESC')->limit(3)->get();
+    
+        if (request()->is('product-grids/*')) {
+            return view('frontend.pages.product-grids', compact('products', 'recent_products'));
+        } else {
+            return view('frontend.pages.product-lists', compact('products', 'recent_products'));
+        }
+    }
+    
     public function blog()
     {
         $post = Post::query();

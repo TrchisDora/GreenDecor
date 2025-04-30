@@ -107,10 +107,10 @@
                     @csrf
                     <div class="input-group">
                         {{-- Ô tìm kiếm --}}
-                        <input name="search" value="{{ old('search') }}" type="search" class="form-control" placeholder="Search for products">
+                        <input name="search" value="{{ old('search') }}" type="search" class="form-control border-primary" placeholder="Search for products">
                         {{-- Nút tìm kiếm --}}
                         <div class="input-group-append">
-                            <button class="btn btn-outline-primary" type="submit">
+                            <button class="btn btn-success" type="submit">
                                 <i class="fa fa-search"></i>
                             </button>
                         </div>
@@ -123,7 +123,7 @@
                 <div class="btn-group">
                     <a href="{{ route('wishlist') }}" class="btn border position-relative">
                         <i class="fas fa-heart text-primary"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white">
                             {{ Helper::wishlistCount() }}
                         </span>
                     </a>
@@ -159,7 +159,7 @@
                 <div class="btn-group">
                     <a href="{{ route('cart') }}" class="btn border position-relative">
                         <i class="fas fa-shopping-cart text-primary"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white">
                             {{ Helper::cartCount() }}
                         </span>
                     </a>

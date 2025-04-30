@@ -71,7 +71,6 @@
  <!-- JavaScript Libraries -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery CDN -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap Bundle (gồm Popper) -->
-
 <script src="{{ asset('frontend/lib/easing/easing.min.js') }}"></script> <!-- Easing dùng cho hiệu ứng scroll -->
 <script src="{{ asset('frontend/lib/owlcarousel/owl.carousel.min.js') }}"></script> <!-- Owl Carousel -->
 

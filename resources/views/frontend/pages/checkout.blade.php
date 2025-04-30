@@ -4,20 +4,16 @@
 
 @section('main-content')
 
-    <!-- Breadcrumbs -->
-    <div class="breadcrumbs">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="bread-inner">
-                        <ul class="bread-list">
-                            <li><a href="{{route('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-                            <li class="active"><a href="javascript:void(0)">Checkout</a></li>
-                        </ul>
-                    </div>
-                </div>
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">CheckOut</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="{{ route('home') }}" class="text-dark">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">CheckOut</p>
             </div>
-        </div>
+        </div>	
     </div>
     <!-- End Breadcrumbs -->
             

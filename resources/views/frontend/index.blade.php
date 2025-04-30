@@ -231,14 +231,14 @@ $newProducts = DB::table('products')
                             <!-- Text right -->
                             <div class="col-12 col-md-6 d-flex flex-column justify-content-center text-center text-md-start p-4">
                                 <h5 class="text-uppercase text-primary mb-2">{{ $data->cat_info['title'] }}</h5>
-                                <h2 class="mb-3 h4">{{ $data->title }}<br><span class="text-warning">Up to {{ $data->discount }}%</span></h2>
+                                <h2 class="mb-3 text-dark h4">{{ $data->title }}<br><span class="text-warning">Up to {{ $data->discount }}%</span></h2>
                                 <a href="{{ route('product-detail', $data->slug) }}" class="btn btn-outline-primary py-md-2 px-md-3">Shop Now</a>
                             </div>
                         @else
                             <!-- Text left -->
                             <div class="col-12 col-md-6 d-flex flex-column justify-content-center text-center text-md-end p-4 order-2 order-md-1">
                                 <h5 class="text-uppercase text-primary mb-2">{{ $data->cat_info['title'] }}</h5>
-                                <h2 class="mb-3 h4">{{ $data->title }}<br><span class="text-warning">Up to {{ $data->discount }}%</span></h2>
+                                <h2 class="mb-3 text-dark h4">{{ $data->title }}<br><span class="text-warning">Up to {{ $data->discount }}%</span></h2>
                                 <a href="{{ route('product-detail', $data->slug) }}" class="btn btn-outline-primary py-md-2 px-md-3">Shop Now</a>
                             </div>
                             <!-- Image right -->

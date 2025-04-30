@@ -111,42 +111,51 @@ class CartController extends Controller
         return back();       
     }     
 
-    public function cartUpdate(Request $request){
-        // dd($request->all());
-        if($request->quant){
+    public function cartUpdate(Request $request)
+    {
+        if($request->quant) {
             $error = array();
             $success = '';
-            // return $request->quant;
-            foreach ($request->quant as $k=>$quant) {
-                // return $k;
+            $totalAmount = 0; // Thêm biến tính tổng
+            
+            foreach ($request->quant as $k => $quant) {
                 $id = $request->qty_id[$k];
-                // return $id;
                 $cart = Cart::find($id);
-                // return $cart;
+                
                 if($quant > 0 && $cart) {
-                    // return $quant;
-
-                    if($cart->product->stock < $quant){
-                        request()->session()->flash('error','Out of stock');
+                    // Kiểm tra tồn kho
+                    if($cart->product->stock < $quant) {
+                        request()->session()->flash('error', 'Out of stock');
                         return back();
                     }
-                    $cart->quantity = ($cart->product->stock > $quant) ? $quant  : $cart->product->stock;
-                    // return $cart;
                     
-                    if ($cart->product->stock <=0) continue;
-                    $after_price=($cart->product->price-($cart->product->price*$cart->product->discount)/100);
-                    $cart->amount = $after_price * $quant;
-                    // return $cart->price;
+                    // Cập nhật số lượng
+                    $cart->quantity = ($cart->product->stock > $quant) ? $quant : $cart->product->stock;
+                    
+                    if ($cart->product->stock <= 0) continue;
+                    
+                    // Tính toán giá sau giảm giá
+                    $after_price = $cart->product->price - ($cart->product->price * $cart->product->discount/100);
+                    $cart->amount = $after_price * $cart->quantity;
                     $cart->save();
+                    
+                    $totalAmount += $cart->amount; // Cộng dồn vào tổng
                     $success = 'Cart updated successfully!';
-                }else{
+                } else {
                     $error[] = 'Cart Invalid!';
                 }
             }
+            
+            // Cập nhật session tổng tiền
+            $request->session()->put('cart_total', $totalAmount);
+            // Xóa session coupon nếu có
+            session()->forget('coupon');
+            
+            
             return back()->with($error)->with('success', $success);
-        }else{
-            return back()->with('Cart Invalid!');
-        }    
+        }
+        
+        return back()->with('error', 'Cart Invalid!');
     }
 
     // public function addToCart(Request $request){
