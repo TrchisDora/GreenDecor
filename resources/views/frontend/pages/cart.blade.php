@@ -22,6 +22,7 @@
 					<thead class="bg-secondary text-dark">
 						<tr>
 							<th>Product</th>
+							<th>Name</th>
 							<th>Price</th>
 							<th>Quantity</th>
 							<th>Total</th>
@@ -38,9 +39,11 @@
 									@endphp
 									<tr>
 										<td class="align-middle">
-											<img src="{{$photo[0]}}" alt="{{$photo[0]}}" style="width: 50px;">
-											<a href="{{route('product-detail',$cart->product['slug'])}}" target="_blank">{{$cart->product['title']}}</a>
-											<p class="text-muted small">{!!($cart['summary']) !!}</p>
+											<img src="{{$photo[0]}}" alt="{{$photo[0]}}" class="img-fluid rounded" style="max-height: 80px;">
+										</td>
+										<td class="align-middle">
+										<a href="{{route('product-detail',$cart->product['slug'])}}" target="_blank">{{$cart->product['title']}}</a>
+										<p class="text-muted small">{!!($cart['summary']) !!}</p>
 										</td>
 										<td class="align-middle cart_single_price">${{number_format($cart['price'],2)}}</td>
 										<td class="align-middle">
@@ -61,7 +64,7 @@
 								@endforeach
 								<tr>
 									<td colspan="4">
-									<span class="text-danger" style="font-size:15px;">[Lưu ý: Khi cập nhật giỏ hàng thì áp dụng của Mã giảm giá trước đó sẽ biển mất!]</span>
+									<span class="text-danger" style="font-size:15px;">[Lưu ý: Khi cập nhật giỏ hàng thì áp dụng của Mã giảm giá (MGG) trước đó sẽ biển mất!]</span>
 									</td>
 									<td colspan="5" class="text-right">
 										<button class="btn btn-primary" type="submit">Update Cart</button>
@@ -111,11 +114,12 @@
 						@php
 							$total = Helper::totalCartPrice();
 							$discount = session('coupon.value') ?? 0;
+							$total_amount = Helper::totalCartPrice() - $discount;
 						@endphp
 
 						<div class="d-flex justify-content-between">
 							<h6 class="font-weight-bold">Total</h6>
-							<h6 class="font-weight-bold">${{ number_format($total - $discount, 2) }}</h6>
+							<h6 class="font-weight-bold">${{ number_format($total_amount, 2) }}</h6>
 						</div>
 					</div>
 					<div class="card-footer border-secondary bg-transparent">
@@ -163,8 +167,8 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<!-- Featured End -->
+	</div>
+	<!-- Featured End -->
 
 	<!-- Start Shop Newsletter  -->
 	@include('frontend.layouts.newsletter')

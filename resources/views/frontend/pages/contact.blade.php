@@ -3,79 +3,75 @@
 @section('main-content')
 <!-- Page Header Start -->
 <div class="container-fluid bg-secondary mb-5">
-	<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
-		<h1 class="font-weight-semi-bold text-uppercase mb-3">Contact</h1>
-		<div class="d-inline-flex">
-			<p class="m-0"><a href="{{ route('home') }}" class="text-dark">Home</a></p>
-			<p class="m-0 px-2">-</p>
-			<p class="m-0">Contact</p>
-		</div>
-	</div>
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Contact Us</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{{ route('home') }}" class="text-dark">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Contact</p>
+        </div>
+    </div>
 </div>
 <!-- Page Header End -->
 
-<!-- Start Contact -->
-<section id="contact-us" class="contact-us section py-5">
-    <div class="container">
-        <div class="row">
-            <!-- Contact Form -->
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0 p-4">
-                    <div class="mb-4">
-                        @php $settings = DB::table('settings')->get(); @endphp
-                        <h4>Get in touch</h4>
-                        <h5>Write us a message @auth @else <span class="text-danger" style="font-size:12px;">[You need to login first]</span> @endauth</h5>
-                    </div>
-                    <form method="post" action="{{route('contact.store')}}" id="contactForm" class="row g-3 needs-validation" novalidate>
-                        @csrf
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Your Name<span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="subject" class="form-label">Your Subject<span class="text-danger">*</span></label>
-                            <input type="text" name="subject" id="subject" class="form-control" placeholder="Enter Subject" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Your Email<span class="text-danger">*</span></label>
-                            <input type="email" name="email" id="email" class="form-control" placeholder="Enter email address" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="phone" class="form-label">Your Phone<span class="text-danger">*</span></label>
-                            <input type="number" name="phone" id="phone" class="form-control" placeholder="Enter your phone" required>
-                        </div>
-                        <div class="col-12">
-                            <label for="message" class="form-label">Your Message<span class="text-danger">*</span></label>
-                            <textarea name="message" id="message" rows="5" class="form-control" placeholder="Enter Message" required></textarea>
-                        </div>
-                        <div class="col-12 text-end">
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </div>
-                    </form>
+<!-- Contact Start -->
+<div class="container-fluid pt-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title px-5"><span class="px-2">Contact For Any Queries</span></h2>
+    </div>
+    <div class="row px-xl-5">
+        <div class="col-lg-7 mb-5">
+            <div class="contact-form">
+                <div class="mb-4">
+                    <h5>Write us a message @auth @else <span class="text-danger" style="font-size:12px;">[You need to login first]</span> @endauth</h5>
                 </div>
-            </div>
-
-            <!-- Contact Info -->
-            <div class="col-lg-4 mt-5 mt-lg-0">
-                <div class="card border-0 shadow-sm p-4">
-                    <div class="mb-4">
-                        <h5><i class="fa fa-phone me-2 text-primary"></i> Call Us Now:</h5>
-                        <p>@foreach($settings as $data) {{$data->phone}} @endforeach</p>
+                <form method="post" action="{{route('contact.store')}}" id="contactForm" novalidate>
+                    @csrf
+                    <div class="control-group">
+                        <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required="required" />
+                        <p class="help-block text-danger"></p>
                     </div>
-                    <div class="mb-4">
-                        <h5><i class="fa fa-envelope-open me-2 text-primary"></i> Email:</h5>
-                        <p><a href="mailto:info@yourwebsite.com">@foreach($settings as $data) {{$data->email}} @endforeach</a></p>
+                    <div class="control-group">
+                        <input type="email" name="email" class="form-control" id="email" placeholder="Your Email" required="required" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <input type="text" name="subject" class="form-control" id="subject" placeholder="Subject" required="required" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <input type="number" name="phone" class="form-control" id="phone" placeholder="Your Phone" required="required" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <textarea class="form-control" rows="6" name="message" id="message" placeholder="Message" required="required"></textarea>
+                        <p class="help-block text-danger"></p>
                     </div>
                     <div>
-                        <h5><i class="fa fa-location-arrow me-2 text-primary"></i> Our Address:</h5>
-                        <p>@foreach($settings as $data) {{$data->address}} @endforeach</p>
+                        <button class="btn btn-primary py-2 px-4" type="submit">Send Message</button>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-5">
+            @php $settings = DB::table('settings')->get(); @endphp
+            <h5 class="font-weight-semi-bold mb-3">Get In Touch</h5>
+            <div class="d-flex flex-column mb-3">
+                <h5 class="font-weight-semi-bold mb-3">Contact Information</h5>
+                <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>
+                    @foreach($settings as $data) {{$data->phone}} @endforeach
+                </p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>
+                    <a href="mailto:info@yourwebsite.com">@foreach($settings as $data) {{$data->email}} @endforeach</a>
+                </p>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>
+                    @foreach($settings as $data) {{$data->address}} @endforeach
+                </p>
             </div>
         </div>
     </div>
-</section>
-<!-- End Contact -->
+</div>
+<!-- Contact End -->
 
 <!-- Map Section -->
 <div class="map-section">

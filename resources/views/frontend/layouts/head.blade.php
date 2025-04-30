@@ -34,7 +34,7 @@
 <link rel="stylesheet" href="{{asset('frontend/css/slicknav.min.css')}}">
 <!-- Jquery Ui -->
 <link rel="stylesheet" href="{{asset('frontend/css/jquery-ui.css')}}">
-
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <!-- Eshop StyleSheet -->
 <link rel="stylesheet" href="{{asset('frontend/css/style.css')}}">
 <link rel="stylesheet" href="{{asset('frontend/css/responsive.css')}}">

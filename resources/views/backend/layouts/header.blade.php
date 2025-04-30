@@ -54,9 +54,9 @@
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{Auth()->user()->name}}</span>
           @if(Auth()->user()->photo)
-            <img class="img-profile rounded-circle" src="{{Auth()->user()->photo}}">
+              <img class="img-fluid rounded-circle" src="{{ Auth()->user()->photo }}" style="object-fit: cover; width: 50px; height: 50px;" alt="User Photo">
           @else
-            <img class="img-profile rounded-circle" src="{{asset('backend/img/avatar.png')}}">
+              <img class="img-fluid rounded-circle" src="{{ asset('backend/img/avatar.png') }}" style="object-fit: cover; width: 50px; height: 50px;" alt="Default Avatar">
           @endif
         </a>
         <!-- Dropdown - User Information -->

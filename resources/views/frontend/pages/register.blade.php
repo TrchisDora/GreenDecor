@@ -54,7 +54,7 @@
                             @enderror
                         </div>
                         <div class="d-grid gap-2 mb-3">
-                            <button class="btn btn-primary" type="submit">Register</button>
+                            <button class="btn btn-block btn-primary my-3 py-3y" type="submit">Register</button>
                         </div>
                         <div class="text-center">
                             <p>Already have an account? <a href="{{ route('login.form') }}" class="text-primary">Back to Login</a></p>

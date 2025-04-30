@@ -1,119 +1,122 @@
 @extends('frontend.layouts.master')
 @section('title','Wishlist Page')
 @section('main-content')
-	<!-- Breadcrumbs -->
-	<div class="breadcrumbs">
-		<div class="container">
-			<div class="row">
-				<div class="col-12">
-					<div class="bread-inner">
-						<ul class="bread-list">
-							<li><a href="{{('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-							<li class="active"><a href="javascript:void(0);">Wishlist</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- End Breadcrumbs -->
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Wishlist</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="{{ route('home') }}" class="text-dark">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Wishlist</p>
+            </div>
+        </div>	
+    </div>
+    <!-- End Breadcrumbs -->
 			
 	<!-- Shopping Cart -->
-	<div class="shopping-cart section">
-		<div class="container">
-			<div class="row">
-				<div class="col-12">
-					<!-- Shopping Summery -->
-					<table class="table shopping-summery">
-						<thead>
-							<tr class="main-hading">
-								<th>PRODUCT</th>
-								<th>NAME</th>
-								<th class="text-center">TOTAL</th> 
-								<th class="text-center">ADD TO CART</th> 
-								<th class="text-center"><i class="ti-trash remove-icon"></i></th>
+	<div class="container-fluid pt-5">
+		<div class="row px-xl-5">
+			<div class="table-responsive mb-5">
+				<table class="table table-bordered text-center mb-0">
+					<thead class="bg-secondary text-dark">
+						<tr class="main-hading">
+							<th>PRODUCT</th>
+							<th>NAME</th>
+							<th class="text-center">TOTAL</th> 
+							<th class="text-center">ADD TO CART</th> 
+							<th class="text-center"><i class="ti-trash remove-icon"></i></th>
+						</tr>	
+					</thead>
+					<tbody class="align-middle" id="cart_item_list">
+					@if(Helper::getAllProductFromWishlist())
+						@foreach(Helper::getAllProductFromWishlist() as $key => $wishlist)
+							@php 
+								$photo = explode(',', $wishlist->product['photo']);
+							@endphp
+							<tr class="border-bottom">
+								<!-- Hình ảnh sản phẩm -->
+								<td class="text-center" style="width: 100px;">
+									<img src="{{$photo[0]}}" alt="{{$photo[0]}}" class="img-fluid rounded" style="max-height: 80px;">
+								</td>
+
+								<!-- Mô tả sản phẩm -->
+								<td>
+									<h6 class="mb-1">
+										<a href="{{route('product-detail', $wishlist->product['slug'])}}" class="text-dark fw-semibold">
+											{{$wishlist->product['title']}}
+										</a>
+									</h6>
+									<small class="text-muted d-block">{!! $wishlist['summary'] !!}</small>
+								</td>
+
+								<!-- Giá -->
+								<td class="text-nowrap">
+									<span class="fw-bold text-success">${{$wishlist['amount']}}</span>
+								</td>
+
+								<!-- Nút thêm vào giỏ -->
+								<td>
+									<a href="{{route('add-to-cart', $wishlist->product['slug'])}}" class="btn btn-sm btn-primary">
+										<i class="fas fa-cart-plus me-1"></i> Add to Cart
+									</a>
+								</td>
+
+								<!-- Nút xóa -->
+								<td class="text-center">
+									<a href="{{route('wishlist-delete', $wishlist->id)}}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+										<i class="fas fa-trash-alt"></i>
+									</a>
+								</td>
 							</tr>
-						</thead>
-						<tbody>
-							@if(Helper::getAllProductFromWishlist())
-								@foreach(Helper::getAllProductFromWishlist() as $key=>$wishlist)
-									<tr>
-										@php 
-											$photo=explode(',',$wishlist->product['photo']);
-										@endphp
-										<td class="image" data-title="No"><img src="{{$photo[0]}}" alt="{{$photo[0]}}"></td>
-										<td class="product-des" data-title="Description">
-											<p class="product-name"><a href="{{route('product-detail',$wishlist->product['slug'])}}">{{$wishlist->product['title']}}</a></p>
-											<p class="product-des">{!!($wishlist['summary']) !!}</p>
-										</td>
-										<td class="total-amount" data-title="Total"><span>${{$wishlist['amount']}}</span></td>
-										<td><a href="{{route('add-to-cart',$wishlist->product['slug'])}}" class='btn text-white'>Add To Cart</a></td>
-										<td class="action" data-title="Remove"><a href="{{route('wishlist-delete',$wishlist->id)}}"><i class="ti-trash remove-icon"></i></a></td>
-									</tr>
-								@endforeach
-							@else 
-								<tr>
-									<td class="text-center">
-										There are no any wishlist available. <a href="{{route('product-grids')}}" style="color:blue;">Continue shopping</a>
+						@endforeach
+					@else
+						<tr>
+							<td colspan="5" class="text-center">
+								<div class="alert alert-warning py-4 rounded shadow-sm">
+									There are no items in your wishlist. 
+									<a href="{{route('product-grids')}}" class="btn btn-sm btn-outline-success mt-2">Continue Shopping</a>
+								</div>
+							</td>
+						</tr>
+					@endif
+				</tbody>
 
-									</td>
-								</tr>
-							@endif
-
-
-						</tbody>
-					</table>
-					<!--/ End Shopping Summery -->
-				</div>
+				</table>
 			</div>
 		</div>
 	</div>
 	<!--/ End Shopping Cart -->
-			
-	<!-- Start Shop Services Area  -->
-	<section class="shop-services section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-rocket"></i>
-						<h4>Free shiping</h4>
-						<p>Orders over $100</p>
+<!-- Featured Start -->
+<div class="container-fluid pt-5">
+			<div class="row px-xl-5 pb-3">
+				<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+					<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+						<h1 class="fa fa-check text-primary m-0 mr-3"></h1>
+						<h5 class="font-weight-semi-bold m-0">Quality Product</h5>
 					</div>
-					<!-- End Single Service -->
 				</div>
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-reload"></i>
-						<h4>Free Return</h4>
-						<p>Within 30 days returns</p>
+				<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+					<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+						<h1 class="fa fa-shipping-fast text-primary m-0 mr-2"></h1>
+						<h5 class="font-weight-semi-bold m-0">Free Shipping</h5>
 					</div>
-					<!-- End Single Service -->
 				</div>
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-lock"></i>
-						<h4>Sucure Payment</h4>
-						<p>100% secure payment</p>
+				<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+					<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+						<h1 class="fas fa-exchange-alt text-primary m-0 mr-3"></h1>
+						<h5 class="font-weight-semi-bold m-0">14-Day Return</h5>
 					</div>
-					<!-- End Single Service -->
 				</div>
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-tag"></i>
-						<h4>Best Peice</h4>
-						<p>Guaranteed price</p>
+				<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+					<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+						<h1 class="fa fa-phone-volume text-primary m-0 mr-3"></h1>
+						<h5 class="font-weight-semi-bold m-0">24/7 Support</h5>
 					</div>
-					<!-- End Single Service -->
 				</div>
 			</div>
-		</div>
-	</section>
-	<!-- End Shop Newsletter -->
+	</div>
+	<!-- Featured End -->
 	
 	@include('frontend.layouts.newsletter')
 	

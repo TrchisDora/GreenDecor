@@ -51,7 +51,7 @@
                             @endif
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary" type="submit">Login</button>
+                            <button class="btn btn-block btn-primary my-3 py-3" type="submit">Login</button>
                         </div>
                     </form>
                     <div class="text-center mt-3">

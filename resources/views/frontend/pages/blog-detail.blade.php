@@ -190,7 +190,7 @@
 @endsection
 
 @push('styles')
-<script type='text/javascript' src='https://platform-api.sharethis.com/js/sharethis.js#property=5f2e5abf393162001291e431&product=inline-share-buttons' async='async'></script>
+<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=68111f256c4c8c00190bb4e9&product=sticky-share-buttons&source=platform" async="async"></script>
 @endpush
 
 @push('scripts')

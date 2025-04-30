@@ -6,7 +6,7 @@
 
     .logo a {
         font-weight: bold;
-        font-size: 20px;
+        font-size: 45px;
         color: #28a745 !important; /* Màu xanh lá */
         display: flex;
         align-items: center;
@@ -50,15 +50,15 @@
 <header class="header shop">
     <!-- Topbar Start -->
     <div class="container-fluid">
-        <div class="row bg-secondary py-2 px-xl-5">
+    <div class="row py-2 px-xl-5 border-bottom border-secondary">
             <div class="col-lg-6 d-none d-lg-block">
                 <div class="d-inline-flex align-items-center">
                     <!-- Top Left -->
                     <div class="top-left">
                         <ul class="list-unstyled d-flex align-items-center mb-0">
                             @php $settings = DB::table('settings')->get(); @endphp
-                            <li class="me-3 mr-5"><i class="ti-headphone-alt me-1"></i> @foreach($settings as $data) {{$data->phone}} @endforeach</li>
-                            <li><i class="ti-email me-1"></i> @foreach($settings as $data) {{$data->email}} @endforeach</li>
+                            <li class="me-3 mr-5"><i class="fa fa-phone fa-sm fa-fw me-2 text-gray-400"></i> @foreach($settings as $data) {{$data->phone}} @endforeach</li>
+                            <li><i class="fa fa-envelope fa-sm fa-fw me-2 text-gray-400"></i> @foreach($settings as $data) {{$data->email}} @endforeach</li>
                         </ul>
                     </div>
                     <!--/ End Top Left -->
@@ -68,27 +68,46 @@
                 <div class="d-inline-flex align-items-center">
                     <!-- Top Right -->
                     <div class="right-content">
-                        <ul class="list-unstyled d-flex align-items-center justify-content-end mb-0">
-                            @auth
-                                @if(Auth::user()->role=='admin')
-                                    <li class="me-3 ml-5"><i class="fa fa-truck me-1"></i> <a href="{{route('order.track')}}">Track Order</a></li>
-                                    <li class="me-3 ml-5"><i class="ti-user me-1"></i> <a href="{{route('admin')}}" target="_blank">Dashboard</a></li>
-                                @else
-                                    <li class="me-3 ml-5"><i class="fa fa-truck me-1"></i> <a href="{{route('order.track')}}">Track Order</a></li>
-                                    <li class="me-3 ml-5"><i class="ti-user me-1"></i> <a href="{{route('user')}}" target="_blank">Dashboard</a></li>
-                                @endif
-                                <li><i class="ti-power-off me-1 ml-5"></i> <a href="{{route('user.logout')}}">Logout</a></li>
-                            @else
-                                <li><i class="fa fa-sign-in me-1 ml-5"></i><a href="{{route('login.form')}}">Login /</a> <a href="{{route('register.form')}}">Register</a></li>
-                            @endauth
-                        </ul>
+                    <ul class="list-unstyled d-flex align-items-center justify-content-end mb-0">
+                        <li>
+                            <a class="text-dark px-2" href="https://www.facebook.com/TrChisnguyen1807">
+                                <iconify-icon icon="simple-icons:facebook" width="24" height="24"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="text-dark px-2" href="https://www.instagram.com/trchisdora/">
+                                <iconify-icon icon="simple-icons:instagram" width="24" height="24"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="text-dark px-2" href="https://zalo.me/0395517801">
+                                <iconify-icon icon="simple-icons:zalo" width="24" height="24"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="text-dark px-2" href="https://www.youtube.com/@trichinguyen7578">
+                                <iconify-icon icon="simple-icons:youtube" width="24" height="24"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="text-dark px-2" href="https://www.tiktok.com/@thenknge?lang=vi-VN">
+                                <iconify-icon icon="simple-icons:tiktok" width="24" height="24"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="text-dark px-2" href="https://shopee.vn/luatraon_offcial?entryPoint=ShopBySearch&searchKeyword=l%C3%BAa%20tr%C3%A0%20%C3%B4n">
+                                <iconify-icon icon="simple-icons:shopee" width="24" height="24"></iconify-icon>
+                            </a>
+                        </li>
+                    </ul>
                     </div>
                     <!-- End Top Right -->
                 </div>
             </div>
         </div>
     </div>
-        <div class="row align-items-center py-3 px-xl-5">
+    <div class="container-fluid">
+        <div class="row align-items-center py-1 px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
                 <!-- Logo -->
                 <div class="logo">
@@ -96,8 +115,8 @@
                         $settings = DB::table('settings')->get();
                     @endphp                    
                     <a href="{{ route('home') }}">
-                        <img src="@foreach($settings as $data){{ $data->logo }}@endforeach" alt="logo">
-                        GREENDECOR
+                        <img src="@foreach($settings as $data){{ $data->logo }}@endforeach" alt="logo" style="object-fit: cover; width: 80px; height: 80px;" >
+                        GreenDecor
                     </a>
                 </div>
                 <!--/ End Logo -->
@@ -121,7 +140,7 @@
             <div class="col-lg-3 col-6 text-right">
                 <!-- Wishlist -->
                 <div class="btn-group">
-                    <a href="{{ route('wishlist') }}" class="btn border position-relative">
+                    <a href="{{ route('wishlist') }}" class="btn btn-lg position-relative">
                         <i class="fas fa-heart text-primary"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white">
                             {{ Helper::wishlistCount() }}
@@ -134,7 +153,7 @@
                                 @foreach(Helper::getAllProductFromWishlist() as $item)
                                     @php $photo = explode(',', $item->product['photo']); @endphp
                                     <div class="list-group-item d-flex align-items-start">
-                                        <img src="{{ $photo[0] }}" alt="wishlist-img" class="me-2" width="50">
+                                        <img src="{{ $photo[0] }}" alt="wishlist-img" class="me-2 mr-3" width="50">
                                         <div class="flex-fill">
                                             <a href="{{ route('product-detail', $item->product['slug']) }}" class="fw-bold" target="_blank">{{ $item->product['title'] }}</a>
                                             <p class="mb-0">{{ $item->quantity }} × ${{ number_format($item->price, 2) }}</p>
@@ -149,7 +168,7 @@
                                 <span>${{ number_format(Helper::totalWishlistPrice(), 2) }}</span>
                             </div>
                             <div class="text-end mt-2">
-                                <a href="{{ route('cart') }}" class="btn btn-sm btn-outline-primary">Go to Cart</a>
+                                <a href="{{ route('cart') }}" class="btn btn-block btn-primary my-3 py-3">Go to Cart</a>
                             </div>
                         </div>
                     @endauth
@@ -157,13 +176,12 @@
 
                 <!-- Cart -->
                 <div class="btn-group">
-                    <a href="{{ route('cart') }}" class="btn border position-relative">
+                    <a href="{{ route('cart') }}" class="btn btn-lg position-relative">
                         <i class="fas fa-shopping-cart text-primary"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white">
                             {{ Helper::cartCount() }}
                         </span>
                     </a>
-
                     @auth
                         <div class="dropdown-menu p-3" style="min-width: 300px;">
                             <h6 class="dropdown-header">{{ count(Helper::getAllProductFromCart()) }} items in Cart</h6>
@@ -171,7 +189,7 @@
                                 @foreach(Helper::getAllProductFromCart() as $item)
                                     @php $photo = explode(',', $item->product['photo']); @endphp
                                     <div class="list-group-item d-flex align-items-start">
-                                        <img src="{{ $photo[0] }}" alt="cart-img" class="me-2" width="50">
+                                        <img src="{{ $photo[0] }}" alt="cart-img" class="me-2 mr-3" width="50">
                                         <div class="flex-fill">
                                             <a href="{{ route('product-detail', $item->product['slug']) }}" class="fw-bold" target="_blank">{{ $item->product['title'] }}</a>
                                             <p class="mb-0">{{ $item->quantity }} × ${{ number_format($item->price, 2) }}</p>
@@ -186,17 +204,17 @@
                                 <span>${{ number_format(Helper::totalCartPrice(), 2) }}</span>
                             </div>
                             <div class="text-end mt-2">
-                                <a href="{{ route('checkout') }}" class="btn btn-sm btn-outline-success">Checkout</a>
+                                <a href="{{ route('checkout') }}" class="btn btn-block btn-primary my-3 py-3">Checkout</a>
                             </div>
                         </div>
                     @endauth
                 </div>
             </div>
         </div>
-
+    </div>
     <!-- Topbar End -->
     <!-- Navbar Start -->
-    <div class="container-fluid mb-5">
+    <div class="container-fluid">
         <div class="row border-top px-xl-5">
            <div class="col-lg-3 px-0 d-none d-lg-block position-relative">
                 <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100"
@@ -235,41 +253,129 @@
                 </nav>            
             </div>
             <div class="col-lg-9">
-                <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
-                    <div class="logo d-block d-lg-none">
-                        @php
-                            $settings = DB::table('settings')->get();
-                        @endphp                    
-                        <a href="{{ route('home') }}">
-                            <img src="@foreach($settings as $data){{ $data->logo }}@endforeach" alt="logo">
-                            GREENDECOR
-                        </a>
-                    </div>
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                        <div class="navbar-nav mr-auto py-0">
-                            <ul class="nav navbar-nav">
+            <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-3 px-lg-0">
+                    <div class="container-fluid justify-content-between align-items-center">
+                        <!-- Logo + nút toggle (chỉ hiện trên màn hình nhỏ) -->
+                        <div class="d-flexjustify-content-between align-items-center d-lg-none">
+                            <div class="logo">
+                                @php
+                                    $settings = DB::table('settings')->get();
+                                @endphp
+                                <a href="{{ route('home') }}">
+                                    <img src="@foreach($settings as $data){{ $data->logo }}@endforeach" alt="logo" height="30">
+                                    GreenDecor
+                                </a>
+                            </div>
+                        </div>
+                        {{-- Phần bên phải của màn hình nhỏ: toggle + user --}}
+                        <div class="d-flex align-items-center d-lg-none ms-auto">
+                            {{-- Menu user bản mobile --}}
+                            <ul class="list-unstyled d-flex align-items-center mb-0 me-2">
+                            {{-- Toggle menu --}}
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            @auth
+                                    <li class="nav-item dropdown no-arrow">
+                                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown">
+                                            <span class="me-2 text-gray-600 small mr-2">{{ Auth()->user()->name }}</span>
+                                            @if(Auth()->user()->photo)
+                                                <img class="img-fluid rounded-circle" src="{{ Auth()->user()->photo }}" style="object-fit: cover; width: 50px; height: 50px;" alt="User Photo">
+                                            @else
+                                                <img class="img-fluid rounded-circle" src="{{ asset('backend/img/avatar.png') }}" style="object-fit: cover; width: 50px; height: 50px;" alt="Default Avatar">
+                                            @endif  
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                            <a class="dropdown-item" href="{{route('user-profile')}}">
+                                                <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
+                                            </a>
+                                            <a class="dropdown-item" href="{{route('order.track')}}">
+                                                <i class="fa fa-truck fa-sm fa-fw me-2 text-gray-400"></i> Track Order
+                                            </a>
+                                            <a class="dropdown-item" href="{{route('admin')}}" target="_blank">
+                                                <i class="ti-user fa-sm fa-fw me-2 text-gray-400"></i> Dashboard
+                                            </a>
+                                            <a class="dropdown-item" href="{{route('user.change.password.form')}}">
+                                                <i class="fas fa-key fa-sm fa-fw me-2 text-gray-400"></i> Change Password
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="{{ route('logout') }}"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Logout
+                                            </a>
+                                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
+                                        </div>
+                                    </li>
+                                @else
+                                    <li class="ms-3">
+                                        <i class="fa fa-sign-in me-1"></i>
+                                        <a href="{{route('login.form')}}">Login /</a>
+                                        <a href="{{route('register.form')}}">Register</a>
+                                    </li>
+                                @endauth
+                            </ul>
+                        </div>
+                        {{-- Nội dung chính: collapse --}}
+                        <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                            {{-- Menu chính bên trái --}}
+                            <ul class="navbar-nav mr-auto py-0">
                                 <li class="nav-item {{Request::path() == 'home' ? 'active' : ''}}">
                                     <a href="{{route('home')}}" class="nav-link">Home</a>
                                 </li>
-
                                 <li class="nav-item {{Request::path() == 'about-us' ? 'active' : ''}}">
                                     <a href="{{route('about-us')}}" class="nav-link">About Us</a>
                                 </li>
-
                                 <li class="nav-item {{Request::path() == 'product-grids' || Request::path() == 'product-lists' ? 'active' : ''}}">
                                     <a href="{{route('product-grids')}}" class="nav-link">Products</a>
                                 </li>
-
                                 <li class="nav-item {{Request::path() == 'blog' ? 'active' : ''}}">
                                     <a href="{{route('blog')}}" class="nav-link">Blog</a>
                                 </li>
-
                                 <li class="nav-item {{Request::path() == 'contact' ? 'active' : ''}}">
                                     <a href="{{route('contact')}}" class="nav-link">Contact Us</a>
                                 </li>
+                            </ul>
+
+                            {{-- Menu user desktop bên phải --}}
+                            <ul class="list-unstyled d-none d-lg-flex align-items-center mb-0">
+                                @auth
+                                    <li class="nav-item dropdown no-arrow">
+                                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown">
+                                            <span class="me-2 mr-2 text-gray-600 small">{{ Auth()->user()->name }}</span>
+                                            @if(Auth()->user()->photo)
+                                                <img class="img-fluid rounded-circle" src="{{ Auth()->user()->photo }}" style="object-fit: cover; width: 50px; height: 50px;" alt="User Photo">
+                                            @else
+                                                <img class="img-fluid rounded-circle" src="{{ asset('backend/img/avatar.png') }}" style="object-fit: cover; width: 50px; height: 50px;" alt="Default Avatar">
+                                            @endif
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                            <a class="dropdown-item" href="{{route('user-profile')}}">
+                                                <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
+                                            </a>
+                                            <a class="dropdown-item" href="{{route('order.track')}}">
+                                                <i class="fa fa-truck fa-sm fa-fw me-2 text-gray-400"></i> Track Order
+                                            </a>
+                                            <a class="dropdown-item" href="{{route('admin')}}" target="_blank">
+                                                <i class="ti-user fa-sm fa-fw me-2 text-gray-400"></i> Dashboard
+                                            </a>
+                                            <a class="dropdown-item" href="{{route('user.change.password.form')}}">
+                                                <i class="fas fa-key fa-sm fa-fw me-2 text-gray-400"></i> Change Password
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="{{ route('logout') }}"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Logout
+                                            </a>
+                                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
+                                        </div>
+                                    </li>
+                                @else
+                                    <li class="ms-3">
+                                        <i class="fa fa-sign-in me-1"></i>
+                                        <a href="{{route('login.form')}}"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>Login /</a>
+                                        <a href="{{route('register.form')}}">Register</a>
+                                    </li>
+                                @endauth
                             </ul>
                         </div>
                     </div>

@@ -2,7 +2,7 @@
 @section('title','Ecommerce Laravel || HOME PAGE')
 @section('main-content')
 <!-- Slider Area -->
-<div class="container-fluid mb-4 mt-4">
+<div class="container-fluid mb-4">
     <div class="row px-xl-5">
        <!-- Cột trái: Danh mục sản phẩm -->
 <div class="col-lg-3 d-none d-lg-block">
@@ -193,7 +193,7 @@ $newProducts = DB::table('products')
 
     {{-- Nút Thêm vào giỏ --}}
     <a href="{{ route('add-to-cart', $product->slug) }}" 
-       class="btn btn-success btn-block d-flex align-items-center justify-content-center py-3 rounded-pill font-weight-bold btn-fade"
+      class="btn btn-success btn-block d-flex align-items-center justify-content-center py-3 rounded-pill font-weight-bold btn-fade"
        title="Thêm vào giỏ">
         <i class="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ
     </a>
