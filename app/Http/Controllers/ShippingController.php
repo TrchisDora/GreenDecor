@@ -38,9 +38,9 @@ class ShippingController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'type'=>'string|required',
-            'price'=>'nullable|numeric',
-            'status'=>'required|in:active,inactive'
+            'type' => 'string|required',
+            'name' => 'required|string', // Thêm validation cho trường 'name'
+            'status' => 'required|in:active,inactive',
         ]);
         $data=$request->all();
         // return $data;
@@ -91,9 +91,9 @@ class ShippingController extends Controller
     {
         $shipping=Shipping::find($id);
         $this->validate($request,[
-            'type'=>'string|required',
-            'price'=>'nullable|numeric',
-            'status'=>'required|in:active,inactive'
+            'type' => 'string|required',
+            'name' => 'required|string', 
+            'status' => 'required|in:active,inactive',
         ]);
         $data=$request->all();
         // return $data;

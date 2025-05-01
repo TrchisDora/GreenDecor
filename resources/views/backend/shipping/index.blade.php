@@ -31,7 +31,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Tiêu đề</th>
-                                        <th>Giá</th>
+                                        <td>Đơn vị</td>
                                         <th>Trạng thái</th>
                                         <th>Hành động</th>
                                     </tr>
@@ -41,7 +41,7 @@
                                         <tr>
                                             <td>{{ $shipping->id }}</td>
                                             <td>{{ $shipping->type }}</td>
-                                            <td>${{ number_format($shipping->price, 2) }}</td>
+                                            <td>{{ $shipping->Name }}</td>
                                             <td>
                                                 @if($shipping->status == 'active')
                                                     <span class="badge badge-success">Hoạt động</span>

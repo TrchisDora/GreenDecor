@@ -90,8 +90,10 @@ Route::get('payment', 'PayPalController@payment')->name('payment');
 Route::get('cancel', 'PayPalController@cancel')->name('payment.cancel');
 Route::get('payment/success', 'PayPalController@success')->name('payment.success');
 
-
-
+// routes/web.php
+Route::post('/checkout/update-total', 'ShippingFeeController@updateTotal')->name('checkout.updateTotal');
+Route::post('/get-shipping-price', 'ShippingFeeController@getPrice')->name('get.shipping.price');
+ 
 // Backend section start
 
 Route::group(['prefix'=>'/admin','middleware'=>['auth','admin']],function(){

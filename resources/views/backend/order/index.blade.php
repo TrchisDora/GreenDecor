@@ -41,18 +41,17 @@
                                 </thead>
                                 <tbody>
                                     @foreach($orders as $order)
-                                    @php
-                                        $shippingType = DB::table('shippings')->where('id', $order->shipping_id)->value('type');
-                                        $shipping_charge = DB::table('shipping_fees')->where('type', $shippingType)->value('price');
-                                    @endphp
+                                        @php
+                                            $shipping_charge = DB::table('shipping_fees')->where('id', $order->shipping_id)->value('price');
+                                        @endphp
                                         <tr id="order-{{ $order->id }}">
                                             <td>{{ $order->id }}</td>
                                             <td>{{ $order->order_number }}</td>
                                             <td>{{ $order->first_name }} {{ $order->last_name }}</td>
                                             <td>{{ $order->email }}</td>
                                             <td>{{ $order->quantity }}</td>
-                                            <td>$ {{ number_format($shipping_charge) }}</td>
-                                            <td>$ {{ number_format($order->total_amount) }}</td>
+                                            <td>$ {{ number_format($shipping_charge, 2) }}</td>
+                                            <td>$ {{ number_format($order->total_amount, 2) }}</td>
                                             <td>
                                                 @if($order->status == 'new')
                                                     <span class="badge badge-primary">Mới</span>

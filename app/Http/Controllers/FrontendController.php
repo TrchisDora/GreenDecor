@@ -42,7 +42,6 @@ class FrontendController extends Controller
                 ->with('product_lists', $products)
                 ->with('category_lists', $category);
     }
-
     public function aboutUs()
     {
         return view('frontend.pages.about-us');

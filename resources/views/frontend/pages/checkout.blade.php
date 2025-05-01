@@ -50,7 +50,7 @@
                         </div>
                         <div class="col-md-6 form-group">
                             <label>Phone Number<span>*</span></label>
-                            <input class="form-control" type="number" name="phone" placeholder="+123 456 789" value="{{old('phone')}}" required>
+                            <input class="form-control" type="text" name="phone" placeholder="+123 456 789" value="{{old('phone')}}" required>
                             @error('phone')
                                 <span class='text-danger'>{{$message}}</span>
                             @enderror
@@ -313,13 +313,29 @@
                                 <span class='text-danger'>{{$message}}</span>
                             @enderror
                         </div>
-                        <div class="col-md-6 form-group">
+                        <!-- Chọn tỉnh, quận, phường -->
+                        <div class="col-md-6 form-group"> 
                             <label>Address Line 2</label>
-                            <input class="form-control" type="text" name="address2" placeholder="Apartment or suite" value="{{old('address2')}}">
+
+                            <select class="form-control mb-2" id="province">
+                                <option value="">Chọn Tỉnh/Thành phố</option>
+                            </select>
+
+                            <select class="form-control mb-2" id="district" disabled>
+                                <option value="">Chọn Quận/Huyện</option>
+                            </select>
+
+                            <select class="form-control mb-2" id="ward" disabled>
+                                <option value="">Chọn Xã/Phường</option>
+                            </select>
+
+                            <input type="hidden" name="address2" id="address2" value="{{ old('address2') }}">
+
                             @error('address2')
                                 <span class='text-danger'>{{$message}}</span>
                             @enderror
                         </div>
+
                         <div class="col-md-6 form-group">
                             <label>Postal Code</label>
                             <input class="form-control" type="text" name="post_code" placeholder="12345" value="{{old('post_code')}}">
@@ -348,35 +364,44 @@
                             <h6 class="font-weight-medium">Subtotal</h6>
                             <h6 class="font-weight-medium">${{number_format(Helper::totalCartPrice(),2)}}</h6>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mb-5 pt-1">
-                            <h6 class="font-weight-medium mb-0 mr-3">Shipping</h6>
-                            @if(count(Helper::shipping()) > 0 && Helper::cartCount() > 0)
-                                <select name="shipping" class="form-control custom-select" required>
-                                    <option value="" disabled selected>Select Shipping Method</option>
-                                    @foreach(Helper::shipping() as $shipping)
-                                        <option value="{{$shipping->id}}" data-price="{{$shipping->price}}">
-                                            {{$shipping->type}} - ${{$shipping->price}}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            @else 
-                                <h6 class="font-weight-medium mb-0">Free</h6>
-                            @endif
-                        </div>
-
                         @if(session('coupon'))
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Coupon Discount</h6>
                             <h6 class="font-weight-medium">-${{number_format(session('coupon')['value'],2)}}</h6>
                         </div>
                         @endif
-                    </div>
-                    <div class="card-footer border-secondary bg-transparent">
-                        <div class="d-flex justify-content-between mt-2">
-                            <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">${{number_format(Helper::totalCartPrice() - (session('coupon')['value'] ?? 0),2)}}</h5>
-                        </div>
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center mb-5 pt-1">
+    <h6 class="font-weight-medium mb-0 mr-3">Shipping</h6>
+    
+    @if(count(Helper::shipping()) > 0 && Helper::cartCount() > 0)
+        <!-- Chọn phương thức vận chuyển -->
+        <select name="shipping" class="form-control custom-select" id="shippingSelect" required>
+            <option value="" disabled selected>Chọn Phương thức vận chuyển</option>
+            @foreach(Helper::shipping() as $shipping)
+                <option value="{{$shipping->id}}">{{$shipping->type}}</option>
+            @endforeach
+        </select>
+    @else
+        <h6 class="font-weight-medium mb-0">Free</h6>
+    @endif
+</div>
+
+<!-- Giá vận chuyển -->
+<form id="confirmShippingForm" action="{{ route('checkout.updateTotal') }}" method="POST">
+    @csrf
+    <!-- Giá vận chuyển -->
+    <div id="shippingPrice" style="margin-top: 10px; font-weight: bold;"></div>
+    <input type="hidden" id="hiddenShippingPrice">
+    <button type="button" class="btn btn-primary mt-3" id="confirmShippingBtn">Xác nhận phương thức vận chuyển</button>
+</form>
+
+<div class="card-footer border-secondary bg-transparent">
+    <div class="d-flex justify-content-between mt-2">
+        <h5 class="font-weight-bold">Total</h5>
+        <h5 class="font-weight-bold" id="totalPrice">${{number_format(Helper::totalCartPrice() - (session('coupon')['value'] ?? 0), 2)}}</h5>
+    </div>
+</div>
+
                 </div>
                 
                 <div class="card border-secondary mb-5">
@@ -558,6 +583,134 @@
                 this.value === 'cardpay' ? 'block' : 'none';
         });
     });
+</script>
+
+<script>
+    const provinceEl = document.getElementById('province');
+    const districtEl = document.getElementById('district');
+    const wardEl = document.getElementById('ward');
+    const address2El = document.getElementById('address2');
+
+    async function loadProvinces() {
+        const res = await fetch('https://provinces.open-api.vn/api/?depth=1');
+        const provinces = await res.json();
+        provinces.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.code;
+            opt.textContent = p.name;
+            provinceEl.appendChild(opt);
+        });
+    }
+
+    async function loadDistricts(provinceCode) {
+        const res = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+        const province = await res.json();
+        districtEl.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+        wardEl.innerHTML = '<option value="">Chọn Xã/Phường</option>';
+        districtEl.disabled = false;
+        wardEl.disabled = true;
+
+        province.districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = JSON.stringify({name: d.name, code: d.code});
+            opt.textContent = d.name;
+            districtEl.appendChild(opt);
+        });
+    }
+
+    async function loadWards(districtCode) {
+        const res = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+        const district = await res.json();
+        wardEl.innerHTML = '<option value="">Chọn Xã/Phường</option>';
+        wardEl.disabled = false;
+
+        district.wards.forEach(w => {
+            const opt = document.createElement('option');
+            opt.value = w.name;
+            opt.textContent = w.name;
+            wardEl.appendChild(opt);
+        });
+    }
+
+    // Xử lý chọn tỉnh
+    provinceEl.addEventListener('change', (e) => {
+        const provinceName = provinceEl.options[provinceEl.selectedIndex].text;
+        if (e.target.value) {
+            loadDistricts(e.target.value);
+            address2El.value = provinceName;
+        } else {
+            districtEl.disabled = true;
+            wardEl.disabled = true;
+            address2El.value = '';
+        }
+    });
+
+    // Xử lý chọn quận
+    districtEl.addEventListener('change', (e) => {
+        const selectedDistrict = JSON.parse(e.target.value || '{}');
+        const provinceName = provinceEl.options[provinceEl.selectedIndex].text;
+        const districtName = selectedDistrict.name;
+
+        if (selectedDistrict.code) {
+            loadWards(selectedDistrict.code);
+            address2El.value = districtName + ', ' + provinceName;
+        } else {
+            wardEl.disabled = true;
+        }
+    });
+
+    // Xử lý chọn phường
+    wardEl.addEventListener('change', (e) => {
+        const wardName = e.target.value;
+        const districtName = districtEl.options[districtEl.selectedIndex].text;
+        const provinceName = provinceEl.options[provinceEl.selectedIndex].text;
+        address2El.value = wardName + ', ' + districtName + ', ' + provinceName;
+    });
+
+    loadProvinces();
+</script>
+<script>
+    // Hàm AJAX lấy giá vận chuyển
+    function fetchShippingPrice() {
+        // Lấy tên tỉnh từ dropdown
+        let provinceName = $('#province option:selected').text();
+        // Lấy shipping_id từ dropdown phương thức vận chuyển
+        let shippingId = $('#shippingSelect').val();
+
+        // Kiểm tra nếu cả tỉnh và phương thức vận chuyển đều đã được chọn
+        if (provinceName && shippingId) {
+            $.ajax({
+                url: '{{ route("get.shipping.price") }}',  // Đường dẫn AJAX
+                method: 'POST',  // Phương thức HTTP
+                data: {
+                    _token: '{{ csrf_token() }}',  // CSRF Token để bảo mật
+                    province: provinceName,  // Tên tỉnh
+                    shipping_id: shippingId  // ID của phương thức vận chuyển
+                },
+                success: function(response) {
+                    // Kiểm tra nếu giá vận chuyển được trả về
+                    if (response.price !== undefined) {
+                        // Hiển thị giá vận chuyển
+                        $('#shippingPrice').text('Shipping Price: $' + response.price);
+                        $('#hiddenShippingPrice').val(response.price);  // Cập nhật giá vận chuyển vào input hidden
+                    } else {
+                        // Nếu không có giá vận chuyển, thông báo lỗi
+                        $('#shippingPrice').text('Không tìm thấy giá vận chuyển.');
+                    }
+                },
+                error: function() {
+                    // Thông báo lỗi khi request gặp sự cố
+                    $('#shippingPrice').text('Lỗi khi lấy giá vận chuyển.');
+                }
+            });
+        } else {
+            // Nếu chưa chọn đầy đủ thông tin, không làm gì
+            $('#shippingPrice').text('');
+        }
+    }
+
+    // Lắng nghe sự kiện thay đổi giá trị của tỉnh và phương thức vận chuyển
+    $('#province, #shippingSelect').change(fetchShippingPrice);
 </script>
 
 @endpush

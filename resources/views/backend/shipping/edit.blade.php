@@ -28,25 +28,22 @@
                     <form method="post" action="{{ route('shipping.update', $shipping->id) }}">
                         @csrf
                         @method('PATCH')
-
                         <!-- Loại -->
                         <div class="form-group mb-3">
-                            <label for="inputTitle" class="col-form-label">Loại <span class="text-danger">*</span></label>
-                            <input id="inputTitle" type="text" name="type" placeholder="Nhập loại phương thức" value="{{ $shipping->type }}" class="form-control">
+                            <label for="inputType" class="col-form-label">Loại <span class="text-danger">*</span></label>
+                            <input id="inputType" type="text" name="type" placeholder="Nhập loại phương thức" value="{{ $shipping->type }}" class="form-control">
                             @error('type')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
                         </div>
-
-                        <!-- Giá -->
+                        <!-- Tên Đơn vị -->
                         <div class="form-group mb-3">
-                            <label for="price" class="col-form-label">Giá <span class="text-danger">*</span></label>
-                            <input id="price" type="number" name="price" placeholder="Nhập giá" value="{{ $shipping->price }}" class="form-control">
-                            @error('price')
+                            <label for="inputName" class="col-form-label">Tên Đơn vị <span class="text-danger">*</span></label>
+                            <input id="inputName" type="text" name="name" placeholder="Nhập tên đơn vị" value="{{ $shipping->Name }}" class="form-control">
+                            @error('name')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
                         </div>
-
                         <!-- Trạng thái -->
                         <div class="form-group mb-3">
                             <label for="status" class="col-form-label">Trạng Thái <span class="text-danger">*</span></label>
@@ -58,7 +55,6 @@
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
                         </div>
-
                         <!-- Nút submit -->
                         <div class="form-group mb-3 d-flex justify-content-center">
                             <button class="btn btn-success mx-2" type="submit">Cập nhật</button>
