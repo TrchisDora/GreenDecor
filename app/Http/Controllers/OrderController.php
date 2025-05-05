@@ -57,43 +57,51 @@ class OrderController extends Controller
     }
     public function store(Request $request)
     {
+        // Validate the request
         $request->validate([
-            'first_name' => 'string|required',
-            'last_name' => 'string|required',
-            'address1' => 'string|required',
-            'address2' => 'string|nullable',
+            'first_name' => 'string|required|max:255',
+            'last_name' => 'string|required|max:255',
+            'email' => 'email|required|max:255',
+            'phone' => 'required|numeric|min:10', // Đảm bảo số điện thoại hợp lệ
+            'country' => 'required|string|max:100',
+            'shipping_address1' => 'required|string|max:255',
+            'shipping_address2' => 'nullable|string|max:255',
+            'shipping_postcode' => 'nullable|string|max:20', // Mã bưu điện có thể có ký tự
+            'shipping_id' => 'required|string|max:255',
+            'shipping_price' => 'nullable|numeric',
             'coupon' => 'nullable|numeric',
-            'phone' => 'numeric|required',
-            'post_code' => 'string|nullable',
-            'email' => 'string|required',
-            'shipping' => 'required|string',
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|string|in:cod,cardpay',
+            'card_number' => 'nullable|numeric|digits:16',
+            'card_name' => 'nullable|string|max:255',
+            'expiration_date' => 'nullable|string|size:5|regex:/^(0[1-9]|1[0-2])\/\d{2}$/', // Định dạng MM/YY
+            'cvv' => 'nullable|numeric|digits:3',
         ]);
-
+        
         // Kiểm tra giỏ hàng
         if (Cart::where('user_id', auth()->user()->id)->whereNull('order_id')->count() == 0) {
             return back()->with('error', 'Giỏ hàng đang trống!');
         }
-
+    
         // Lấy ID của phương thức vận chuyển từ bảng shippings
-        $shippingType = $request->shipping; // ví dụ: "Vnp", "Ghn"
+        $shippingType = $request->shipping_id; // Sử dụng shipping_id từ request
         $shippingModel = Shipping::where('id', $shippingType)->first();
         if (!$shippingModel) {
             return back()->with('error', 'Không tìm thấy phương thức vận chuyển phù hợp.');
         }
-
+    
         $shipping_id = $shippingModel->id;
         $province = $this->normalizeProvinceName($request->province) ?? 'Cần Thơ'; // Thiết lập giá trị mặc định nếu không có trong request
         $shippingFee = ShippingFee::where('province_name', $province)
                                 ->where('shipping_id', $shipping_id)
                                 ->first();
         $shipping_price = $shippingFee ? $shippingFee->price : 0;
-        
+    
         // Tính toán tổng đơn hàng
         $sub_total = Helper::totalCartPrice();
         $quantity = Helper::cartCount();
         $coupon = session('coupon')['value'] ?? 0;
         $total_amount = $sub_total + $shipping_price - $coupon;
+    
         // Tạo đơn hàng
         $order = new Order();
         $order_data = $request->all();
@@ -104,7 +112,12 @@ class OrderController extends Controller
         $order_data['quantity'] = $quantity;
         $order_data['coupon'] = $coupon;
         $order_data['total_amount'] = $total_amount;
-       
+    
+        // Thêm thông tin địa chỉ vận chuyển vào đơn hàng
+        $order_data['address1'] = $request->shipping_address1;
+        $order_data['address2'] = $request->shipping_address2;
+        $order_data['post_code'] = $request->shipping_postcode;
+    
         // Xử lý phương thức thanh toán
         if ($request->payment_method == 'paypal') {
             $order_data['payment_method'] = 'paypal';
@@ -116,15 +129,16 @@ class OrderController extends Controller
             $order_data['payment_method'] = 'cod';
             $order_data['payment_status'] = 'Unpaid';
         }
-
+    
+        // Save the order
         $order->fill($order_data);
         $order->save();
-
+    
         // Cập nhật giỏ hàng với order_id
         Cart::where('user_id', auth()->user()->id)
             ->whereNull('order_id')
             ->update(['order_id' => $order->id]);
-
+    
         // Gửi thông báo cho admin
         $admin = User::where('role', 'admin')->first();
         $details = [
@@ -133,17 +147,20 @@ class OrderController extends Controller
             'fas' => 'fa-file-alt'
         ];
         Notification::send($admin, new StatusNotification($details));
-
+    
         // Xử lý redirect theo phương thức thanh toán
         if ($request->payment_method == 'paypal') {
             return redirect()->route('payment')->with(['id' => $order->id]);
         } else {
+            // Xóa giỏ hàng và mã giảm giá
             session()->forget('cart');
             session()->forget('coupon');
         }
-
+    
         return redirect()->route('home')->with('success', 'Đặt hàng thành công. Cảm ơn bạn đã mua sắm!');
     }
+    
+    
 
     /**
      * Display the specified resource.
