@@ -2,6 +2,11 @@
 
 @section('title', 'Order Detail')
 @section('main-content')
+@php
+  $shipping_fee = DB::table('shipping_fees')
+      ->where('shipping_id', $order->shipping_id)
+      ->first();
+@endphp
   <div class="container-fluid px-4">
     <h1 class="mt-4">Chi tiết đơn hàng</h1>
     <ol class="breadcrumb mb-4">
@@ -44,7 +49,7 @@
         <td>{{ $order->first_name }} {{ $order->last_name }}</td>
         <td>{{ $order->email }}</td>
         <td>{{ $order->quantity }}</td>
-        <td>${{ $order->shipping->price }}</td>
+        <td>$ {{ number_format($shipping_fee->price ?? 0, 2) }}</td>
         <td>${{ number_format($order->total_amount, 2) }}</td>
         <td>
         
@@ -109,7 +114,7 @@
         </tr>
         <tr>
         <td>Phí vận chuyển:</td>
-        <td>${{ $order->shipping->price }}</td>
+        <td>$ {{ number_format($shipping_fee->price ?? 0, 2) }}</td>
         </tr>
         <tr>
         <td>Mã giảm giá:</td>
@@ -249,7 +254,7 @@
           <p><strong>Địa chỉ:</strong> {{ $order->address1 }}, {{ $order->address2 }}</p>
           <p><strong>Quốc gia:</strong> {{ $order->country }}</p>
           <p><strong>Mã bưu điện:</strong> {{ $order->post_code }}</p>
-          <p><strong>Phí vận chuyển:</strong> ${{ $order->shipping->price }}</p>
+          <p><strong>Phí vận chuyển:</strong> $ {{ number_format($shipping_fee->price ?? 0, 2) }}</p>
           </div>
         </div>
         </div>

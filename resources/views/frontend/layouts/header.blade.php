@@ -156,7 +156,7 @@
                                         <img src="{{ $photo[0] }}" alt="wishlist-img" class="me-2 mr-3" width="50">
                                         <div class="flex-fill">
                                             <a href="{{ route('product-detail', $item->product['slug']) }}" class="fw-bold" target="_blank">{{ $item->product['title'] }}</a>
-                                            <p class="mb-0">{{ $item->quantity }} × ${{ number_format($item->price, 2) }}</p>
+                                            <p class="mb-0">{{ $item->quantity }} × {{ number_format($item->price) }} đ</p>
                                         </div>
                                         <a href="{{ route('wishlist-delete', $item->id) }}" class="text-danger ms-2"><i class="fa fa-times"></i></a>
                                     </div>
@@ -165,7 +165,7 @@
                             <div class="dropdown-divider"></div>
                             <div class="d-flex justify-content-between px-2">
                                 <strong>Total:</strong>
-                                <span>${{ number_format(Helper::totalWishlistPrice(), 2) }}</span>
+                                <span>{{ number_format(Helper::totalWishlistPrice()) }} đ</span>
                             </div>
                             <div class="text-end mt-2">
                                 <a href="{{ route('cart') }}" class="btn btn-block btn-primary my-3 py-3">Go to Cart</a>
@@ -192,7 +192,7 @@
                                         <img src="{{ $photo[0] }}" alt="cart-img" class="me-2 mr-3" width="50">
                                         <div class="flex-fill">
                                             <a href="{{ route('product-detail', $item->product['slug']) }}" class="fw-bold" target="_blank">{{ $item->product['title'] }}</a>
-                                            <p class="mb-0">{{ $item->quantity }} × ${{ number_format($item->price, 2) }}</p>
+                                            <p class="mb-0">{{ $item->quantity }} × {{ number_format($item->price) }} đ</p>
                                         </div>
                                         <a href="{{ route('cart-delete', $item->id) }}" class="text-danger ms-2"><i class="fa fa-times"></i></a>
                                     </div>
@@ -201,7 +201,7 @@
                             <div class="dropdown-divider"></div>
                             <div class="d-flex justify-content-between px-2">
                                 <strong>Total:</strong>
-                                <span>${{ number_format(Helper::totalCartPrice(), 2) }}</span>
+                                <span>{{ number_format(Helper::totalCartPrice()) }} đ</span>
                             </div>
                             <div class="text-end mt-2">
                                 <a href="{{ route('checkout') }}" class="btn btn-block btn-primary my-3 py-3">Checkout</a>

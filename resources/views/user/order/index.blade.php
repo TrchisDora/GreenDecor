@@ -41,16 +41,18 @@
                                 </thead>
                                 <tbody>
                                     @foreach($orders as $order)
-                                        @php
-                                            $shipping_charge = DB::table('shippings')->where('id', $order->shipping_id)->value('price');
-                                        @endphp
+                                    @php
+                                        $shipping_fee = DB::table('shipping_fees')
+                                            ->where('shipping_id', $order->shipping_id)
+                                            ->first();
+                                    @endphp
                                         <tr id="order-{{ $order->id }}">
                                             <td>{{ $order->id }}</td>
                                             <td>{{ $order->order_number }}</td>
                                             <td>{{ $order->first_name }} {{ $order->last_name }}</td>
                                             <td>{{ $order->email }}</td>
                                             <td>{{ $order->quantity }}</td>
-                                            <td>$ {{ number_format($shipping_charge, 2) }}</td>
+                                            <td>$ {{ number_format($shipping_fee->price ?? 0, 2) }}</td>
                                             <td>$ {{ number_format($order->total_amount, 2) }}</td>
                                             <td>
                                                 @if($order->status == 'new')

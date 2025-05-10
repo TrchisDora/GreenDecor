@@ -11,4 +11,9 @@ class ShippingFee extends Model
     protected $fillable = ['province_name','region', 'shipping_fees', 'price'];
 
     public $timestamps = false;
+    public function shipping()
+{
+    return $this->belongsTo(Shipping::class, 'shipping_id', 'id');
+}
+
 }

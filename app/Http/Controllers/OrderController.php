@@ -66,6 +66,7 @@ class OrderController extends Controller
             'country' => 'required|string|max:100',
             'shipping_address1' => 'required|string|max:255',
             'shipping_address2' => 'nullable|string|max:255',
+            'province_name' => 'nullable|string|max:255',
             'shipping_postcode' => 'nullable|string|max:20', // Mã bưu điện có thể có ký tự
             'shipping_id' => 'required|string|max:255',
             'shipping_price' => 'nullable|numeric',
@@ -76,6 +77,8 @@ class OrderController extends Controller
             'expiration_date' => 'nullable|string|size:5|regex:/^(0[1-9]|1[0-2])\/\d{2}$/', // Định dạng MM/YY
             'cvv' => 'nullable|numeric|digits:3',
         ]);
+        
+        // dd($request->all());
         
         // Kiểm tra giỏ hàng
         if (Cart::where('user_id', auth()->user()->id)->whereNull('order_id')->count() == 0) {
@@ -90,7 +93,7 @@ class OrderController extends Controller
         }
     
         $shipping_id = $shippingModel->id;
-        $province = $this->normalizeProvinceName($request->province) ?? 'Cần Thơ'; // Thiết lập giá trị mặc định nếu không có trong request
+        $province = $this->normalizeProvinceName($request->province_name) ?? 'Cần Thơ';
         $shippingFee = ShippingFee::where('province_name', $province)
                                 ->where('shipping_id', $shipping_id)
                                 ->first();
@@ -111,7 +114,7 @@ class OrderController extends Controller
         $order_data['sub_total'] = $sub_total;
         $order_data['quantity'] = $quantity;
         $order_data['coupon'] = $coupon;
-        $order_data['total_amount'] = $total_amount;
+        $order_data['total_amount'] = $total_amount + $shipping_price;
     
         // Thêm thông tin địa chỉ vận chuyển vào đơn hàng
         $order_data['address1'] = $request->shipping_address1;
@@ -170,16 +173,15 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        // Lấy thông tin đơn hàng với ID và các sản phẩm trong giỏ hàng liên quan
-        $order = Order::with('carts')->find($id);
-
-        // Kiểm tra nếu không có đơn hàng
+        // Lấy đơn hàng cùng với các sản phẩm trong giỏ và thông tin vận chuyển
+        $order = Order::with(['shipping.fee'])->find($id);
         if (!$order) {
             return redirect()->back()->with('error', 'Order not found');
         }
 
         return view('backend.order.show')->with('order', $order);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

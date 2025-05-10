@@ -45,7 +45,7 @@
 										<a href="{{route('product-detail',$cart->product['slug'])}}" target="_blank">{{$cart->product['title']}}</a>
 										<p class="text-muted small">{!!($cart['summary']) !!}</p>
 										</td>
-										<td class="align-middle cart_single_price">${{number_format($cart['price'],2)}}</td>
+										<td class="align-middle cart_single_price">{{number_format($cart['price'])}} đ</td>
 										<td class="align-middle">
 											<div class="input-group quantity mx-auto" style="width: 100px;">
 												<input type="number" name="quant[{{ $key }}]"
@@ -54,7 +54,7 @@
 												<input type="hidden" name="qty_id[{{ $key }}]" value="{{ $cart->id }}">
 											</div>
 										</td>
-										<td class="align-middle">${{number_format($cart['amount'],2)}}</td>
+										<td class="align-middle">{{number_format($cart['amount'])}} đ</td>
 										<td class="align-middle">
 											<a href="{{route('cart-delete',$cart->id)}}" class="btn btn-sm btn-danger">
 												<i class="fas fa-times"></i>
@@ -101,13 +101,13 @@
 						{{-- Tổng tiền trước giảm --}}
 						<div class="d-flex justify-content-between mb-3">
 							<h6 class="font-weight-medium">Subtotal</h6>
-							<h6 class="font-weight-medium">${{ number_format(Helper::totalCartPrice(), 2) }}</h6>
+							<h6 class="font-weight-medium">{{ number_format(Helper::totalCartPrice()) }} đ</h6>
 						</div>
 						{{-- Nếu có coupon thì hiển thị phần giảm --}}
 						@if(session()->has('coupon'))
 						<div class="d-flex justify-content-between mb-3">
 							<h6 class="font-weight-medium">Discount ({{ Session::get('coupon')['code'] }})</h6>
-							<h6 class="font-weight-medium text-success">- ${{ number_format(Session::get('coupon')['value'], 2) }}</h6>
+							<h6 class="font-weight-medium text-success">- {{ number_format(Session::get('coupon')['value'], 2) }} đ</h6>
 						</div>
 						@endif
 						{{-- Tổng tiền sau giảm --}}
@@ -119,14 +119,14 @@
 
 						<div class="d-flex justify-content-between">
 							<h6 class="font-weight-bold">Total</h6>
-							<h6 class="font-weight-bold">${{ number_format($total_amount, 2) }}</h6>
+							<h6 class="font-weight-bold">{{ number_format($total_amount) }} đ</h6>
 						</div>
 					</div>
 					<div class="card-footer border-secondary bg-transparent">
 						<div class="d-flex justify-content-between mt-2">
 							<h5 class="font-weight-bold">You Pay</h5>
 							<h5 class="font-weight-bold" id="order_total_price">
-								${{number_format($total_amount ?? Helper::totalCartPrice(),2)}}
+								{{number_format($total_amount ?? Helper::totalCartPrice())}} đ
 							</h5>
 						</div>
 						<div class="button5 mt-3">

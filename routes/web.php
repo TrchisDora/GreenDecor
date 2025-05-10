@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -184,3 +185,6 @@ Route::group(['prefix'=>'/user','middleware'=>['user']],function(){
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
 });
+//Pay VNPay
+Route::get('/installment-checkout', [PaymentController::class, 'createPayment'])->name('installment.checkout');
+Route::get('/installment-return', [PaymentController::class, 'paymentReturn'])->name('installment.return');

@@ -97,9 +97,9 @@
 											@php 
 												$after_discount = $product_detail->price - (($product_detail->price * $product_detail->discount) / 100);
 											@endphp
-											<p class="h5 text-danger fw-bold mb-1">${{ number_format($after_discount, 2) }}
+											<p class="h5 text-danger fw-bold mb-1">{{ number_format($after_discount) }} đ
 												@if($product_detail->discount > 0)
-													<s class="text-muted h6 ms-2">${{ number_format($product_detail->price, 2) }}</s>
+													<s class="text-muted h6 ms-2 ml-2">{{ number_format($product_detail->price) }} đ</s>
 												@endif
 											</p>
 											<p class="text-muted mt-2">{!! $product_detail->summary !!}</p>
@@ -354,9 +354,9 @@
 											<h6 class="text-truncate mb-3">{{ $product->title }}</h6>
 										</a>
 										<div class="d-flex justify-content-center">
-											<h6>{{ number_format($discounted, 0, ',', '.') }}đ</h6>
+											<h6>{{ number_format($discounted, 0, ',', '.') }} đ</h6>
 											@if($product->discount > 0)
-												<h6 class="text-muted ml-2"><del>{{ number_format($product->price, 0, ',', '.') }}đ</del></h6>
+												<h6 class="text-muted ml-2"><del>{{ number_format($product->price, 0, ',', '.') }} đ</del></h6>
 											@endif
 										</div>
 									</div>

@@ -322,6 +322,7 @@
                     <div class="col-md-6 form-group">
                         <label>Address Line 2</label>
                         <input class="form-control" type="text" name="shipping_address2" id="shippingAddress2" readonly value="{{ old('address2') }}">
+                        <input type="hidden" id="province_name" name="province_name" value="">
                         @error('address2')
                             <span class='text-danger'>{{ $message }}</span>
                         @enderror
@@ -740,15 +741,14 @@
 </script>
 <script>
 $('#confirmShippingBtn').click(function () {
-    let address1 = $('input[name="address1"]').val(); // lấy giá trị của địa chỉ 1
-    let post_code = $('input[name="post_code"]').val(); // lấy mã bưu chính
-    let shippingText = $('#shippingSelect option:selected').text(); // lấy phương thức vận chuyển đã chọn
+    let address1 = $('input[name="address1"]').val(); 
+    let post_code = $('input[name="post_code"]').val(); 
+    let shippingText = $('#shippingSelect option:selected').text(); 
 
-    let province = $('#province option:selected').text(); // lấy tên tỉnh
-    let district = $('#district option:selected').text(); // lấy tên quận
-    let ward = $('#ward option:selected').text(); // lấy tên phường
-    let shippingId = $('#shippingSelect').val(); // lấy id phương thức vận chuyển
-
+    let province = $('#province option:selected').text(); 
+    let district = $('#district option:selected').text(); 
+    let ward = $('#ward option:selected').text(); 
+    let shippingId = $('#shippingSelect').val(); 
     if (province && district && ward && shippingId) {
         $.ajax({
             url: '{{ route("get.shipping.price") }}',
@@ -765,14 +765,15 @@ $('#confirmShippingBtn').click(function () {
                     let originalTotal = {{ Helper::totalCartPrice() - (session('coupon')['value'] ?? 0) }};
                     let shippingPrice = Number(response.price.toString().replace(/,/g, ''));
                     let newTotal = originalTotal + shippingPrice;
-                    $('#shippingPrice').text('Phí: ' + shippingPrice.toLocaleString('vi-VN') + 'đ');
+                    $('#shippingPrice').text('Phí vận chuyển: ' + shippingPrice.toLocaleString('vi-VN') + 'đ');
                     $('#hiddenShippingPrice').val(response.price); 
                     $('#totalPrice').text(newTotal.toLocaleString('vi-VN') + 'đ');
                     $('#shippingAddress1').val(address1);
                     $('#shippingAddress2').val(`${ward}, ${district}, ${province}`);
+                    $('#province_name').val(province); 
                     $('#shippingPostCode').val(post_code);
                     $('#shippingMethod').val(shippingText);
-                     $('#shippingIdInput').val(shippingId); 
+                    $('#shippingIdInput').val(shippingId); 
                     $('#shippingPriceInput').val(shippingPrice);
                     $('#shippingInfoDisplay').show();
                     $('#shippingModal').modal('hide');

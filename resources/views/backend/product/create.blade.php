@@ -95,26 +95,18 @@
         <span class="text-danger">{{$message}}</span>
       @enderror
         </div>
-
         <div class="form-group">
           <label for="size">Kích cỡ</label>
           <select name="size[]" class="form-control selectpicker" multiple data-live-search="true">
           <option value="">--Chọn kích cỡ--</option>
-          <option value="S">Nhỏ (S)</option>
-          <option value="M">Vừa (M)</option>
-          <option value="L">Lớn (L)</option>
-          <option value="XL">Cực lớn (XL)</option>
-          <option value="2XL">Siêu lớn (2XL)</option>
-          <option value="7US">7 US</option>
-          <option value="8US">8 US</option>
-          <option value="9US">9 US</option>
-          <option value="10US">10 US</option>
-          <option value="11US">11 US</option>
-          <option value="12US">12 US</option>
-          <option value="13US">13 US</option>
+          <option value="None">Không có</option>
+          <option value="S">Nhỏ</option>
+          <option value="M">Vừa</option>
+          <option value="L">Lớn</option>
+          <option value="XL">Cực lớn</option>
+          <option value="2XL">Siêu lớn</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="brand_id">Thương hiệu</label>
           <select name="brand_id" class="form-control">

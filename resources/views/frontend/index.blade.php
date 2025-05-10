@@ -174,9 +174,9 @@ $newProducts = DB::table('products')
             <h6 class="text-truncate mb-3">{{ $product->title }}</h6>
                 </a>
                 <div class="d-flex justify-content-center">
-                    <h6>{{ number_format($discounted, 0, ',', '.') }}đ</h6>
+                    <h6>{{ number_format($discounted, 0, ',', '.') }} đ</h6>
                     @if ($product->discount > 0)
-                        <h6 class="text-muted ml-2"><del>{{ number_format($product->price, 0, ',', '.') }}đ</del></h6>
+                        <h6 class="text-muted ml-2"><del>{{ number_format($product->price, 0, ',', '.') }} đ</del></h6>
                     @endif
                 </div>
             </div>
@@ -288,9 +288,9 @@ $products = DB::table('products')
             <h6 class="text-truncate mb-3">{{ $product->title }}</h6>
                 </a>
                 <div class="d-flex justify-content-center">
-                    <h6>{{ number_format($discounted, 0, ',', '.') }}đ</h6>
+                    <h6>{{ number_format($discounted, 0, ',', '.') }} đ</h6>
                     @if ($product->discount > 0)
-                        <h6 class="text-muted ml-2"><del>{{ number_format($product->price, 0, ',', '.') }}đ</del></h6>
+                        <h6 class="text-muted ml-2"><del>{{ number_format($product->price, 0, ',', '.') }} đ</del></h6>
                     @endif
                 </div>
             </div>
@@ -412,9 +412,9 @@ $products = DB::table('products')
 
                             {{-- Giá sau khi giảm --}}
                             @php $after_discount = $product->price - ($product->price * $product->discount / 100); @endphp
-                            <h5 class="text-primary">{{ number_format($after_discount, 0, ',', '.') }}đ
+                            <h5 class="text-primary">{{ number_format($after_discount, 0, ',', '.') }} đ
                                 @if ($product->discount > 0)
-                                    <del class="text-muted ml-2">{{ number_format($product->price, 0, ',', '.') }}đ</del>
+                                    <del class="text-muted ml-2">{{ number_format($product->price, 0, ',', '.') }} đ</del>
                                 @endif
                             </h5>
 

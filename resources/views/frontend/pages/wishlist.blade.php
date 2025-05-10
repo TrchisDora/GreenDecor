@@ -47,12 +47,12 @@
 											{{$wishlist->product['title']}}
 										</a>
 									</h6>
-									<small class="text-muted d-block">{!! $wishlist['summary'] !!}</small>
+									<small class="text-muted d-block">{!! number_format($wishlist['summary']) !!}</small>
 								</td>
 
 								<!-- Giá -->
 								<td class="text-nowrap">
-									<span class="fw-bold text-success">${{$wishlist['amount']}}</span>
+									<span class="fw-bold text-success">{{number_format($wishlist['amount'])}} đ</span>
 								</td>
 
 								<!-- Nút thêm vào giỏ -->

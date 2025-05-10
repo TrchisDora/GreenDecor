@@ -91,12 +91,11 @@
                         @php
                             // Lấy các mức giá lọc
                             $priceRanges = [
-                                '0-100' => 'Under $100',
-                                '100-500' => '$100 - $500',
-                                '500-1000' => '$500 - $1000',
-                                '1000-5000' => '$1000 - $5000',
-                                '5000-10000' => '$5000 - $10000',
-                                '10000' => 'Above $10000'
+                                '0-10000' => 'Under 10.000đ',
+                                '10000-50000' => '10.000đ - 50.000đ',
+                                '50000-100000' => '50.000đ - 100.000đ',
+                                '100000-500000' => '100.000đ - 500.000đ',
+                                '500000-1000000' => '500.000đ - 1.000.000đ'
                             ];
                             // Lấy mức giá hiện tại từ URL
                             $currentPrice = request()->has('price') ? request()->price : null;
@@ -135,8 +134,8 @@
                                 <div class="media-body">
                                     <h6 class="mt-0 mb-1"><a href="{{ route('product-detail', $product->slug) }}">{{ $product->title }}</a></h6>
                                     <small>
-                                        <del class="text-muted">${{ number_format($product->price, 2) }}</del>
-                                        <span class="text-danger">${{ number_format($org, 2) }}</span>
+                                        <del class="text-muted">{{ number_format($product->price) }} đ</del>
+                                        <span class="text-danger">{{ number_format($org) }} đ</span>
                                     </small>
                                 </div>
                             </div>
@@ -228,10 +227,10 @@
 
                                             <div class="mb-2">
                                                 <span class="text-primary h6">
-                                                    ${{ number_format($after_discount, 2) }}
+                                                    {{ number_format($after_discount) }} đ
                                                 </span>
                                                 <del class="text-muted ml-2">
-                                                    ${{ number_format($product->price, 2) }}
+                                                    {{ number_format($product->price) }} đ
                                                 </del>
                                             </div>
 
