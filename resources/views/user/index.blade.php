@@ -6,10 +6,8 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
       <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
     </div>
-
     <!-- Content Row -->
     {{-- <div class="row">
-
       <!-- Category -->
       <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
@@ -92,63 +90,82 @@
       @endphp
       <!-- Order -->
       <div class="col-xl-12 col-lg-12">
-        <table class="table table-bordered table-hover" id="order-dataTable" width="100%" cellspacing="0">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Order No.</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Qty.</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          
-          <tbody>
-          @php
-            $counter = 1;
-        @endphp
-            @if(count($orders)>0)
-              @foreach($orders as $order)   
-                <tr>
-                    <td>{{$counter}}</td>
-                    <td>{{$order->order_number}}</td>
-                    <td>{{$order->first_name}} {{$order->last_name}}</td>
-                    <td>{{$order->email}}</td>
-                    <td>{{$order->quantity}}</td>
-                    <td>${{number_format($order->total_amount,2)}}</td>
-                    <td>
-                        @if($order->status=='new')
-                          <span class="badge badge-primary">NEW</span>
-                        @elseif($order->status=='process')
-                          <span class="badge badge-warning">PROCESSING</span>
-                        @elseif($order->status=='delivered')
-                          <span class="badge badge-success">DELIVERED</span>
-                        @else
-                          <span class="badge badge-danger">{{$order->status}}</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{route('user.order.show',$order->id)}}" class="btn btn-warning btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="view" data-placement="bottom"><i class="fas fa-eye"></i></a>
-                        <form method="POST" action="{{route('user.order.delete',[$order->id])}}">
-                          @csrf 
-                          @method('delete')
-                              <button class="btn btn-danger btn-sm dltBtn" data-id={{$order->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                @php
-                $counter++;
-            @endphp
-              @endforeach
-              @else
-                <td colspan="8" class="text-center"><h4 class="my-4">No orders found! Try ordering some products to view it here.</h4></td>
-              @endif
-          </tbody>
-        </table>
+      <div class="table-responsive">
+                        @if(count($orders) > 0)
+                            <table class="table table-striped table-borderless" id="order-dataTable" width="100%" cellspacing="0">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Mã Đơn hàng</th>
+                                        <th>Tên</th>
+                                        <th>Email</th>
+                                        <th>Số lượng</th>
+                                        <th>Phí vận chuyển</th>
+                                        <th>Tổng cộng</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($orders as $order)
+                                    @php
+                                        $shipping_fee = DB::table('shipping_fees')
+                                            ->where('shipping_id', $order->shipping_id)
+                                            ->first();
+                                    @endphp
 
+                                        <tr id="order-{{ $order->id }}">
+                                            <td>{{ $order->id }}</td>
+                                            <td>{{ $order->order_number }}</td>
+                                            <td>{{ $order->first_name }} {{ $order->last_name }}</td>
+                                            <td>{{ $order->email }}</td>
+                                            <td>{{ $order->quantity }}</td>
+                                            <td>$ {{ number_format($shipping_fee->price ?? 0, 2) }}</td>
+                                            <td>$ {{ number_format($order->total_amount, 2) }}</td>
+                                            <td>
+                                                @if($order->status == 'new')
+                                                    <span class="badge badge-primary">Mới</span>
+                                                @elseif($order->status == 'process')
+                                                    <span class="badge badge-warning">Xác nhận đơn hàng</span>
+                                                @elseif($order->status == 'shipping')
+                                                    <span class="badge badge-info">Đang giao hàng</span>
+                                                @elseif($order->status == 'delivered')
+                                                    <span class="badge badge-success">Đã giao</span>
+                                                @elseif($order->status == 'cancel_requested')
+                                                    <span class="badge badge-secondary">Yêu cầu hủy đơn hàng</span>
+                                                @elseif($order->status == 'cancelled')
+                                                    <span class="badge badge-danger">Đã hủy</span>
+                                                @elseif($order->status == 'failed_delivery')
+                                                    <span class="badge badge-danger">Giao hàng thất bại</span>
+                                                @elseif($order->status == 'out_of_stock')
+                                                    <span class="badge badge-dark">Hết hàng</span>
+                                                @elseif($order->status == 'store_payment')
+                                                    <span class="badge badge-info">Thanh toán tại cửa hàng</span>
+                                                @else
+                                                    <span class="badge badge-secondary">{{ $order->status }}</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                    
+                                              <form method="POST" action="{{ route('user.order.delete', [$order->id]) }}">
+                                                  @csrf
+                                                  @method('delete')
+                                                  <a href="{{ route('user.order.show', $order->id) }}" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Xem" data-placement="bottom">
+                                                  <i class="fas fa-eye"></i>
+                                              </a>
+                                                  <button class="btn btn-danger btn-sm delete-order" data-id="{{ $order->id }}" data-toggle="tooltip" data-placement="bottom" title="Xóa">
+                                                      <i class="fas fa-trash-alt"></i>
+                                                  </button>
+                                              </form>
+                                          </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <h6 class="text-center">Không có đơn hàng nào! Vui lòng đặt hàng sản phẩm.</h6>
+                        @endif
+                    </div>
         {{$orders->links()}}
       </div>
     </div>

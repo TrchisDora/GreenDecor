@@ -1,565 +1,567 @@
 @extends('frontend.layouts.master')
-@section('title','Ecommerce Laravel || HOME PAGE')
+@section('title', 'GreenDecor || Trang chủ')
 @section('main-content')
+
 <!-- Slider Area -->
-<div class="container-fluid mb-4 mt-4">
+<div class="container-fluid mb-4">
     <div class="row px-xl-5">
-       <!-- Cột trái: Danh mục sản phẩm -->
-<div class="col-lg-3 d-none d-lg-block">
-    <div class="shop-sidebar">
-                                <!-- Single Widget -->
-                                <div class="single-widget category">
-                                    <ul class="categor-list">
-										@php
-											// $category = new Category();
-											$menu=App\Models\Category::getAllParentWithChild();
-										@endphp
-										@if($menu)
-										<li>
-											@foreach($menu as $cat_info)
-													@if($cat_info->child_cat->count()>0)
-														<li><a href="{{route('product-cat',$cat_info->slug)}}">{{$cat_info->title}}</a>
-															<ul>
-																@foreach($cat_info->child_cat as $sub_menu)
-																	<li><a href="{{route('product-sub-cat',[$cat_info->slug,$sub_menu->slug])}}">{{$sub_menu->title}}</a></li>
-																@endforeach
-															</ul>
-														</li>
-													@else
-														<li><a href="{{route('product-cat',$cat_info->slug)}}">{{$cat_info->title}}</a></li>
-													@endif
-											@endforeach
-										</li>
-										@endif
-                                        {{-- @foreach(Helper::productCategoryList('products') as $cat)
-                                            @if($cat->is_parent==1)
-												<li><a href="{{route('product-cat',$cat->slug)}}">{{$cat->title}}</a></li>
-											@endif
-                                        @endforeach --}}
-                                    </ul>
-                                </div>
-                                <!--/ End Single Widget -->
-                              
-                               
-    </div>
-</div>
+        
+        <!-- Cột trái: Danh mục sản phẩm -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <!-- Nội dung danh mục nếu có -->
+        </div>
 
         <!-- Cột phải: Carousel slider -->
         <div class="col-lg-9">
-        @if(count($banners)>0)
-    <section id="Gslider" class="carousel slide" data-ride="carousel">
-        <ol class="carousel-indicators">
-            @foreach($banners as $key=>$banner)
-        <li data-target="#Gslider" data-slide-to="{{$key}}" class="{{(($key==0)? 'active' : '')}}"></li>
-            @endforeach
+            @if(count($banners) > 0)
+                <section id="header-carousel" class="carousel slide" data-ride="carousel">
 
-        </ol>
-        <div class="carousel-inner" role="listbox">
-                @foreach($banners as $key=>$banner)
-                <div class="carousel-item {{(($key==0)? 'active' : '')}}">
-                    <img class="first-slide" src="{{$banner->photo}}" alt="First slide">
-                    <div class="carousel-caption d-none d-md-block text-left">
-                        <h1 class="wow fadeInDown">{{$banner->title}}</h1>
-                        <p>{!! html_entity_decode($banner->description) !!}</p>
-                        <a class="btn btn-lg ws-btn wow fadeInUpBig" href="{{route('product-grids')}}" role="button">Shop Now<i class="far fa-arrow-alt-circle-right"></i></i></a>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-        <a class="carousel-control-prev" href="#Gslider" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#Gslider" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-        </a>
-    </section>
-@endif
-        </div>
-    </div>
-</div>
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        @foreach($banners as $key => $banner)
+                            <li data-target="#header-carousel" data-slide-to="{{ $key }}" class="{{ $key == 0 ? 'active' : '' }}"></li>
+                        @endforeach
+                    </ol>
 
+                    <!-- Slides -->
+                    <div class="carousel-inner">
+                        @foreach($banners as $key => $banner)
+                            <div class="carousel-item {{ $key == 0 ? 'active' : '' }}" style="height: 620px;">
+                                <div class="banner-wrapper">
 
-<!--/ End Slider Area -->
+                                    <!-- Ảnh nền -->
+                                    <div class="banner-image">
+                                        <img src="{{ Helper::fixStoragePath($banner->photo) }}" alt="Slide {{ $key + 1 }}">
+                                    </div>
 
-<!-- Start Small Banner  -->
-<section class="small-banner section">
-    <div class="container-fluid mb-4 mt-4">
-        <div class="row">
-            @php
-            $category_lists=DB::table('categories')->where('status','active')->limit(3)->get();
-            @endphp
-            @if($category_lists)
-                @foreach($category_lists as $cat)
-                    @if($cat->is_parent==1)
-                        <!-- Single Banner  -->
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="single-banner">
-                                @if($cat->photo)
-                                    <img src="{{$cat->photo}}" alt="{{$cat->photo}}">
-                                @else
-                                    <img src="https://via.placeholder.com/600x370" alt="#">
-                                @endif
-                                <div class="content">
-                                    <h3>{{$cat->title}}</h3>
-                                        <a href="{{route('product-cat',$cat->slug)}}">Discover Now</a>
+                                    <!-- Nội dung khi hover -->
+                                    <div class="banner-content text-center">
+                                        <div class="p-3" style="max-width: 700px;">
+                                            <h4 class="text-uppercase font-weight-medium mb-3">
+                                                {{ $banner->title }}
+                                            </h4>
+                                            <h3 class="font-weight-semi-bold mb-4">
+                                                {!! html_entity_decode($banner->description) !!}
+                                            </h3>
+                                            <a href="{{ route('product-grids') }}" class="btn btn-light py-2 px-4">
+                                                Shop Now
+                                            </a>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
-                        </div>
-                    @endif
-                    <!-- /End Single Banner  -->
-                @endforeach
-            @endif
-        </div>
-    </div>
-</section>
-<!-- End Small Banner -->
-
-<!-- Start Product Area -->
-<div class="product-area section">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-title">
-                        <h2>New Items</h2>
+                        @endforeach
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="product-info">
-                        <div class="nav-main">
-                            <!-- Tab Nav -->
-                            <ul class="nav nav-tabs filter-tope-group" id="myTab" role="tablist">
-                                @php
-                                    $categories=DB::table('categories')->where('status','active')->where('is_parent',1)->get();
-                                    // dd($categories);
-                                @endphp
-                                @if($categories)
-                                <button class="btn" style="background:black"data-filter="*">
-                                    Recently Added
-                                </button>
-                                    @foreach($categories as $key=>$cat)
 
-                                    <button class="btn" style="background:none;color:black;"data-filter=".{{$cat->id}}">
-                                        {{$cat->title}}
-                                    </button>
-                                    @endforeach
-                                @endif
-                            </ul>
-                            <!--/ End Tab Nav -->
+                    <!-- Controls -->
+                    <a class="carousel-control-prev" href="#header-carousel" data-slide="prev">
+                        <div class="btn btn-dark" style="width: 45px; height: 45px;">
+                            <span class="carousel-control-prev-icon mb-n2"></span>
                         </div>
-                        <div class="tab-content isotope-grid" id="myTabContent">
-    @php
-        $recentlyAddedProducts = DB::table('products')
-            ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->take(8) // Get the 8 most recently added products
-            ->get();
-    @endphp
-
-    @foreach($recentlyAddedProducts as $key => $product)
-        <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item {{$product->cat_id}}">
-            <div class="single-product">
-                <div class="product-img">
-                    <a href="{{route('product-detail', $product->slug)}}">
-                        @php
-                            $photos = explode(',', $product->photo);
-                        @endphp
-                        <img class="default-img" src="{{$photos[0]}}" alt="{{$photos[0]}}">
-                        <img class="hover-img" src="{{$photos[0]}}" alt="{{$photos[0]}}">
-                        @if($product->stock <= 0)
-                            <span class="out-of-stock">Sold Out</span>
-                        @elseif($product->condition == 'new')
-                            <span class="new">New</span>
-                        @elseif($product->condition == 'hot')
-                            <span class="hot">Hot</span>
-                        @else
-                            <span class="price-dec">{{$product->discount}}% Off</span>
-                        @endif
                     </a>
-                    <div class="button-head">
-                        <div class="product-action">
-                            <a data-toggle="modal" data-target="#{{$product->id}}" title="Quick View" href="#"><i class="ti-eye"></i><span>Quick Shop</span></a>
-                            <a title="Wishlist" href="{{route('add-to-wishlist', $product->slug)}}"><i class="ti-heart"></i><span>Add to Wishlist</span></a>
+                    <a class="carousel-control-next" href="#header-carousel" data-slide="next">
+                        <div class="btn btn-dark" style="width: 45px; height: 45px;">
+                            <span class="carousel-control-next-icon mb-n2"></span>
                         </div>
-                        <div class="product-action-2">
-                            <a title="Add to cart" href="{{route('add-to-cart', $product->slug)}}">Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="product-content">
-                    <h3><a href="{{route('product-detail', $product->slug)}}">{{$product->title}}</a></h3>
-                    @php
-                        $after_discount = ($product->price - ($product->price * $product->discount) / 100);
-                    @endphp
-                    <div class="product-price">
-                        <span>${{number_format($after_discount, 2)}}</span>
-                        <del style="padding-left: 4%;">${{number_format($product->price, 2)}}</del>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-</div>
-<!-- End Product Area -->
-{{-- @php
-    $featured=DB::table('products')->where('is_featured',1)->where('status','active')->orderBy('id','DESC')->limit(1)->get();
-@endphp --}}
-<!-- Start Midium Banner  -->
-<section class="midium-banner">
-    <div class="container">
-        <div class="row">
-            @if($featured)
-                @foreach($featured as $data)
-                    <!-- Single Banner  -->
-                    <div class="col-lg-6 col-md-6 col-12">
-                        <div class="single-banner">
-                            @php
-                                $photo=explode(',',$data->photo);
-                            @endphp
-                            <img src="{{$photo[0]}}" alt="{{$photo[0]}}">
-                            <div class="content">
-                                <p>{{$data->cat_info['title']}}</p>
-                                <h3>{{$data->title}} <br>Up to<span> {{$data->discount}}%</span></h3>
-                                <a href="{{route('product-detail',$data->slug)}}">Shop Now</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /End Single Banner  -->
-                @endforeach
+                    </a>
+
+                </section>
             @endif
         </div>
+        
     </div>
-</section>
-<!-- End Midium Banner -->
+</div>
+<!-- /End Slider Area -->
 
-<!-- Start Most Popular -->
-<div class="product-area most-popular section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-title">
-                    <h2>Hot Item</h2>
-                </div>
+
+<!-- Featured Start -->
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5 pb-3">
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+                <h1 class="fa fa-check text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">Sản phẩm chất lượng</h5>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="owl-carousel popular-slider">
-                    @foreach($product_lists as $product)
-                        @if($product->condition=='hot')
-                            <!-- Start Single Product -->
-                        <div class="single-product">
-                            <div class="product-img">
-                                <a href="{{route('product-detail',$product->slug)}}">
-                                    @php
-                                        $photo=explode(',',$product->photo);
-                                    // dd($photo);
-                                    @endphp
-                                    <img class="default-img" src="{{$photo[0]}}" alt="{{$photo[0]}}">
-                                    <img class="hover-img" src="{{$photo[0]}}" alt="{{$photo[0]}}">
-                                    {{-- <span class="out-of-stock">Hot</span> --}}
-                                </a>
-                                <div class="button-head">
-                                    <div class="product-action">
-                                        <a data-toggle="modal" data-target="#{{$product->id}}" title="Quick View" href="#"><i class=" ti-eye"></i><span>Quick Shop</span></a>
-                                        <a title="Wishlist" href="{{route('add-to-wishlist',$product->slug)}}" ><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
-                                    </div>
-                                    <div class="product-action-2">
-                                        <a href="{{route('add-to-cart',$product->slug)}}">Add to cart</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-content">
-                                <h3><a href="{{route('product-detail',$product->slug)}}">{{$product->title}}</a></h3>
-                                <div class="product-price">
-                                    <span class="old">${{number_format($product->price,2)}}</span>
-                                    @php
-                                    $after_discount=($product->price-($product->price*$product->discount)/100)
-                                    @endphp
-                                    <span>${{number_format($after_discount,2)}}</span>
-                                </div>
-                            </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+                <h1 class="fa fa-shipping-fast text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">Miễn phí giao hàng</h5>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+                <h1 class="fas fa-exchange-alt text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">Đổi trả trong 14 ngày</h5>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+                <h1 class="fa fa-phone-volume text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">Hỗ trợ 24/7</h5>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Featured End -->
+
+<!-- Danh mục sản phẩm -->
+@php
+    $category_lists = DB::table('categories')
+        ->where('status', 'active')
+        ->where('is_parent', 1)
+        ->get();
+@endphp
+<div class="container-fluid pt-5">
+    <div class="d-flex justify-content-center flex-wrap">
+        @foreach($category_lists as $index => $cat)
+            @php
+                // Lấy danh sách ID của loại con
+                $childCategoryIDs = DB::table('categories')
+                    ->where('parent_id', $cat->id)
+                    ->pluck('id')
+                    ->toArray();
+
+                // Đếm loại con
+                $childCount = count($childCategoryIDs);
+
+                // Đếm sản phẩm thuộc loại cha hoặc loại con
+                $productCount = DB::table('products')
+                    ->where(function ($query) use ($cat, $childCategoryIDs) {
+                        $query->where('cat_id', $cat->id);
+                        if (!empty($childCategoryIDs)) {
+                            $query->orWhereIn('child_cat_id', $childCategoryIDs);
+                        }
+                    })
+                    ->count();
+            @endphp
+
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 {{ $index >= 8 ? 'extra-category d-none' : '' }}">
+                <a href="{{ route('product-grids-cat', $cat->slug) }}" class="text-decoration-none text-dark">
+                    <div class="cat-item d-flex flex-column border p-3 h-100 rounded-3 text-center hover-shadow">
+                        <p class="text-muted mb-1">
+                            {{ $childCount }} loại, {{ $productCount }} sản phẩm
+                        </p>
+                        <div class="cat-img mb-3">
+                            <img src="{{ Helper::fixStoragePath( $cat->photo ?? 'https://via.placeholder.com/600x370' ) }}"
+                                class="img-fluid w-100"
+                                style="height: 253px; object-fit: cover;"
+                                alt="{{ $cat->title }}">
                         </div>
-                        <!-- End Single Product -->
+                        <h6 class="fw-semibold mb-0">{{ $cat->title }}</h6>
+                    </div>
+                </a>
+            </div>
+        @endforeach
+    </div>
+
+    @if(count($category_lists) > 8)
+        <div class="row">
+            <div class="col-12 text-center">
+                <button id="toggle-category-btn" class="btn btn-outline-success my-3 px-4 py-2">
+                    Xem thêm danh mục
+                </button>
+            </div>
+        </div>
+    @endif
+</div>
+@php
+$newProducts = DB::table('products')
+    ->where('status', 'active')
+    ->where('condition', 'hot')
+    ->orderByDesc('id')
+    ->get();
+@endphp
+<!-- New Products Start -->
+<div class="container-fluid pt-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title px-5">
+            <span class="px-2">Sản phẩm mới</span>
+        </h2>
+    </div>
+
+    <div class="row px-xl-5 pb-3" id="product-list">
+        @foreach($newProducts as $key => $product)
+            @php
+                $discounted = $product->price - ($product->price * $product->discount / 100);
+            @endphp
+
+            <div class="col-lg-3 col-md-6 col-sm-12 pb-1 product-item-wrapper" style="{{ $key >= 8 ? 'display:none;' : '' }}">
+                <div class="card product-item border-0 mb-4">
+                    
+                    <!-- Hình ảnh sản phẩm -->
+                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                        <div class="product-image-wrapper {{ $product->stock <= 0 ? 'out-of-stock' : '' }}">
+                            <img class="img-fluid w-100"
+                                 src=" {{ Helper::fixStoragePath($product->photo) }}"
+                                 alt="{{ $product->title }}"
+                                 style="width: 426px; height: 426px; object-fit: cover;">
+                            <div class="product-overlay"></div>
+
+                            @if($product->stock <= 0)
+                                <div class="out-of-stock-badge">Hết hàng</div>
+                            @else
+                                @if($product->discount > 0)
+                                    <span class="position-absolute bg-danger text-white px-3 py-2 rounded-pill shadow"
+                                          style="top: 15px; left: 15px; font-size: 1rem; font-weight: bold; z-index: 10;">
+                                        -{{ $product->discount }}%
+                                    </span>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Nội dung sản phẩm -->
+                    <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                        <a href="{{ url('/product-detail/' . $product->slug) }}" class="btn btn-sm text-dark p-0">
+                            <h6 class="text-truncate mb-3">{{ $product->title }}</h6>
+                        </a>
+                        <div class="d-flex justify-content-center">
+                            <h6>{{ number_format($discounted, 0, ',', '.') }} đ</h6>
+                            @if ($product->discount > 0)
+                                <h6 class="text-muted ml-2">
+                                    <del>{{ number_format($product->price, 0, ',', '.') }} đ</del>
+                                </h6>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Footer: Nút chức năng -->
+                    <div class="card-footer bg-white border-top p-3">
+
+                        {{-- Nhóm nút Xem nhanh + Yêu thích --}}
+                        <div class="d-flex mb-3 flex-wrap justify-content-between btn-group-spaced">
+                            <a href="#" data-toggle="modal" data-target="#quickView{{ $product->id }}"
+                               class="btn btn-sm text-dark p-0" title="Quick View">
+                                <i class="ti-eye text-primary mr-1"></i>Xem nhanh
+                            </a>
+                            <a href="{{ route('add-to-wishlist', $product->slug) }}"
+                               class="btn btn-sm text-dark p-0"
+                               title="Wishlist"
+                               data-id="{{ $product->id }}">
+                                <i class="ti-heart text-danger"></i> Yêu thích
+                            </a>
+                        </div>
+
+                        {{-- Nút Thêm vào giỏ --}}
+                        <a href="{{ route('add-to-cart', $product->slug) }}"
+                           class="btn btn-success btn-block d-flex align-items-center justify-content-center py-3 rounded-pill font-weight-bold btn-fade"
+                           title="Thêm vào giỏ">
+                            <i class="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    @if($newProducts->count() > 8)
+        <div class="text-center mt-4 mb-5">
+            <button id="loadMoreNewBtn" class="btn btn-outline-success btn-lg px-5 py-3 rounded-pill shadow-sm">
+                Xem thêm
+            </button>
+        </div>
+    @endif
+</div>
+<!-- New Products End -->
+
+@if($featured)
+    <div class="container-fluid pt-5">
+        <div class="row">
+            @foreach($featured as $key => $data)
+                @php
+                    $photo = explode(',', $data->photo);
+                    $isEven = $key % 2 == 0;
+                @endphp
+                <div class="col-12 col-md-6 pb-4">
+                    <div class="row bg-secondary text-white rounded-4 overflow-hidden align-items-stretch h-100 g-0">
+                        @if($isEven)
+                            <!-- Image left -->
+                            <div class="col-12 col-md-6 p-0">
+                                <img src="{{ Helper::fixStoragePath($photo[0]) }}" class="img-fluid w-100 h-100" style="object-fit: cover; max-height: 300px;" />
+                            </div>
+                            <!-- Text right -->
+                            <div class="col-12 col-md-6 d-flex flex-column justify-content-center text-center text-md-start p-4">
+                                <h5 class="text-uppercase text-primary mb-2">{{ $data->cat_info['title'] }}</h5>
+                                <h2 class="mb-3 text-dark h4">{{ $data->title }}<br><span class="text-warning">Giảm đến {{ $data->discount }}%</span></h2>
+                                <a href="{{ route('product-detail', $data->slug) }}" class="btn btn-outline-primary py-md-2 px-md-3">Shop Now</a>
+                            </div>
+                        @else
+                            <!-- Text left -->
+                            <div class="col-12 col-md-6 d-flex flex-column justify-content-center text-center text-md-end p-4 order-2 order-md-1">
+                                <h5 class="text-uppercase text-primary mb-2">{{ $data->cat_info['title'] }}</h5>
+                                <h2 class="mb-3 text-dark h4">{{ $data->title }}<br><span class="text-warning">Giảm đến {{ $data->discount }}%</span></h2>
+                                <a href="{{ route('product-detail', $data->slug) }}" class="btn btn-outline-primary py-md-2 px-md-3">Shop Now</a>
+                            </div>
+                            <!-- Image right -->
+                            <div class="col-12 col-md-6 p-0 order-1 order-md-2">
+                                <img src="{{ Helper::fixStoragePath($photo[0]) }}" class="img-fluid w-100 h-100" style="object-fit: cover; max-height: 300px;" />
+                            </div>
                         @endif
-                    @endforeach
+                    </div>
                 </div>
-            </div>
+            @endforeach
         </div>
     </div>
+@endif
+
+@php
+$products = DB::table('products')
+    ->where('status', 'active')
+    ->where('is_featured', 1)
+    ->orderByDesc('id')
+    ->get();
+@endphp
+<!-- Products Start -->
+<div class="container-fluid pt-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title px-5">
+            <span class="px-2">Sản phẩm nổi bật</span>
+        </h2>
+    </div>
+
+    <div class="row px-xl-5 pb-3" id="product-list">
+        @foreach($products as $key => $product)
+            @php
+                $discounted = $product->price - ($product->price * $product->discount / 100);
+            @endphp
+
+            <div class="col-lg-3 col-md-6 col-sm-12 pb-1 product-item-wrapper" style="{{ $key >= 8 ? 'display:none;' : '' }}">
+                <div class="card product-item border-0 mb-4">
+                    
+                    <!-- Hình ảnh sản phẩm -->
+                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                        <div class="product-image-wrapper {{ $product->stock <= 0 ? 'out-of-stock' : '' }}">
+                            <img class="img-fluid w-100"
+                                 src="{{ Helper::fixStoragePath($product->photo) }}"
+                                 alt="{{ $product->title }}"
+                                 style="width: 426px; height: 426px; object-fit: cover;">
+                            <div class="product-overlay"></div>
+
+                            @if($product->stock <= 0)
+                                <div class="out-of-stock-badge">Hết hàng</div>
+                            @else
+                                @if($product->discount > 0)
+                                    <span class="position-absolute bg-danger text-white px-3 py-2 rounded-pill shadow"
+                                          style="top: 15px; left: 15px; font-size: 1rem; font-weight: bold; z-index: 10;">
+                                        -{{ $product->discount }}%
+                                    </span>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Nội dung sản phẩm -->
+                    <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                        <a href="{{ url('/product-detail/' . $product->slug) }}" class="btn btn-sm text-dark p-0">
+                            <h6 class="text-truncate mb-3">{{ $product->title }}</h6>
+                        </a>
+                        <div class="d-flex justify-content-center">
+                            <h6>{{ number_format($discounted, 0, ',', '.') }} đ</h6>
+                            @if ($product->discount > 0)
+                                <h6 class="text-muted ml-2">
+                                    <del>{{ number_format($product->price, 0, ',', '.') }} đ</del>
+                                </h6>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Footer: Nút chức năng -->
+                    <div class="card-footer bg-white border-top p-3">
+
+                        {{-- Nhóm nút Xem nhanh + Yêu thích --}}
+                        <div class="d-flex mb-3 flex-wrap justify-content-between btn-group-spaced">
+                            <a href="#" data-toggle="modal" data-target="#quickView{{ $product->id }}"
+                               class="btn btn-sm text-dark p-0" title="Quick View">
+                                <i class="ti-eye text-primary mr-1"></i>Xem nhanh
+                            </a>
+                            <a href="{{ route('add-to-wishlist', $product->slug) }}"
+                               class="btn btn-sm text-dark p-0"
+                               title="Wishlist"
+                               data-id="{{ $product->id }}">
+                                <i class="ti-heart text-danger"></i> Yêu thích
+                            </a>
+                        </div>
+
+                        {{-- Nút Thêm vào giỏ --}}
+                        <a href="{{ route('add-to-cart', $product->slug) }}"
+                           class="btn btn-success btn-block d-flex align-items-center justify-content-center py-3 rounded-pill font-weight-bold btn-fade"
+                           title="Thêm vào giỏ">
+                            <i class="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    @if($products->count() > 8)
+        <div class="text-center mt-4 mb-5">
+            <button id="loadMoreBtn" class="btn btn-outline-success btn-lg px-5 py-3 rounded-pill shadow-sm">
+                Xem thêm
+            </button>
+        </div>
+    @endif
 </div>
-<!-- End Most Popular Area -->
-
-<!-- Start Shop Home List  -->
-<section class="shop-home-list section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-12">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="shop-section-title">
-                            <h1>Latest Items</h1>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    @php
-                        $product_lists=DB::table('products')->where('status','active')->orderBy('id','DESC')->limit(6)->get();
-                    @endphp
-                    @foreach($product_lists as $product)
-                        <div class="col-md-4">
-                            <!-- Start Single List  -->
-                            <div class="single-list">
-                                <div class="row">
-                                <div class="col-lg-6 col-md-6 col-12">
-                                    <div class="list-image overlay">
-                                        @php
-                                            $photo=explode(',',$product->photo);
-                                            // dd($photo);
-                                        @endphp
-                                        <img src="{{$photo[0]}}" alt="{{$photo[0]}}">
-                                        <a href="{{route('add-to-cart',$product->slug)}}" class="buy"><i class="fa fa-shopping-bag"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-12 no-padding">
-                                    <div class="content">
-                                        <h4 class="title"><a href="{{route('product-detail',$product->slug)}}">{{$product->title}}</a></h4>
-                                        <p class="price with-discount">{{number_format($product->discount,2)}}% OFF</p>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                            <!-- End Single List  -->
-                        </div>
-                    @endforeach
-
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End Shop Home List  -->
-
-<!-- Start Shop Blog  -->
-<section class="shop-blog section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-title">
-                    <h2>From Our Blog</h2>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            @if($posts)
-                @foreach($posts as $post)
-                    <div class="col-lg-4 col-md-6 col-12">
-                        <!-- Start Single Blog  -->
-                        <div class="shop-single-blog">
-                            <img src="{{$post->photo}}" alt="{{$post->photo}}">
-                            <div class="content">
-                                <p class="date">{{$post->created_at->format('d M , Y. D')}}</p>
-                                <a href="{{route('blog.detail',$post->slug)}}" class="title">{{$post->title}}</a>
-                                <a href="{{route('blog.detail',$post->slug)}}" class="more-btn">Continue Reading</a>
-                            </div>
-                        </div>
-                        <!-- End Single Blog  -->
-                    </div>
-                @endforeach
-            @endif
-
-        </div>
-    </div>
-</section>
-<!-- End Shop Blog  -->
-
-<!-- Start Shop Services Area -->
-<section class="shop-services section home">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3 col-md-6 col-12">
-                <!-- Start Single Service -->
-                <div class="single-service">
-                    <i class="ti-rocket"></i>
-                    <h4>Free shiping</h4>
-                    <p>Orders over $100</p>
-                </div>
-                <!-- End Single Service -->
-            </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <!-- Start Single Service -->
-                <div class="single-service">
-                    <i class="ti-reload"></i>
-                    <h4>Free Return</h4>
-                    <p>Within 30 days returns</p>
-                </div>
-                <!-- End Single Service -->
-            </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <!-- Start Single Service -->
-                <div class="single-service">
-                    <i class="ti-lock"></i>
-                    <h4>Sucure Payment</h4>
-                    <p>100% secure payment</p>
-                </div>
-                <!-- End Single Service -->
-            </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <!-- Start Single Service -->
-                <div class="single-service">
-                    <i class="ti-tag"></i>
-                    <h4>Best Peice</h4>
-                    <p>Guaranteed price</p>
-                </div>
-                <!-- End Single Service -->
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End Shop Services Area -->
+<!-- Products End -->
 
 @include('frontend.layouts.newsletter')
+<!-- Start Shop Blog -->
 
-<!-- Modal -->
-@if($product_lists)
-    @foreach($product_lists as $key=>$product)
-        <div class="modal fade" id="{{$product->id}}" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="ti-close" aria-hidden="true"></span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row no-gutters">
-                                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                    <!-- Product Slider -->
-                                        <div class="product-gallery">
-                                            <div class="quickview-slider-active">
-                                                @php
-                                                    $photo=explode(',',$product->photo);
-                                                // dd($photo);
-                                                @endphp
-                                                @foreach($photo as $data)
-                                                    <div class="single-slider">
-                                                        <img src="{{$data}}" alt="{{$data}}">
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    <!-- End Product slider -->
-                                </div>
-                                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="quickview-content">
-                                        <h2>{{$product->title}}</h2>
-                                        <div class="quickview-ratting-review">
-                                            <div class="quickview-ratting-wrap">
-                                                <div class="quickview-ratting">
-                                                    {{-- <i class="yellow fa fa-star"></i>
-                                                    <i class="yellow fa fa-star"></i>
-                                                    <i class="yellow fa fa-star"></i>
-                                                    <i class="yellow fa fa-star"></i>
-                                                    <i class="fa fa-star"></i> --}}
-                                                    @php
-                                                        $rate=DB::table('product_reviews')->where('product_id',$product->id)->avg('rate');
-                                                        $rate_count=DB::table('product_reviews')->where('product_id',$product->id)->count();
-                                                    @endphp
-                                                    @for($i=1; $i<=5; $i++)
-                                                        @if($rate>=$i)
-                                                            <i class="yellow fa fa-star"></i>
-                                                        @else
-                                                        <i class="fa fa-star"></i>
-                                                        @endif
-                                                    @endfor
-                                                </div>
-                                                <a href="#"> ({{$rate_count}} customer review)</a>
-                                            </div>
-                                            <div class="quickview-stock">
-                                                @if($product->stock >0)
-                                                <span><i class="fa fa-check-circle-o"></i> {{$product->stock}} in stock</span>
-                                                @else
-                                                <span><i class="fa fa-times-circle-o text-danger"></i> {{$product->stock}} out stock</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        @php
-                                            $after_discount=($product->price-($product->price*$product->discount)/100);
-                                        @endphp
-                                        <h3><small><del class="text-muted">${{number_format($product->price,2)}}</del></small>    ${{number_format($after_discount,2)}}  </h3>
-                                        <div class="quickview-peragraph">
-                                            <p>{!! html_entity_decode($product->summary) !!}</p>
-                                        </div>
-                                        @if($product->size)
-                                            <div class="size">
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-12">
-                                                        <h5 class="title">Size</h5>
-                                                        <select>
-                                                            @php
-                                                            $sizes=explode(',',$product->size);
-                                                            // dd($sizes);
-                                                            @endphp
-                                                            @foreach($sizes as $size)
-                                                                <option>{{$size}}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    {{-- <div class="col-lg-6 col-12">
-                                                        <h5 class="title">Color</h5>
-                                                        <select>
-                                                            <option selected="selected">orange</option>
-                                                            <option>purple</option>
-                                                            <option>black</option>
-                                                            <option>pink</option>
-                                                        </select>
-                                                    </div> --}}
-                                                </div>
-                                            </div>
-                                        @endif
-                                        <form action="{{route('single-add-to-cart')}}" method="POST" class="mt-4">
-                                            @csrf
-                                            <div class="quantity">
-                                                <!-- Input Order -->
-                                                <div class="input-group">
-                                                    <div class="button minus">
-                                                        <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-                                                            <i class="ti-minus"></i>
-                                                        </button>
-                                                    </div>
-													<input type="hidden" name="slug" value="{{$product->slug}}">
-                                                    <input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1">
-                                                    <div class="button plus">
-                                                        <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
-                                                            <i class="ti-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <!--/ End Input Order -->
-                                            </div>
-                                            <div class="add-to-cart">
-                                                <button type="submit" class="btn">Add to cart</button>
-                                                <a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a>
-                                            </div>
-                                        </form>
-                                        <div class="default-social">
-                                        </div>
-                                    </div>
-                                </div>
+<section class="shop-blog section bg-light">
+    @php
+        $brands = DB::table('brands')->where('status', 'active')->get();
+    @endphp
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col">
+                <div class="owl-carousel vendor-carousel">
+                    @foreach ($brands as $brand)
+                    <div class="text-white rounded-4 overflow-hidden h-100 mr-3 ml-3">
+                    <!-- Hình ảnh thương hiệu -->
+                    <div class="p-0">
+                        <img src="{{ asset(Helper::fixStoragePath($brand->photo)) }}" alt="{{ $brand->title }}" class="img-fluid w-100" style="object-fit: cover;">
+                    </div>
+                    <!-- Tên thương hiệu -->
+                    <div class="d-flex flex-column justify-content-center text-center text-md-start p-4">
+                        <h5 class="mb-0 font-weight-bold" style="font-size: 20px; color: #28a745;">
+                            {{ $brand->title }}
+                        </h5>
+                    </div>
+                </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="shop-blog section py-5 bg-light">
+    <div class="container-fluid">
+        <!-- Section Title -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="section-title px-5"><span class="px-2">Từ các bài viết Của Chúng Tôi</span></h2>
+                <p class="text-muted">Khám phá mẹo vặt, hướng dẫn và thông tin mới nhất từ blog.</p>
+            </div>
+        </div>
+
+        <!-- Blog Posts -->
+        <div class="row d-flex justify-content-center flex-wrap">
+            @if($posts && count($posts) > 0)
+                @foreach($posts->take(3) as $post)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{{ Helper::fixStoragePath($post->photo) }}" alt="{{ $post->title }}" class="card-img-top img-fluid" style="height: 300px; object-fit: cover;">
+                                <span class="badge bg-primary position-absolute top-0 start-0 m-3 px-3 py-2 text-uppercase small">{{ $post->created_at->format('d M, Y') }}</span>
+                            </div>
+                            <div class="card-body d-flex flex-column p-4">
+                                <h5 class="card-title mb-3">
+                                    <a href="{{ route('blog.detail', $post->slug) }}" class="text-dark text-decoration-none fw-semibold hover-primary">
+                                        {{ $post->title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted flex-grow-1">
+                                    {{ \Illuminate\Support\Str::limit(strip_tags($post->summary), 100, '...') }}
+                                </p>
+                                <a href="{{ route('blog.detail', $post->slug) }}" class="btn btn-outline-primary mt-3 w-auto">
+                                    Đọc tiếp <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
+                @endforeach
+            @else
+                <div class="col-12 text-center">
+                    <p class="text-muted">Không có bài viết nào được tìm thấy.</p>
                 </div>
+            @endif
         </div>
-    @endforeach
-@endif
-<!-- Modal end -->
+
+        <!-- Xem tất cả Blog -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{{ route('blog') }}" class="btn btn-primary px-4">
+                    Xem tất cả bài viết <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Shop Blog -->
+
+<!-- Phần modal tách riêng sau danh sách sản phẩm -->
+@foreach($products as $product)
+    <!-- Quick View Modal -->
+    <div class="modal fade" id="quickView{{ $product->id }}" tabindex="-1" role="dialog" aria-labelledby="quickViewLabel{{ $product->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="quickViewLabel{{ $product->id }}">{{ $product->title }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        {{-- Image --}}
+                        <div class="col-md-6">
+                            @php $photo = explode(',', $product->photo); @endphp
+                            <img src="{{ Helper::fixStoragePath($photo[0]) }}" class="img-fluid w-100" style="height: 400px; object-fit: cover;" alt="{{ $product->title }}">
+                        </div>
+
+                        {{-- Product Info --}}
+                        <div class="col-md-6">
+                            <h4>{{ $product->title }}</h4>
+
+                            {{-- Giá sau khi giảm --}}
+                            @php $after_discount = $product->price - ($product->price * $product->discount / 100); @endphp
+                            <h5 class="text-primary">{{ number_format($after_discount, 0, ',', '.') }} đ
+                                @if ($product->discount > 0)
+                                    <del class="text-muted ml-2">{{ number_format($product->price, 0, ',', '.') }} đ</del>
+                                @endif
+                            </h5>
+
+                            {{-- Đánh giá sao --}}
+                            @php
+                                $rate = DB::table('product_reviews')->where('product_id', $product->id)->avg('rate');
+                            @endphp
+                            <div class="rating mb-3">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($rate >= $i)
+                                        <i class="fa fa-star text-warning"></i>
+                                    @else
+                                        <i class="fa fa-star text-secondary"></i>
+                                    @endif
+                                @endfor
+                                <small class="ml-2 text-muted">({{ number_format($rate, 1) }}/5)</small>
+                            </div>
+
+                            {{-- Mô tả --}}
+                            <p>{!! $product->summary !!}</p>
+
+                            {{-- Nút mua --}}
+                            <form action="{{ route('single-add-to-cart') }}" method="POST" class="mt-3">
+                                @csrf
+                                <input type="hidden" name="slug" value="{{ $product->slug }}">
+                                <input type="hidden" name="quant[1]" value="1">
+                                <button type="submit" class="btn btn-outline-success">
+                                    <i class="fa fa-shopping-cart mr-1"></i> Thêm vào giỏ
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+@endforeach
+
 @endsection
 
 @push('styles')
@@ -675,5 +677,34 @@
             return false
         }
     </script>
+    <script>
+    let itemsToShow = 8;
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const products = document.querySelectorAll('.product-item-wrapper');
 
+    loadMoreBtn.addEventListener('click', function () {
+        let hiddenItems = Array.from(products).filter(p => p.style.display === 'none');
+        for (let i = 0; i < 8 && i < hiddenItems.length; i++) {
+            hiddenItems[i].style.display = 'block';
+        }
+
+        if (Array.from(products).filter(p => p.style.display === 'none').length === 0) {
+            loadMoreBtn.style.display = 'none';
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('toggle-category-btn');
+        let expanded = false;
+
+        toggleBtn.addEventListener('click', function () {
+            const extras = document.querySelectorAll('.extra-category');
+            extras.forEach(el => el.classList.toggle('d-none'));
+
+            expanded = !expanded;
+            toggleBtn.textContent = expanded ? 'Ẩn bớt danh mục' : 'Xem thêm danh mục';
+        });
+    });
+</script>
 @endpush

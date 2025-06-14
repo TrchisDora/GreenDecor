@@ -1,91 +1,73 @@
 @extends('frontend.layouts.master')
 
-@section('title','Ecommerce Laravel || Register Page')
+@section('title','GreenDecor || Trang Đăng Ký')
 
 @section('main-content')
-	<!-- Breadcrumbs -->
-    <div class="breadcrumbs">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="bread-inner">
-                        <ul class="bread-list">
-                            <li><a href="{{route('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-                            <li class="active"><a href="javascript:void(0);">Register</a></li>
-                        </ul>
-                    </div>
+    <!-- Tiêu Đề Trang Bắt Đầu -->
+    <div class="container-fluid bg-secondary">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Đăng Ký</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="{{ route('home') }}" class="text-dark">Trang Chủ</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Đăng Ký</p>
+            </div>
+        </div>	
+    </div>
+    <!-- Kết Thúc Tiêu Đề Trang -->
+
+<!-- Đăng Ký Cửa Hàng -->
+<section class="shop-register section py-5 background-success-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-12">
+                <div class="register-form shadow-lg p-4 rounded bg-white">
+                    <!-- Form -->
+                    <form method="post" action="{{ route('register.submit') }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Tên Của Bạn<span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nhập tên của bạn" required value="{{ old('name') }}">
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Của Bạn<span class="text-danger">*</span></label>
+                            <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" placeholder="Nhập email của bạn" required value="{{ old('email') }}">
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật Khẩu Của Bạn<span class="text-danger">*</span></label>
+                            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Nhập mật khẩu của bạn" required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="password_confirmation" class="form-label">Xác Nhận Mật Khẩu<span class="text-danger">*</span></label>
+                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Xác nhận mật khẩu của bạn" required>
+                            @error('password_confirmation')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="d-grid gap-2 mb-3">
+                            <button class="btn btn-block btn-primary my-3 py-3y" type="submit">Đăng Ký</button>
+                        </div>
+                        <div class="text-center">
+                            <p>Bạn đã có tài khoản? <a href="{{ route('login.form') }}" class="text-primary">Quay lại Đăng Nhập</a></p>
+                        </div>
+                    </form>
+                    <!--/ Kết Thúc Form -->
                 </div>
             </div>
         </div>
     </div>
-    <!-- End Breadcrumbs -->
-            
-    <!-- Shop Login -->
-    <section class="shop login section">
-        <div class="container">
-            <div class="row"> 
-                <div class="col-lg-6 offset-lg-3 col-12">
-                    <div class="login-form">
-                        <h2>Register</h2>
-                        <!-- Form -->
-                        <form class="form" method="post" action="{{route('register.submit')}}">
-                            @csrf
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label>Your Name<span>*</span></label>
-                                        <input type="text" name="name" placeholder="" required="required" value="{{old('name')}}">
-                                        @error('name')
-                                            <span class="text-danger">{{$message}}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label>Your Email<span>*</span></label>
-                                        <input type="text" name="email" placeholder="" required="required" value="{{old('email')}}">
-                                        @error('email')
-                                            <span class="text-danger">{{$message}}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label>Your Password<span>*</span></label>
-                                        <input type="password" name="password" placeholder="" required="required" value="{{old('password')}}">
-                                        @error('password')
-                                            <span class="text-danger">{{$message}}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label>Confirm Password<span>*</span></label>
-                                        <input type="password" name="password_confirmation" placeholder="" required="required" value="{{old('password_confirmation')}}">
-                                        @error('password_confirmation')
-                                            <span class="text-danger">{{$message}}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group login-btn">
-                                        <button class="btn" type="submit">Register</button>
-                                        <a href="{{route('login.form')}}" class="btn btn-google">Back to Login</a>
-                                        <!-- OR
-                                        <a href="{{route('login.redirect','facebook')}}" class="btn btn-facebook"><i class="ti-facebook"></i></a>
-                                        <a href="{{route('login.redirect','github')}}" class="btn btn-github"><i class="ti-github"></i></a>
-                                        <a href="{{route('login.redirect','google')}}" class="btn btn-google"><i class="ti-google"></i></a> -->
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        <!--/ End Form -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--/ End Login -->
+</section>
+<!--/ Kết Thúc Đăng Ký -->
+
 @endsection
 
 @push('styles')

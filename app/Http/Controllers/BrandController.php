@@ -36,27 +36,37 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'title'=>'string|required',
+        // Validate input data
+        $this->validate($request, [
+            'title' => 'required|string|max:255',
+            'photo' => 'required|string',  // Assuming the photo is a string (URL or path)
+            'status' => 'required|in:active,inactive',
         ]);
-        $data=$request->all();
-        $slug=Str::slug($request->title);
-        $count=Brand::where('slug',$slug)->count();
-        if($count>0){
-            $slug=$slug.'-'.date('ymdis').'-'.rand(0,999);
+
+        // Get input data
+        $data = $request->all();
+
+        // Process slug for the brand
+        $slug = Str::slug($request->title);
+        $count = Brand::where('slug', $slug)->count();
+        if ($count > 0) {
+            $slug = $slug . '-' . now()->format('ymdis') . '-' . rand(0, 999);
         }
-        $data['slug']=$slug;
-        // return $data;
-        $status=Brand::create($data);
-        if($status){
-            request()->session()->flash('success','Brand created successfully');
+        $data['slug'] = $slug;
+
+        // Create a new brand
+        $status = Brand::create($data);
+
+        // Check result and flash message
+        if ($status) {
+            request()->session()->flash('success', 'Brand created successfully');
+        } else {
+            request()->session()->flash('error', 'Error, Please try again');
         }
-        else{
-            request()->session()->flash('error','Error, Please try again');
-        }
+
+        // Redirect to the brand list page
         return redirect()->route('brand.index');
     }
-
     /**
      * Display the specified resource.
      *
@@ -93,21 +103,38 @@ class BrandController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $brand=Brand::find($id);
-        $this->validate($request,[
-            'title'=>'string|required',
+        // Find the brand by ID
+        $brand = Brand::find($id);
+
+        // Validate incoming request
+        $this->validate($request, [
+            'title' => 'required|string|max:255',
+            'photo' => 'nullable|string', // Validate photo as a string (URL or path)
+            'status' => 'required|in:active,inactive',
         ]);
-        $data=$request->all();
-       
-        $status=$brand->fill($data)->save();
-        if($status){
-            request()->session()->flash('success','Brand updated successfully');
+
+        // Get all the input data
+        $data = $request->all();
+
+        // If there's a photo URL provided, use it
+        if ($request->has('photo') && $request->photo) {
+            $data['photo'] = $request->photo; // Update the photo URL/path
         }
-        else{
-            request()->session()->flash('error','Error, Please try again');
+
+        // Update the brand data
+        $status = $brand->fill($data)->save();
+
+        // Check if the update was successful and set session messages
+        if ($status) {
+            request()->session()->flash('success', 'Brand updated successfully');
+        } else {
+            request()->session()->flash('error', 'Error, Please try again');
         }
+
+        // Redirect back to the brand index page
         return redirect()->route('brand.index');
     }
+
 
     /**
      * Remove the specified resource from storage.

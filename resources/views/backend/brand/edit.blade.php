@@ -38,6 +38,23 @@
                             @enderror
                         </div>
 
+                        <!-- Ảnh -->
+                        <div class="form-group">
+                            <label for="inputPhoto" class="col-form-label">Ảnh <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-primary">
+                                        <i class="fas fa-image"></i> Chọn ảnh
+                                    </a>
+                                </span>
+                                <input id="thumbnail" class="form-control" type="text" name="photo" value="{{ $brand->photo }}">
+                            </div>
+                            <div id="holder" style="margin-top: 15px; max-height: 100px;"></div>
+                            @error('photo')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <!-- Trạng thái -->
                         <div class="form-group mb-3">
                             <label for="status" class="col-form-label">Trạng Thái <span class="text-danger">*</span></label>
@@ -56,6 +73,7 @@
                         </div>
 
                     </form>
+
                 </div>
             </div>
         </div>

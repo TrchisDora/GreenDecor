@@ -22,4 +22,9 @@ class Coupon extends Model
             return 0;
         }
     }
+    // Mối quan hệ với VoucherCondition
+    public function voucherConditions()
+    {
+        return $this->hasMany(VoucherCondition::class);
+    }
 }

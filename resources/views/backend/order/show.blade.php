@@ -2,6 +2,9 @@
 
 @section('title', 'Order Detail')
 @section('main-content')
+@php
+  $shipping_charge = DB::table('shipping_fees')->where('id', $order->shipping_id)->value('price');
+@endphp
   <div class="container-fluid px-4">
     <h1 class="mt-4">Chi tiết đơn hàng</h1>
     <ol class="breadcrumb mb-4">
@@ -44,91 +47,91 @@
         <td>{{ $order->first_name }} {{ $order->last_name }}</td>
         <td>{{ $order->email }}</td>
         <td>{{ $order->quantity }}</td>
-        <td>${{ $order->shipping->price }}</td>
-        <td>${{ number_format($order->total_amount, 2) }}</td>
+        <td>$ {{ number_format($shipping_charge)}}</td>
+        <td>${{ number_format($order->total_amount) }}</td>
         <td>
         
-        @if($order->status == 'new')
-      <span class="badge badge-primary">Mới</span>
-    @elseif($order->status == 'process')
-    <span class="badge badge-warning">Xác nhận đơn hàng</span>
-  @elseif($order->status == 'shipping')
-  <span class="badge badge-info">Đang giao hàng</span>
-@elseif($order->status == 'delivered')
-  <span class="badge badge-success">Đã giao</span>
-@elseif($order->status == 'cancel_requested')
-  <span class="badge badge-secondary">Yêu cầu hủy đơn hàng</span>
-@elseif($order->status == 'cancelled')
-  <span class="badge badge-danger">Đã hủy</span>
-@elseif($order->status == 'failed_delivery')
-  <span class="badge badge-danger">Giao hàng thất bại</span>
-@elseif($order->status == 'out_of_stock')
-  <span class="badge badge-dark">Hết hàng</span>
-@elseif($order->status == 'store_payment')
-  <span class="badge badge-info">Thanh toán tại cửa hàng</span>
-@else
-  <span class="badge badge-secondary">{{ $order->status }}</span>
-@endif
-       
-        </td>
-        <td class="d-flex">
-        <a href="{{ route('order.edit', $order->id) }}" class="btn btn-sm btn-info me-2" title="Chỉnh sửa">
-        <i class="fas fa-edit"></i>
-        </a>
-        <form method="POST" action="{{ route('order.destroy', $order->id) }}">
-        @csrf
-        @method('delete')
-        <button class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')" title="Xóa">
-        <i class="fas fa-trash-alt"></i>
-        </button>
-        </form>
-        </td>
-      </tr>
-      </tbody>
-      </table>
-      </div>
+                @if($order->status == 'new')
+              <span class="badge badge-primary">Mới</span>
+            @elseif($order->status == 'process')
+            <span class="badge badge-warning">Xác nhận đơn hàng</span>
+          @elseif($order->status == 'shipping')
+          <span class="badge badge-info">Đang giao hàng</span>
+        @elseif($order->status == 'delivered')
+          <span class="badge badge-success">Đã giao</span>
+        @elseif($order->status == 'cancel_requested')
+          <span class="badge badge-secondary">Yêu cầu hủy đơn hàng</span>
+        @elseif($order->status == 'cancelled')
+          <span class="badge badge-danger">Đã hủy</span>
+        @elseif($order->status == 'failed_delivery')
+          <span class="badge badge-danger">Giao hàng thất bại</span>
+        @elseif($order->status == 'out_of_stock')
+          <span class="badge badge-dark">Hết hàng</span>
+        @elseif($order->status == 'store_payment')
+          <span class="badge badge-info">Thanh toán tại cửa hàng</span>
+        @else
+          <span class="badge badge-secondary">{{ $order->status }}</span>
+        @endif
+              
+                </td>
+                <td class="d-flex">
+                <a href="{{ route('order.edit', $order->id) }}" class="btn btn-sm btn-info me-2" title="Chỉnh sửa">
+                <i class="fas fa-edit"></i>
+                </a>
+                <form method="POST" action="{{ route('order.destroy', $order->id) }}">
+                @csrf
+                @method('delete')
+                <button class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')" title="Xóa">
+                <i class="fas fa-trash-alt"></i>
+                </button>
+                </form>
+                </td>
+              </tr>
+              </tbody>
+              </table>
+              </div>
 
-      <div class="row mt-4">
-      <div class="col-md-6">
-      <div class="card">
-      <div class="card-header">Thông tin đơn hàng</div>
-      <div class="card-body">
-        <table class="table table-borderless">
-        <tr>
-        <td>Mã đơn:</td>
-        <td>{{ $order->order_number }}</td>
-        </tr>
-        <tr>
-        <td>Ngày đặt:</td>
-        <td>{{ $order->created_at->format('d/m/Y - H:i') }}</td>
-        </tr>
-        <tr>
-        <td>Số lượng:</td>
-        <td>{{ $order->quantity }}</td>
-        </tr>
-        <tr>
-        <td>Trạng thái:</td>
-        <td>{{ $order->status }}</td>
-        </tr>
-        <tr>
-        <td>Phí vận chuyển:</td>
-        <td>${{ $order->shipping->price }}</td>
-        </tr>
-        <tr>
-        <td>Mã giảm giá:</td>
-        <td>${{ number_format($order->coupon, 2) }}</td>
-        </tr>
-        <tr>
-        <td>Tổng tiền:</td>
-        <td>${{ number_format($order->total_amount, 2) }}</td>
-        </tr>
-        <tr>
-        <td>Phương thức thanh toán:</td>
-        <td>
-        @if($order->payment_method == 'cod') Thanh toán khi nhận hàng
-    @elseif($order->payment_method == 'paypal') PayPal
-  @elseif($order->payment_method == 'cardpay') Thẻ tín dụng
-@endif
+              <div class="row mt-4">
+              <div class="col-md-6">
+              <div class="card">
+              <div class="card-header">Thông tin đơn hàng</div>
+              <div class="card-body">
+                <table class="table table-borderless">
+                <tr>
+                <td>Mã đơn:</td>
+                <td>{{ $order->order_number }}</td>
+                </tr>
+                <tr>
+                <td>Ngày đặt:</td>
+                <td>{{ $order->created_at->format('d/m/Y - H:i') }}</td>
+                </tr>
+                <tr>
+                <td>Số lượng:</td>
+                <td>{{ $order->quantity }}</td>
+                </tr>
+                <tr>
+                <td>Trạng thái:</td>
+                <td>{{ $order->status }}</td>
+                </tr>
+                <tr>
+                <td>Phí vận chuyển:</td>
+                <td>$ {{ number_format($shipping_charge)}}</td>
+                </tr>
+                <tr>
+                <td>Mã giảm giá:</td>
+                <td>- ${{ number_format($order->coupon, 2) }}</td>
+                </tr>
+                <tr>
+                <td>Tổng tiền:</td>
+                <td>${{ number_format($order->total_amount, 2) }}</td>
+                </tr>
+                <tr>
+                <td>Phương thức thanh toán:</td>
+                <td>
+                @if($order->payment_method == 'cod') Thanh toán khi nhận hàng
+            @elseif($order->payment_method == 'paypal') PayPal
+          @elseif($order->payment_method == 'cardpay') Thẻ tín dụng
+        @endif
         </td>
         </tr>
         <tr>
@@ -252,7 +255,7 @@
           <p><strong>Địa chỉ:</strong> {{ $order->address1 }}, {{ $order->address2 }}</p>
           <p><strong>Quốc gia:</strong> {{ $order->country }}</p>
           <p><strong>Mã bưu điện:</strong> {{ $order->post_code }}</p>
-          <p><strong>Phí vận chuyển:</strong> ${{ $order->shipping->price }}</p>
+          <p><strong>Phí vận chuyển:</strong>$ {{ number_format($shipping_charge)}}</p>
           </div>
         </div>
         </div>

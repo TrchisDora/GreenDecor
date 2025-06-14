@@ -1,203 +1,175 @@
 @extends('frontend.layouts.master')
-@section('title','Cart Page')
+@section('title','GreenDecor || Giỏ hàng')
 @section('main-content')
-	<!-- Breadcrumbs -->
-	<div class="breadcrumbs">
-		<div class="container">
-			<div class="row">
-				<div class="col-12">
-					<div class="bread-inner">
-						<ul class="bread-list">
-							<li><a href="{{('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-							<li class="active"><a href="">Cart</a></li>
-						</ul>
-					</div>
-				</div>
+	<!-- Page Header Start -->
+	<div class="container-fluid bg-secondary">
+		<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+			<h1 class="font-weight-semi-bold text-uppercase mb-3">Giỏ hàng</h1>
+			<div class="d-inline-flex">
+				<p class="m-0"><a href="{{ route('home') }}" class="text-dark">Trang chủ</a></p>
+				<p class="m-0 px-2">-</p>
+				<p class="m-0">Giỏ hàng</p>
 			</div>
-		</div>
+		</div>    
 	</div>
 	<!-- End Breadcrumbs -->
 
-	<!-- Shopping Cart -->
-	<div class="shopping-cart section">
-		<div class="container">
-			<div class="row">
-				<div class="col-12">
-					<!-- Shopping Summery -->
-					<table class="table shopping-summery">
-						<thead>
-							<tr class="main-hading">
-								<th>PRODUCT</th>
-								<th>NAME</th>
-								<th class="text-center">UNIT PRICE</th>
-								<th class="text-center">QUANTITY</th>
-								<th class="text-center">TOTAL</th>
-								<th class="text-center"><i class="ti-trash remove-icon"></i></th>
-							</tr>
-						</thead>
-						<tbody id="cart_item_list">
-							<form action="{{route('cart.update')}}" method="POST">
-								@csrf
-								@if(Helper::getAllProductFromCart())
-									@foreach(Helper::getAllProductFromCart() as $key=>$cart)
-										<tr>
-											@php
-											$photo=explode(',',$cart->product['photo']);
-											@endphp
-											<td class="image" data-title="No"><img src="{{$photo[0]}}" alt="{{$photo[0]}}"></td>
-											<td class="product-des" data-title="Description">
-												<p class="product-name"><a href="{{route('product-detail',$cart->product['slug'])}}" target="_blank">{{$cart->product['title']}}</a></p>
-												<p class="product-des">{!!($cart['summary']) !!}</p>
-											</td>
-											<td class="price" data-title="Price"><span>${{number_format($cart['amount'],2)}}</span></td>
-											<td class="qty" data-title="Qty"><!-- Input Order -->
-												<div class="input-group">
-													<div class="button minus">
-														<button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[{{$key}}]">
-															<i class="ti-minus"></i>
-														</button>
-													</div>
-													<input type="text" name="quant[{{$key}}]" class="input-number"  data-min="1" data-max="100" value="{{$cart->quantity}}">
-													<input type="hidden" name="qty_id[]" value="{{$cart->id}}">
-													<div class="button plus">
-														<button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[{{$key}}]">
-															<i class="ti-plus"></i>
-														</button>
-													</div>
-												</div>
-												<!--/ End Input Order -->
-											</td>
-											<td class="total-amount cart_single_price" data-title="Total"><span class="money">${{$cart['price']}}</span></td>
-
-											<td class="action" data-title="Remove"><a href="{{route('cart-delete',$cart->id)}}"><i class="ti-trash remove-icon"></i></a></td>
-										</tr>
-									@endforeach
-									<track>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td class="float-right">
-											<button class="btn float-right" type="submit">Update</button>
+	<!-- Cart Start -->
+	<div class="container-fluid pt-5">
+		<div class="row px-xl-5">
+			<div class="col-lg-8 table-responsive mb-5">
+				<table class="table table-bordered text-center mb-0">
+					<thead class="bg-secondary text-dark">
+						<tr>
+							<th>Sản phẩm</th>
+							<th>Tên sản phẩm</th>
+							<th>Giá</th>
+							<th>Số lượng</th>
+							<th>Tổng cộng</th>
+							<th>Xóa</th>
+						</tr>
+					</thead>
+					<tbody class="align-middle" id="cart_item_list">
+						<form action="{{route('cart.update')}}" method="POST" id="cart-update-form">
+							@csrf
+							@if(Helper::getAllProductFromCart())
+								@foreach(Helper::getAllProductFromCart() as $key=>$cart)
+									@php
+									$photo=explode(',',$cart->product['photo']);
+									@endphp
+									<tr>
+										<td class="align-middle">
+											<img src="{{$photo[0]}}" alt="{{$photo[0]}}" class="img-fluid rounded" style="max-height: 80px;">
 										</td>
-									</track>
-								@else
-										<tr>
-											<td class="text-center">
-												There are no any carts available. <a href="{{route('product-grids')}}" style="color:blue;">Continue shopping</a>
-
-											</td>
-										</tr>
-								@endif
-
-							</form>
-						</tbody>
-					</table>
-					<!--/ End Shopping Summery -->
-				</div>
+										<td class="align-middle">
+										<a href="{{route('product-detail',$cart->product['slug'])}}" target="_blank">{{$cart->product['title']}}</a>
+										<p class="text-muted small">{!!($cart['summary']) !!}</p>
+										</td>
+										<td class="align-middle cart_single_price">{{number_format($cart['price'])}} đ</td>
+										<td class="align-middle">
+											<div class="input-group quantity mx-auto" style="width: 100px;">
+												<input type="number" name="quant[{{ $key }}]"
+													class="form-control form-control-sm text-center border-primary"
+													value="{{ $cart->quantity }}" min="1">
+												<input type="hidden" name="qty_id[{{ $key }}]" value="{{ $cart->id }}">
+											</div>
+										</td>
+										<td class="align-middle">{{number_format($cart['amount'])}} đ</td>
+										<td class="align-middle">
+											<a href="{{route('cart-delete',$cart->id)}}" class="btn btn-sm btn-danger">
+												<i class="fas fa-times"></i>
+											</a>
+										</td>
+									</tr>
+								@endforeach
+								<tr>
+									<td colspan="4">
+									<span class="text-danger" style="font-size:15px;">[Lưu ý: Khi cập nhật giỏ hàng thì áp dụng của Mã giảm giá (MGG) trước đó sẽ biển mất!]</span>
+									</td>
+									<td colspan="5" class="text-right">
+										<button class="btn btn-primary" type="submit">Cập nhật giỏ hàng</button>
+									</td>
+								</tr>
+							@else
+								<tr>
+									<td colspan="6" class="text-center">
+									<div class="alert-warning text-center p-4 rounded-3 shadow-sm">
+										Giỏ hàng của bạn đang trống. <a href="{{route('product-grids')}}" class="btn btn-sm btn-outline-success">Tiếp tục mua sắm</a>
+									</div>
+									</td>
+								</tr>
+							@endif
+						</form>
+					</tbody>
+				</table>
 			</div>
-			<div class="row">
-				<div class="col-12">
-					<!-- Total Amount -->
-					<div class="total-amount">
-						<div class="row">
-							<div class="col-lg-8 col-md-5 col-12">
-								<div class="left">
-									<div class="coupon">
-									<form action="{{route('coupon-store')}}" method="POST">
-											@csrf
-											<input name="code" placeholder="Enter Valid Coupon">
-											<button class="btn">Apply Coupon</button>
-										</form>
-									</div>
-									{{-- <div class="checkbox">`
-										@php
-											$shipping=DB::table('shippings')->where('status','active')->limit(1)->get();
-										@endphp
-										<label class="checkbox-inline" for="2"><input name="news" id="2" type="checkbox" onchange="showMe('shipping');"> Shipping</label>
-									</div> --}}
-								</div>
-							</div>
-							<div class="col-lg-4 col-md-7 col-12">
-								<div class="right">
-									<ul>
-										<li class="order_subtotal" data-price="{{Helper::totalCartPrice()}}">Cart Subtotal<span>${{number_format(Helper::totalCartPrice(),2)}}</span></li>
-
-										@if(session()->has('coupon'))
-										<li class="coupon_price" data-price="{{Session::get('coupon')['value']}}">You Save<span>${{number_format(Session::get('coupon')['value'],2)}}</span></li>
-										@endif
-										@php
-											$total_amount=Helper::totalCartPrice();
-											if(session()->has('coupon')){
-												$total_amount=$total_amount-Session::get('coupon')['value'];
-											}
-										@endphp
-										@if(session()->has('coupon'))
-											<li class="last" id="order_total_price">You Pay<span>${{number_format($total_amount,2)}}</span></li>
-										@else
-											<li class="last" id="order_total_price">You Pay<span>${{number_format($total_amount,2)}}</span></li>
-										@endif
-									</ul>
-									<div class="button5">
-										<a href="{{route('checkout')}}" class="btn">Checkout</a>
-										<a href="{{route('product-grids')}}" class="btn">Continue shopping</a>
-									</div>
-								</div>
-							</div>
+			<div class="col-lg-4">
+				<form class="mb-5" action="{{route('coupon-store')}}" method="POST">
+					@csrf
+					<div class="input-group">
+						<input type="text" name="code" class="form-control p-4" placeholder="Mã giảm giá">
+						<div class="input-group-append">
+							<button class="btn btn-primary">Áp dụng mã giảm giá</button>
 						</div>
 					</div>
-					<!--/ End Total Amount -->
+				</form>
+				<div class="card border-secondary mb-5">
+					<div class="card-header bg-secondary border-0">
+						<h4 class="font-weight-semi-bold m-0">Tổng giỏ hàng</h4>
+					</div>
+					<div class="card-body">
+						{{-- Tổng tiền trước giảm --}}
+						<div class="d-flex justify-content-between mb-3">
+							<h6 class="font-weight-medium">Tạm tính</h6>
+							<h6 class="font-weight-medium">{{ number_format(Helper::totalCartPrice()) }} đ</h6>
+						</div>
+						{{-- Nếu có coupon thì hiển thị phần giảm --}}
+						@if(session()->has('coupon'))
+						<div class="d-flex justify-content-between mb-3">
+							<h6 class="font-weight-medium">Giảm giá ({{ Session::get('coupon')['code'] }})</h6>
+							<h6 class="font-weight-medium text-success">- {{ number_format(Session::get('coupon')['value'], 2) }} đ</h6>
+						</div>
+						@endif
+						{{-- Tổng tiền sau giảm --}}
+						@php
+							$total = Helper::totalCartPrice();
+							$discount = session('coupon.value') ?? 0;
+							$total_amount = Helper::totalCartPrice() - $discount;
+						@endphp
+
+						<div class="d-flex justify-content-between">
+							<h6 class="font-weight-bold">Tổng cộng</h6>
+							<h6 class="font-weight-bold">{{ number_format($total_amount) }} đ</h6>
+						</div>
+					</div>
+					<div class="card-footer border-secondary bg-transparent">
+						<div class="d-flex justify-content-between mt-2">
+							<h5 class="font-weight-bold">Số tiền bạn phải trả</h5>
+							<h5 class="font-weight-bold" id="order_total_price">
+								{{number_format($total_amount ?? Helper::totalCartPrice())}} đ
+							</h5>
+						</div>
+						<div class="button5 mt-3">
+							<a href="{{route('checkout')}}" class="btn btn-block btn-primary my-3 py-3">Tiến hành thanh toán</a>
+							<a href="{{route('product-grids')}}" class="btn btn-block btn-outline-success">Tiếp tục mua sắm</a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!--/ End Shopping Cart -->
+<!-- Cart End -->
 
-	<!-- Start Shop Services Area  -->
-	<section class="shop-services section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-rocket"></i>
-						<h4>Free shiping</h4>
-						<p>Orders over $100</p>
-					</div>
-					<!-- End Single Service -->
+	<!-- Featured Start -->
+	<div class="container-fluid pt-5">
+		<div class="row px-xl-5 pb-3">
+			<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+				<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+					<h1 class="fa fa-check text-primary m-0 mr-3"></h1>
+					<h5 class="font-weight-semi-bold m-0">Sản phẩm chất lượng</h5>
 				</div>
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-reload"></i>
-						<h4>Free Return</h4>
-						<p>Within 30 days returns</p>
-					</div>
-					<!-- End Single Service -->
+			</div>
+			<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+				<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+					<h1 class="fa fa-shipping-fast text-primary m-0 mr-3"></h1>
+					<h5 class="font-weight-semi-bold m-0">Miễn phí giao hàng</h5>
 				</div>
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-lock"></i>
-						<h4>Sucure Payment</h4>
-						<p>100% secure payment</p>
-					</div>
-					<!-- End Single Service -->
+			</div>
+			<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+				<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+					<h1 class="fas fa-exchange-alt text-primary m-0 mr-3"></h1>
+					<h5 class="font-weight-semi-bold m-0">Đổi trả trong 14 ngày</h5>
 				</div>
-				<div class="col-lg-3 col-md-6 col-12">
-					<!-- Start Single Service -->
-					<div class="single-service">
-						<i class="ti-tag"></i>
-						<h4>Best Peice</h4>
-						<p>Guaranteed price</p>
-					</div>
-					<!-- End Single Service -->
+			</div>
+			<div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+				<div class="d-flex align-items-center border mb-4" style="padding: 30px;">
+					<h1 class="fa fa-phone-volume text-primary m-0 mr-3"></h1>
+					<h5 class="font-weight-semi-bold m-0">Hỗ trợ 24/7</h5>
 				</div>
 			</div>
 		</div>
-	</section>
-	<!-- End Shop Newsletter -->
+	</div>
+	<!-- Featured End -->
 
 	<!-- Start Shop Newsletter  -->
 	@include('frontend.layouts.newsletter')
@@ -264,8 +236,6 @@
 				$('#order_total_price span').text('$'+(subtotal + cost-coupon).toFixed(2));
 			});
 
-		});
-
+		});	
 	</script>
-
 @endpush

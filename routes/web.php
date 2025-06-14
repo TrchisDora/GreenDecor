@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SubscribeController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,19 +17,27 @@ use Illuminate\Support\Facades\Route;
 */
 
 Auth::routes(['register'=>false]);
+// Route cho form đăng nhập
+Route::get('user/login', 'FrontendController@login')->name('login.form');
+Route::post('user/login', 'FrontendController@loginSubmit')->name('login.submit');
 
-Route::get('user/login','FrontendController@login')->name('login.form');
-Route::post('user/login','FrontendController@loginSubmit')->name('login.submit');
-Route::get('user/logout','FrontendController@logout')->name('user.logout');
+// Route cho đăng xuất
+Route::get('user/logout', 'FrontendController@logout')->name('user.logout');
 
-Route::get('user/register','FrontendController@register')->name('register.form');
-Route::post('user/register','FrontendController@registerSubmit')->name('register.submit');
-// Reset password
-Route::post('password-reset', 'FrontendController@showResetForm')->name('password.reset'); 
-// Socialite 
+// Route cho form đăng ký
+Route::get('user/register', 'FrontendController@register')->name('register.form');
+Route::post('user/register', 'FrontendController@registerSubmit')->name('register.submit');
+
+// Route cho form quên mật khẩu
+Route::get('password-reset', 'FrontendController@showResetForm')->name('password.reset');
+Route::get('forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('forgot.password.form');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('send.reset.link');
+// Route reset mật khẩu
+Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('reset.password.form');
+Route::post('change-password', [ForgotPasswordController::class, 'emailresetPassword'])->name('email.reset.password');
+// Socialite routes
 Route::get('login/{provider}/', 'Auth\LoginController@redirect')->name('login.redirect');
 Route::get('login/{provider}/callback/', 'Auth\LoginController@Callback')->name('login.callback');
-
 Route::get('/','FrontendController@home')->name('home');
 
 // Frontend Routes
@@ -36,9 +47,10 @@ Route::get('/contact','FrontendController@contact')->name('contact');
 Route::post('/contact/message','MessageController@store')->name('contact.store');
 Route::get('product-detail/{slug}','FrontendController@productDetail')->name('product-detail');
 Route::post('/product/search','FrontendController@productSearch')->name('product.search');
-Route::get('/product-cat/{slug}','FrontendController@productCat')->name('product-cat');
-Route::get('/product-sub-cat/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-sub-cat');
-Route::get('/product-brand/{slug}','FrontendController@productBrand')->name('product-brand');
+Route::get('/product-lists/{slug}','FrontendController@productCat')->name('product-lists-cat');
+Route::get('/product-lists/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-lists-sub-cat');
+Route::get('/product-grids/{slug}','FrontendController@productCat')->name('product-grids-cat');
+Route::get('/product-grids/{slug}/{sub_slug}','FrontendController@productSubCat')->name('product-grids-sub-cat');
 // Cart section
 Route::get('/add-to-cart/{slug}','CartController@addToCart')->name('add-to-cart')->middleware('user');
 Route::post('/add-to-cart','CartController@singleAddToCart')->name('single-add-to-cart')->middleware('user');
@@ -72,9 +84,11 @@ Route::get('/blog/search','FrontendController@blogSearch')->name('blog.search');
 Route::post('/blog/filter','FrontendController@blogFilter')->name('blog.filter');
 Route::get('blog-cat/{slug}','FrontendController@blogByCategory')->name('blog.category');
 Route::get('blog-tag/{slug}','FrontendController@blogByTag')->name('blog.tag');
-
 // NewsLetter
-Route::post('/subscribe','FrontendController@subscribe')->name('subscribe');
+Route::get('/subscribe', [SubscribeController::class, 'showForm']); // Hiển thị form đăng ký
+Route::post('/subscribe', [SubscribeController::class, 'subscribe'])->name('subscribe'); // Xử lý form đăng ký
+// Route hủy đăng ký
+Route::get('/unsubscribe/{email}', 'SubscribeController@unsubscribe')->name('unsubscribe');
 
 // Product Review
 Route::resource('/review','ProductReviewController');
@@ -90,8 +104,10 @@ Route::get('payment', 'PayPalController@payment')->name('payment');
 Route::get('cancel', 'PayPalController@cancel')->name('payment.cancel');
 Route::get('payment/success', 'PayPalController@success')->name('payment.success');
 
-
-
+// routes/web.php
+Route::post('/checkout/update-total', 'ShippingFeeController@updateTotal')->name('checkout.updateTotal');
+Route::post('/get-shipping-price', 'ShippingFeeController@getPrice')->name('get.shipping.price');
+ 
 // Backend section start
 
 Route::group(['prefix'=>'/admin','middleware'=>['auth','admin']],function(){
@@ -140,6 +156,7 @@ Route::group(['prefix'=>'/admin','middleware'=>['auth','admin']],function(){
     // Password Change
     Route::get('change-password', 'AdminController@changePassword')->name('change.password.form');
     Route::post('change-password', 'AdminController@changPasswordStore')->name('change.password');
+
 });
 
 
@@ -182,3 +199,9 @@ Route::group(['prefix'=>'/user','middleware'=>['user']],function(){
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
 });
+//Pay VNPay
+// Gửi form đặt hàng
+Route::post('cart/order', 'OrderController@store')->name('cart.order');
+// Xử lý khi VNPay redirect về
+Route::get('cart/vnpay-return', 'OrderController@vnpayReturn')->name('cart.vnpay_return');
+

@@ -8,6 +8,9 @@ use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\PostTag;
 use App\User;
+use App\Models\Subscriber;
+use App\Mail\NewPostNotification;
+use Illuminate\Support\Facades\Mail;
 
 class PostController extends Controller
 {
@@ -75,16 +78,27 @@ class PostController extends Controller
         }
         // return $data;
 
-        $status=Post::create($data);
-        if($status){
+        $status = Post::create($data);
+        if ($status) {
             request()->session()->flash('success','Post added');
+
+            $subscribers = Subscriber::pluck('email')->toArray();
+
+            foreach ($subscribers as $email) {
+               Mail::send('auth.emails.new_post', [
+                'post' => $status,
+                'email' => $email, // truyền thêm biến email vào view
+                ], function ($message) use ($email, $status) {
+                $message->to($email);
+                $message->subject('Bài viết mới: ' . $status->title);
+                });
+            }
         }
-        else{
+        else {
             request()->session()->flash('error','Please try again!!');
         }
         return redirect()->route('post.index');
     }
-
     /**
      * Display the specified resource.
      *

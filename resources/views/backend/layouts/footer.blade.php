@@ -3,7 +3,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>&copy; {{date('Y')}} Developed By DoraEntertainment-2015.</span>
+            <span>&copy; {{date('Y')}} Developed By GreenDecor-2025.</span>
           </div>
         </div>
       </footer>
@@ -36,9 +36,10 @@
           <a class="btn btn-primary" href="login.html">Logout</a>
         </div>
       </div>
-    </div>
+    </div>  
   </div>
-
+  <!-- Calendar script -->
+  <script src="{{ asset('backend/js/monthly.js') }}"></script>
   <!-- Bootstrap core JavaScript-->
   <script src="{{asset('backend/vendor/jquery/jquery.min.js')}}"></script>
   <script src="{{asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>

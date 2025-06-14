@@ -19,36 +19,34 @@
                         <form action="{{ route('order.update', $order->id) }}" method="POST">
                             @csrf
                             @method('PATCH')
-                          <!-- Trạng thái đơn hàng -->
-<div class="form-group mb-3">
-    <label for="status">Trạng Thái Đơn Hàng:</label>
-    <select name="status" class="form-control" {{ in_array($order->status, ['delivered', 'store_payment', 'cancelled', 'failed_delivery', 'out_of_stock']) ? 'disabled' : '' }}>
-        @if($order->status == 'new')
-            <option value="process" {{ old('status', $order->status) == 'process' ? 'selected' : '' }}>Đã xử lý đơn hàng</option>
-            <option value="out_of_stock" {{ old('status', $order->status) == 'out_of_stock' ? 'selected' : '' }}>Hết hàng</option>
-        @elseif($order->status == 'cancel_requested')
-            <option value="cancel_requested" {{ old('status', $order->status) == 'cancel_requested' ? 'selected' : '' }}>Xác nhận yêu cầu hủy đơn</option>
-        @elseif($order->status == 'process')
-            <option value="shipping" {{ old('status', $order->status) == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
-        @elseif($order->status == 'shipping')
-            <option value="delivered" {{ old('status', $order->status) == 'delivered' ? 'selected' : '' }}>Giao hàng thành công</option>
-            <option value="failed_delivery" {{ old('status', $order->status) == 'failed_delivery' ? 'selected' : '' }}>Giao hàng thất bại</option>
-        @endif
-    </select>
-    @error('status')
-        <span class="text-danger small">{{ $message }}</span>
-    @enderror
-</div>
+                            <!-- Trạng thái đơn hàng -->
+                            <div class="form-group mb-3">
+                                <label for="status">Trạng Thái Đơn Hàng:</label>
+                                <select name="status" class="form-control" {{ in_array($order->status, ['delivered', 'cancelled', 'failed_delivery', 'out_of_stock']) ? 'disabled' : '' }}>
+                                    @if($order->status == 'new')
+                                        <option value="process" {{ old('status', $order->status) == 'process' ? 'selected' : '' }}>Đã xử lý đơn hàng</option>
+                                        <option value="out_of_stock" {{ old('status', $order->status) == 'out_of_stock' ? 'selected' : '' }}>Hết hàng</option>
+                                    @elseif($order->status == 'cancel_requested')
+                                        <option value="cancel_requested" {{ old('status', $order->status) == 'cancel_requested' ? 'selected' : '' }}>Xác nhận yêu cầu hủy đơn</option>
+                                    @elseif($order->status == 'process')
+                                        <option value="shipping" {{ old('status', $order->status) == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
+                                    @elseif($order->status == 'shipping')
+                                        <option value="delivered" {{ old('status', $order->status) == 'delivered' ? 'selected' : '' }}>Giao hàng thành công</option>
+                                        <option value="failed_delivery" {{ old('status', $order->status) == 'failed_delivery' ? 'selected' : '' }}>Giao hàng thất bại</option>
+                                    @endif
+                                </select>
+                                @error('status')
+                                    <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <!-- Cập nhật trạng thái cho payment_status khi giao hàng thành công hoặc thanh toán tại cửa hàng -->
+                            @if(in_array($order->status, ['delivered']))
+                                <input type="hidden" name="payment_status" value="paid">
+                            @endif
 
-<!-- Cập nhật trạng thái cho payment_status khi giao hàng thành công hoặc thanh toán tại cửa hàng -->
-@if(in_array($order->status, ['delivered', 'store_payment']))
-    <input type="hidden" name="payment_status" value="paid">
-@endif
-
-<div class="form-group mb-3 d-flex justify-content-center">
-    <button type="submit" class="btn btn-success">Cập nhật trạng thái</button>
-</div>
-
+                            <div class="form-group mb-3 d-flex justify-content-center">
+                                <button type="submit" class="btn btn-success">Cập nhật trạng thái</button>
+                            </div>
                         </form>
                     </div>
                 </div>

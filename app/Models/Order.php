@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
@@ -52,6 +54,21 @@ class Order extends Model
      {
          return $this->hasMany(Cart::class, 'order_id', 'id');
      }
-    
+     public static function countRevenueForCurrentMonth()
+    {
+        // Lấy tháng và năm hiện tại
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
 
+        // Truy vấn doanh thu cho tháng hiện tại
+        $data = DB::table('orders')
+            ->select(DB::raw('SUM(sub_total) AS total_revenue'))
+            ->where('payment_status', 'paid') 
+            ->whereYear('created_at', $currentYear) 
+            ->whereMonth('created_at', $currentMonth)
+            ->first();
+
+        // Trả về tổng doanh thu, nếu không có thì trả về 0
+        return $data ? $data->total_revenue : 0;
+    }    
 }

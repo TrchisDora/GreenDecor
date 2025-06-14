@@ -25,37 +25,55 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-header">Thông Tin Thương Hiệu</h5>
-                    <form method="post" action="{{ route('brand.store') }}">
-                        {{ csrf_field() }}
+<form method="post" action="{{ route('brand.store') }}">
+    {{ csrf_field() }}
 
-                        <!-- Tiêu đề -->
-                        <div class="form-group mb-3">
-                            <label for="inputTitle" class="col-form-label">Tiêu Đề <span class="text-danger">*</span></label>
-                            <input id="inputTitle" type="text" name="title" placeholder="Nhập tiêu đề" value="{{ old('title') }}" class="form-control">
-                            @error('title')
-                                <span class="text-danger small">{{ $message }}</span>
-                            @enderror
-                        </div>
+    <!-- Tiêu đề -->
+    <div class="form-group mb-3">
+        <label for="inputTitle" class="col-form-label">Tiêu Đề <span class="text-danger">*</span></label>
+        <input id="inputTitle" type="text" name="title" placeholder="Nhập tiêu đề" value="{{ old('title') }}" class="form-control">
+        @error('title')
+            <span class="text-danger small">{{ $message }}</span>
+        @enderror
+    </div>
 
-                        <!-- Trạng thái -->
-                        <div class="form-group mb-3">
-                            <label for="status" class="col-form-label">Trạng Thái <span class="text-danger">*</span></label>
-                            <select name="status" class="form-control">
-                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Kích hoạt</option>
-                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Không kích hoạt</option>
-                            </select>
-                            @error('status')
-                                <span class="text-danger small">{{ $message }}</span>
-                            @enderror
-                        </div>
+    <!-- Ảnh -->
+    <div class="form-group">
+        <label for="inputPhoto" class="col-form-label">Ảnh <span class="text-danger">*</span></label>
+        <div class="input-group">
+            <span class="input-group-btn">
+                <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-primary">
+                    <i class="fas fa-image"></i> Chọn ảnh
+                </a>
+            </span>
+            <input id="thumbnail" class="form-control" type="text" name="photo" value="{{ old('photo') }}">
+        </div>
+        <div id="holder" style="margin-top: 15px; max-height: 100px;"></div>
+        @error('photo')
+            <span class="text-danger">{{$message}}</span>
+        @enderror
+    </div>
 
-                        <!-- Nút submit và reset -->
-                        <div class="form-group mb-3 d-flex justify-content-center">
-                            <button type="reset" class="btn btn-warning mx-2">Đặt lại</button>
-                            <button class="btn btn-success mx-2" type="submit">Lưu</button>
-                        </div>
+    <!-- Trạng thái -->
+    <div class="form-group mb-3">
+        <label for="status" class="col-form-label">Trạng Thái <span class="text-danger">*</span></label>
+        <select name="status" class="form-control">
+            <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Kích hoạt</option>
+            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Không kích hoạt</option>
+        </select>
+        @error('status')
+            <span class="text-danger small">{{ $message }}</span>
+        @enderror
+    </div>
 
-                    </form>
+    <!-- Nút submit và reset -->
+    <div class="form-group mb-3 d-flex justify-content-center">
+        <button type="reset" class="btn btn-warning mx-2">Đặt lại</button>
+        <button class="btn btn-success mx-2" type="submit">Lưu</button>
+    </div>
+
+</form>
+
                 </div>
             </div>
         </div>

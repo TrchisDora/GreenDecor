@@ -29,7 +29,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Tên thương hiệu</th>
-                                        <th>Slug</th>
+                                        <th>Thương hiệu</th>
                                         <th>Trạng thái</th>
                                         <th>Hành động</th>
                                     </tr>
@@ -39,7 +39,16 @@
                                         <tr>
                                             <td>{{ $brand->id }}</td>
                                             <td>{{ $brand->title }}</td>
-                                            <td>{{ $brand->slug }}</td>
+                                            <td>
+                                                @if($brand->photo)
+                                                    @php
+                                                        $photo = explode(',', $brand->photo);
+                                                    @endphp
+                                                    <img src="{{ $photo[0] }}" class="img-fluid" style="max-width:80px" alt="{{ $brand->photo }}">
+                                                @else
+                                                    <img src="{{ asset('backend/img/thumbnail-default.jpg') }}" class="img-fluid" style="max-width:80px" alt="No image">
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($brand->status == 'active')
                                                     <span class="badge badge-success">Hoạt động</span>

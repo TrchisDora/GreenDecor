@@ -15,7 +15,8 @@ class Product extends Model
         return $this->hasOne('App\Models\Category','id','child_cat_id');
     }
     public static function getAllProduct(){
-        return Product::with(['cat_info','sub_cat_info'])->orderBy('id','desc')->paginate();
+        return Product::with(['cat_info','sub_cat_info'])->orderBy('id','desc')->get();
+
     }
     public function rel_prods(){
         return $this->hasMany('App\Models\Product','cat_id','cat_id')->where('status','active')->orderBy('id','DESC')->limit(8);
@@ -45,5 +46,6 @@ class Product extends Model
     public function brand(){
         return $this->hasOne(Brand::class,'id','brand_id');
     }
+    
 
 }

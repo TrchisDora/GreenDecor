@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\Order;
-use App\Models\Shipping;
+use App\Models\Product;
+use App\Models\ShippingFee; // Import ShippingFee model
+use App\Models\Shipping; // Import Shipping model
 use App\User;
 use PDF;
 use Notification;
@@ -43,120 +45,210 @@ class OrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // Hàm chuẩn hóa tên tỉnh (xóa từ "Tỉnh" và "Thành phố" đầu chuỗi)
+    private function normalizeProvinceName($name)
+    {
+        // Xoá "Tỉnh" hoặc "Thành phố" đầu chuỗi
+        $name = preg_replace('/^(Tỉnh|Thành phố)\s+/iu', '', $name);
+    
+        // Xoá khoảng trắng thừa
+        $name = trim($name);
+    
+        return $name;
+    }
+
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'first_name' => 'string|required',
-            'last_name' => 'string|required',
-            'address1' => 'string|required',
-            'address2' => 'string|nullable',
+        // 1. VALIDATE INPUT
+        $request->validate([
+            'first_name' => 'string|required|max:255',
+            'last_name' => 'string|required|max:255',
+            'email' => 'email|required|max:255',
+            'phone' => 'required|numeric|min:10',
+            'country' => 'required|string|max:100',
+            'shipping_address1' => 'required|string|max:255',
+            'shipping_address2' => 'nullable|string|max:255',
+            'province_name' => 'nullable|string|max:255',
+            'shipping_postcode' => 'nullable|string|max:20',
+            'shipping_id' => 'required|string|max:255',
+            'shipping_price' => 'nullable|numeric',
             'coupon' => 'nullable|numeric',
-            'phone' => 'numeric|required',
-            'post_code' => 'string|nullable',
-            'email' => 'string|required'
+            'payment_method' => 'required|string|in:cod,cardpay,vnpay',
+            'card_number' => 'nullable|numeric|digits:16',
+            'card_name' => 'nullable|string|max:255',
+            'expiration_date' => 'nullable|string|size:5|regex:/^(0[1-9]|1[0-2])\/\d{2}$/',
+            'cvv' => 'nullable|numeric|digits:3',
         ]);
-        // return $request->all();
+    
+        // dd($request->all()); 
 
-        if (empty(Cart::where('user_id', auth()->user()->id)->where('order_id', null)->first())) {
-            request()->session()->flash('error', 'Cart is Empty !');
-            return back();
+        if (Cart::where('user_id', auth()->user()->id)->whereNull('order_id')->count() == 0) {
+            return back()->with('error', 'Giỏ hàng đang trống!');
         }
-        // $cart=Cart::get();
-        // // return $cart;
-        // $cart_index='ORD-'.strtoupper(uniqid());
-        // $sub_total=0;
-        // foreach($cart as $cart_item){
-        //     $sub_total+=$cart_item['amount'];
-        //     $data=array(
-        //         'cart_id'=>$cart_index,
-        //         'user_id'=>$request->user()->id,
-        //         'product_id'=>$cart_item['id'],
-        //         'quantity'=>$cart_item['quantity'],
-        //         'amount'=>$cart_item['amount'],
-        //         'status'=>'new',
-        //         'price'=>$cart_item['price'],
-        //     );
 
-        //     $cart=new Cart();
-        //     $cart->fill($data);
-        //     $cart->save();
-        // }
+        // 3. SHIPPING INFO
+        $shippingModel = Shipping::where('id', $request->shipping_id)->first();
+        if (!$shippingModel) {
+            return back()->with('error', 'Không tìm thấy phương thức vận chuyển phù hợp.');
+        }
 
-        // $total_prod=0;
-        // if(session('cart')){
-        //         foreach(session('cart') as $cart_items){
-        //             $total_prod+=$cart_items['quantity'];
-        //         }
-        // }
+        $shipping_id = $shippingModel->id;
+        $province = $this->normalizeProvinceName($request->province_name) ?? 'Cần Thơ';
+        $shippingFee = ShippingFee::where('province_name', $province)
+                                ->where('shipping_id', $shipping_id)
+                                ->first();
+        $shipping_price = $shippingFee ? $shippingFee->price : 0;
 
+        $sub_total = (int) Helper::totalCartPrice();
+        $quantity = Helper::cartCount();
+        $coupon = session('coupon')['value'] ?? 0;
+        $total_amount = $sub_total + $shipping_price - $coupon;
+
+       if ($request->payment_method === 'vnpay') {
+            $order_data = [
+                'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+                'user_id' => auth()->user()->id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'shipping_id' => $request->shipping_id,
+                'sub_total' => $sub_total,
+                'quantity' => $quantity,
+                'coupon' => $coupon,
+                'total_amount' => $total_amount,
+                'address1' => $request->shipping_address1,
+                'address2' => $request->shipping_address2,
+                'post_code' => $request->shipping_postcode,
+                'payment_method' => 'vnpay',
+                'payment_status' => 'paid',
+                'country' => $request->country, // Thêm country vào đây
+            ];
+
+            session(['vnpay_order_data' => $order_data]);
+
+            // VNPay settings
+            $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+            $vnp_Returnurl = route('cart.vnpay_return');
+            $vnp_TmnCode = "RZYBNT5M";
+            $vnp_HashSecret = "YHNZQ4561JN1QTQKVI2UNPDQAUWP04B6";
+            $vnp_TxnRef = $order_data['order_number'];
+            $vnp_OrderInfo = "Thanh toán đơn hàng " . $vnp_TxnRef;
+            $vnp_Amount = $order_data['total_amount'] * 100;
+
+            $inputData = [
+                "vnp_Version" => "2.1.0",
+                "vnp_TmnCode" => $vnp_TmnCode,
+                "vnp_Amount" => $vnp_Amount,
+                "vnp_Command" => "pay",
+                "vnp_CreateDate" => now()->format('YmdHis'),
+                "vnp_CurrCode" => "VND",
+                "vnp_IpAddr" => $request->ip(),
+                "vnp_Locale" => 'vn',
+                "vnp_OrderInfo" => $vnp_OrderInfo,
+                "vnp_OrderType" => 'billpayment',
+                "vnp_ReturnUrl" => $vnp_Returnurl,
+                "vnp_TxnRef" => $vnp_TxnRef,
+            ];
+
+            // Bắt đầu mã hóa đúng chuẩn theo VNPay
+            ksort($inputData);
+            $hashdata = '';
+            $i = 0;
+            foreach ($inputData as $key => $value) {
+                if ($i == 1) {
+                    $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
+                } else {
+                    $hashdata .= urlencode($key) . "=" . urlencode($value);
+                    $i = 1;
+                }
+            }
+
+            $vnp_SecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+            $query = http_build_query($inputData);
+            $vnp_Url .= '?' . $query . '&vnp_SecureHash=' . $vnp_SecureHash;
+
+            return redirect($vnp_Url);
+        }
+        // Nếu không phải VNPay thì tạo đơn hàng luôn
         $order = new Order();
         $order_data = $request->all();
         $order_data['order_number'] = 'ORD-' . strtoupper(Str::random(10));
-        $order_data['user_id'] = $request->user()->id;
-        $order_data['shipping_id'] = $request->shipping;
-        $shipping = Shipping::where('id', $order_data['shipping_id'])->pluck('price');
-        // return session('coupon')['value'];
-        $order_data['sub_total'] = Helper::totalCartPrice();
-        $order_data['quantity'] = Helper::cartCount();
-        if (session('coupon')) {
-            $order_data['coupon'] = session('coupon')['value'];
-        }
-        if ($request->shipping) {
-            if (session('coupon')) {
-                $order_data['total_amount'] = Helper::totalCartPrice() + $shipping[0] - session('coupon')['value'];
-            } else {
-                $order_data['total_amount'] = Helper::totalCartPrice() + $shipping[0];
-            }
-        } else {
-            if (session('coupon')) {
-                $order_data['total_amount'] = Helper::totalCartPrice() - session('coupon')['value'];
-            } else {
-                $order_data['total_amount'] = Helper::totalCartPrice();
-            }
-        }
-        // return $order_data['total_amount'];
-        // $order_data['status']="new";
-        // if(request('payment_method')=='paypal'){
-        //     $order_data['payment_method']='paypal';
-        //     $order_data['payment_status']='paid';
-        // }
-        // else{
-        //     $order_data['payment_method']='cod';
-        //     $order_data['payment_status']='Unpaid';
-        // }
-        if (request('payment_method') == 'paypal') {
-            $order_data['payment_method'] = 'paypal';
-            $order_data['payment_status'] = 'paid';
-        } elseif (request('payment_method') == 'cardpay') {
-            $order_data['payment_method'] = 'cardpay';
-            $order_data['payment_status'] = 'paid';
-        } else {
-            $order_data['payment_method'] = 'cod';
-            $order_data['payment_status'] = 'Unpaid';
-        }
+        $order_data['user_id'] = auth()->user()->id;
+        $order_data['shipping_id'] = $shipping_id;
+        $order_data['sub_total'] = $sub_total;
+        $order_data['quantity'] = $quantity;
+        $order_data['coupon'] = $coupon;
+        $order_data['total_amount'] = $total_amount;
+        $order_data['address1'] = $request->shipping_address1;
+        $order_data['address2'] = $request->shipping_address2;
+        $order_data['post_code'] = $request->shipping_postcode;
+        $order_data['payment_status'] = in_array($request->payment_method, ['cardpay']) ? 'paid' : 'Unpaid';
+        $order_data['country'] = $request->country; // Thêm country vào đây
         $order->fill($order_data);
-        $status = $order->save();
-        if ($order)
-            // dd($order->id);
-            $users = User::where('role', 'admin')->first();
+        $order->save();
+        $cartItems = Cart::where('user_id', auth()->user()->id)->whereNull('order_id')->get();
+
+        // GÁN order_id CHO CART ITEMS
+        Cart::where('user_id', auth()->user()->id)->whereNull('order_id')->update(['order_id' => $order->id]);
+
+        // TRỪ TỒN KHO
+        foreach ($cartItems as $item) {
+            $product = Product::find($item->product_id);
+            if ($product) {
+                $product->stock -= $item->quantity;
+                $product->save();
+            }
+        }
+
+        // Gửi notification
+        $admin = User::where('role', 'admin')->first();
         $details = [
-            'title' => 'New Order Received',
+            'title' => 'Đơn hàng mới',
             'actionURL' => route('order.show', $order->id),
             'fas' => 'fa-file-alt'
         ];
-        Notification::send($users, new StatusNotification($details));
-        if (request('payment_method') == 'paypal') {
-            return redirect()->route('payment')->with(['id' => $order->id]);
-        } else {
+        Notification::send($admin, new StatusNotification($details));
+
+        session()->forget('cart');
+        session()->forget('coupon');
+
+        return redirect()->route('home')->with('success', 'Đặt hàng thành công. Cảm ơn bạn đã mua sắm!');
+    }
+
+
+    public function vnpayReturn(Request $request)
+    {
+        // Validate chữ ký ở đây nếu muốn bảo mật hơn...
+
+        if ($request->vnp_ResponseCode == '00') {
+            // Thành công
+            $order_data = session('vnpay_order_data');
+            if (!$order_data) return redirect()->route('home')->with('error', 'Không tìm thấy thông tin đơn hàng.');
+
+            $order_data['payment_status'] = 'paid';
+            $order = Order::create($order_data);
+
+            Cart::where('user_id', auth()->user()->id)->whereNull('order_id')->update(['order_id' => $order->id]);
+
+            $admin = User::where('role', 'admin')->first();
+            $details = [
+                'title' => 'Đơn hàng mới (VNPay)',
+                'actionURL' => route('order.show', $order->id),
+                'fas' => 'fa-file-alt'
+            ];
+            Notification::send($admin, new StatusNotification($details));
+
             session()->forget('cart');
             session()->forget('coupon');
-        }
-        Cart::where('user_id', auth()->user()->id)->where('order_id', null)->update(['order_id' => $order->id]);
+            session()->forget('vnpay_order_data');
 
-        // dd($users);        
-        request()->session()->flash('success', 'Your product order has been placed. Thank you for shopping with us.');
-        return redirect()->route('home');
+            return redirect()->route('home')->with('success', 'Thanh toán VNPay thành công. Đơn hàng đã được ghi nhận.');
+        }
+
+        return redirect()->route('home')->with('error', 'Thanh toán VNPay thất bại hoặc bị hủy.');
     }
+
 
     /**
      * Display the specified resource.
@@ -166,16 +258,15 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        // Lấy thông tin đơn hàng với ID và các sản phẩm trong giỏ hàng liên quan
-        $order = Order::with('carts')->find($id);
-
-        // Kiểm tra nếu không có đơn hàng
+        // Lấy đơn hàng cùng với các sản phẩm trong giỏ và thông tin vận chuyển
+        $order = Order::with(['shipping.fee'])->find($id);
         if (!$order) {
             return redirect()->back()->with('error', 'Order not found');
         }
 
         return view('backend.order.show')->with('order', $order);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -213,7 +304,7 @@ class OrderController extends Controller
     
         // Validate dữ liệu từ form
         $this->validate($request, [
-            'status' => 'required|in:new,process,shipping,delivered,cancel_requested,cancelled,failed_delivery,out_of_stock,store_payment'
+            'status' => 'required|in:new,process,shipping,delivered,cancel_requested,cancelled,failed_delivery,out_of_stock'
         ]);
     
         // Lấy tất cả dữ liệu từ request
@@ -288,7 +379,7 @@ class OrderController extends Controller
             return back();
         }
     
-        $validStatuses = ['new', 'process', 'shipping', 'delivered', 'cancel_requested', 'cancelled', 'failed_delivery', 'out_of_stock', 'store_payment'];
+        $validStatuses = ['new', 'process', 'shipping', 'delivered', 'cancel_requested', 'cancelled', 'failed_delivery', 'out_of_stock'];
         $status = $request->input('status');
     
         if (!in_array($status, $validStatuses)) {

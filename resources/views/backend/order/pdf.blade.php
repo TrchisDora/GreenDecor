@@ -86,6 +86,11 @@
 
 </head>
 <body>
+@php
+    $shipping_fee = DB::table('shipping_fees')
+        ->where('shipping_id', $order->shipping_id)
+        ->first();
+@endphp
     <div class="container">
         <div class="text-center">
             
@@ -97,8 +102,8 @@
                 <p><strong>Ngày đặt hàng:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
                 <p><strong>Phương thức thanh toán:</strong>
                     @if($order->payment_method == 'cod') Thanh toán khi nhận hàng
-                    @elseif($order->payment_method == 'paypal') PayPal
-                    @elseif($order->payment_method == 'cardpay') Thẻ tín dụng
+                    @elseif($order->payment_method == 'Epay') Thanh toán VNPay
+                    
                     @endif
                 </p>
                 
@@ -115,7 +120,7 @@
     <p><strong>Họ và tên:</strong> {{ $order->first_name }} {{ $order->last_name }}</p>
     <p><strong>Địa chỉ nhận hàng:</strong> {{ $order->phone }}, {{ $order->address1 }}, {{ $order->country }}</p>
     <p><strong>Mã bưu điện:</strong> {{ $order->post_code }}</p>
-    <p><strong>Phí vận chuyển:</strong> ${{ number_format($order->shipping->price, 2) }}</p>
+    <p><strong>Phí vận chuyển:</strong> $ {{ number_format($shipping_fee->price ?? 0, 2) }}</p>
 
         <!-- Danh sách sản phẩm -->
         <div class="section">

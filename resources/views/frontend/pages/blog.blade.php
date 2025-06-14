@@ -1,163 +1,147 @@
 @extends('frontend.layouts.master')
 
-@section('title','Ecommerce Laravel || Blog Page')
+@section('title','GreenDecor || Trang bài viết')
 
 @section('main-content')
-    <!-- Breadcrumbs -->
-    <div class="breadcrumbs">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="bread-inner">
-                        <ul class="bread-list">
-                            <li><a href="{{route('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-                            <li class="active"><a href="javascript:void(0);">Blog Grid Sidebar</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+
+<!-- Page Header Start -->
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Bài viết</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{{ route('home') }}" class="text-dark">Trang chủ</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Bài viết</p>
         </div>
     </div>
-    <!-- End Breadcrumbs -->
+</div>
+<!-- Page Header End -->
 
-    <!-- Start Blog Single -->
-    <section class="blog-single shop-blog grid section">
-        <div class="container">
+<!-- Blog Section Start -->
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <!-- Bài viết Blog -->
+        <div class="col-lg-8 col-md-12 col-12">
             <div class="row">
-                <div class="col-lg-8 col-12">
-                    <div class="row">
-                        @foreach($posts as $post)
-                        {{-- {{$post}} --}}
-                            <div class="col-lg-6 col-md-6 col-12">
-                                <!-- Start Single Blog  -->
-                                <div class="shop-single-blog">
-                                <img src="{{$post->photo}}" alt="{{$post->photo}}">
-                                    <div class="content">
-                                        <p class="date"><i class="fa fa-calendar" aria-hidden="true"></i> {{$post->created_at->format('d M, Y. D')}}
-                                            <span class="float-right">
-                                                <i class="fa fa-user" aria-hidden="true"></i>
-                                                 {{$post->author_info->name ?? 'Anonymous'}}
-                                            </span>
-                                        </p>
-                                        <a href="{{route('blog.detail',$post->slug)}}" class="title">{{$post->title}}</a>
-                                        <p>{!! html_entity_decode($post->summary) !!}</p>
-                                        <a href="{{route('blog.detail',$post->slug)}}" class="more-btn">Continue Reading</a>
-                                    </div>
-                                </div>
-                                <!-- End Single Blog  -->
-                            </div>
-                        @endforeach
-                        <div class="col-12">
-                            <!-- Pagination -->
-                            {{-- {{$posts->appends($_GET)->links()}} --}}
-                            <!--/ End Pagination -->
+                @foreach($posts as $post)
+                <div class="col-lg-6 col-md-6 col-12 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ $post->photo }}" class="card-img-top" alt="{{ $post->title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ route('blog.detail', $post->slug) }}" class="text-dark text-decoration-none fw-semibold hover-primary">
+                                    {{ $post->title }}
+                                </a>
+                            </h5>
+                            <p class="card-text small text-muted">
+                                <i class="fa fa-calendar"></i> {{ $post->created_at->format('d M, Y. D') }}
+                                <span class="float-right">
+                                    <i class="fa fa-user"></i> {{ $post->author_info->name ?? 'Ẩn danh' }}
+                                </span>
+                            </p>
+                            <p>{!! \Illuminate\Support\Str::limit(strip_tags($post->summary), 100) !!}</p>
+                            <a href="{{ route('blog.detail', $post->slug) }}" class="btn btn-sm btn-primary">Đọc tiếp</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-12">
-                    <div class="main-sidebar">
-                        <!-- Single Widget -->
-                        <div class="single-widget search">
-                            <form class="form" method="GET" action="{{route('blog.search')}}">
-                                <input type="text" placeholder="Search Here..." name="search">
-                                <button class="button" type="sumbit"><i class="fa fa-search"></i></button>
-                            </form>
-                        </div>
-                        <!--/ End Single Widget -->
-                        <!-- Single Widget -->
-                        <div class="single-widget category">
-                            <h3 class="title">Blog Categories</h3>
-                            <ul class="categor-list">
-                                @if(!empty($_GET['category']))
-                                    @php
-                                        $filter_cats=explode(',',$_GET['category']);
-                                    @endphp
-                                @endif
-                            <form action="{{route('blog.filter')}}" method="POST">
-                                    @csrf
-                                    {{-- {{count(Helper::postCategoryList())}} --}}
-                                    @foreach(Helper::postCategoryList('posts') as $cat)
-                                    <li>
-                                        <a href="{{route('blog.category',$cat->slug)}}">{{$cat->title}} </a>
-                                    </li>
-                                    @endforeach
-                                </form>
-
-                            </ul>
-                        </div>
-                        <!--/ End Single Widget -->
-                        <!-- Single Widget -->
-                        <div class="single-widget recent-post">
-                            <h3 class="title">Recent post</h3>
-                            @foreach($recent_posts as $post)
-                                <!-- Single Post -->
-                                <div class="single-post">
-                                    <div class="image">
-                                        <img src="{{$post->photo}}" alt="{{$post->photo}}">
-                                    </div>
-                                    <div class="content">
-                                        <h5><a href="#">{{$post->title}}</a></h5>
-                                        <ul class="comment">
-                                            <li><i class="fa fa-calendar" aria-hidden="true"></i>{{$post->created_at->format('d M, y')}}</li>
-                                            <li><i class="fa fa-user" aria-hidden="true"></i>
-                                                {{$post->author_info->name ?? 'Anonymous'}}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- End Single Post -->
-                            @endforeach
-                        </div>
-                        <!--/ End Single Widget -->
-                        <!-- Single Widget -->
-                        <!--/ End Single Widget -->
-                        <!-- Single Widget -->
-                        <div class="single-widget side-tags">
-                            <h3 class="title">Tags</h3>
-                            <ul class="tag">
-                                @if(!empty($_GET['tag']))
-                                    @php
-                                        $filter_tags=explode(',',$_GET['tag']);
-                                    @endphp
-                                @endif
-                                <form action="{{route('blog.filter')}}" method="POST">
-                                    @csrf
-                                    @foreach(Helper::postTagList('posts') as $tag)
-                                        <li>
-                                            <li>
-                                                <a href="{{route('blog.tag',$tag->title)}}">{{$tag->title}} </a>
-                                            </li>
-                                        </li>
-                                    @endforeach
-                                </form>
-                            </ul>
-                        </div>
-                        <!--/ End Single Widget -->
-                        <!-- Single Widget -->
-                        <div class="single-widget newsletter">
-                            <h3 class="title">Newslatter</h3>
-                            <div class="letter-inner">
-                                <h4>Subscribe & get news <br> latest updates.</h4>
-                                <form method="POST" action="{{route('subscribe')}}" class="form-inner">
-                                    @csrf
-                                    <input type="email" name="email" placeholder="Enter your email">
-                                    <button type="submit" class="btn " style="width: 100%">Submit</button>
-                                </form>
-                            </div>
-                        </div>
-                        <!--/ End Single Widget -->
-                    </div>
+                @endforeach
+                <div class="col-12 d-flex justify-content-center mt-4">
+                    {{-- {!! $posts->appends($_GET)->links() !!} --}}
                 </div>
             </div>
         </div>
-    </section>
-    <!--/ End Blog Single -->
-@endsection
-@push('styles')
-    <style>
-        .pagination{
-            display:inline-flex;
-        }
-    </style>
 
+        <!-- Sidebar -->
+        <div class="col-lg-4 col-md-12 col-12">
+        <aside class="blog-sidebar">
+            <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                <div class="card-header bg-primary text-white font-weight-bold">
+                    <i class="fa fa-search"></i> Tìm kiếm
+                </div>
+                <div class="card-body bg-secondary text-primary">
+                    <form method="GET" action="{{ route('blog.search') }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm tại đây..." name="search">
+                            <div class="input-group-append">
+                                <button class="btn btn-dark" type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                <div class="card-header bg-primary text-white font-weight-bold">
+                    <i class="fa fa-list"></i> Danh mục
+                </div>
+                <ul class="list-group list-group-flush bg-secondary text-primary">
+                    @foreach(Helper::postCategoryList('posts') as $cat)
+                        <li class="list-group-item bg-secondary border-0">
+                            <a href="{{ route('blog.category', $cat->slug) }}" class="nav-link text-primary">{{ $cat->title }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                <div class="card-header bg-primary text-white font-weight-bold">
+                    <i class="fa fa-clock"></i> Bài viết gần đây
+                </div>
+                <div class="card-body bg-secondary text-primary">
+                    @foreach($recent_posts as $post)
+                        <div class="media mb-3 border-bottom pb-2">
+                            <img src="{{ $post->photo }}" alt="{{ $post->title }}" class="mr-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="media-body">
+                                <h6 class="mt-0 mb-1">
+                                    <a href="{{ route('blog.detail', $post->slug) }}" class="nav-link p-0 text-primary">{{ $post->title }}</a>
+                                </h6>
+                                <small class="text-primary">
+                                    <i class="fa fa-calendar"></i> {{ $post->created_at->format('d M, y') }}<br>
+                                    <i class="fa fa-user"></i> {{ $post->author_info->name ?? 'Ẩn danh' }}
+                                </small>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                <div class="card-header bg-primary text-white font-weight-bold">
+                    <i class="fa fa-tags"></i> Thẻ
+                </div>
+                <div class="card-body bg-secondary text-primary">
+                    @foreach(Helper::postTagList('posts') as $tag)
+                        <a href="{{ route('blog.tag', $tag->title) }}" class="badge badge-light m-1 text-primary">{{ $tag->title }}</a>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                <div class="card-header bg-primary text-white font-weight-bold">
+                    <i class="fa fa-envelope"></i> Đăng ký nhận bản tin
+                </div>
+                <div class="card-body bg-secondary text-primary">
+                    <form method="POST" action="{{ route('subscribe') }}">
+                        @csrf
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn">
+                        </div>
+                        <button type="submit" class="btn btn-dark btn-block">Đăng ký</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+        </div>
+    </div>
+</div>
+<!-- Blog Section End -->
+
+@endsection
+
+@push('styles')
+<style>
+    .card-title a:hover {
+        color: #007bff;
+    }
+</style>
 @endpush

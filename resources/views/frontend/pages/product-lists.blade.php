@@ -4,363 +4,352 @@
 
 @section('main-content')
 	
-		<!-- Breadcrumbs -->
-		<div class="breadcrumbs">
-			<div class="container">
-				<div class="row">
-					<div class="col-12">
-						<div class="bread-inner">
-							<ul class="bread-list">
-								<li><a href="{{route('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-								<li class="active"><a href="javascript:void(0);">Shop List</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- End Breadcrumbs -->
-		<form action="{{route('shop.filter')}}" method="POST">
-		@csrf
-			<!-- Product Style 1 -->
-			<section class="product-area shop-sidebar shop-list shop section">
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-3 col-md-4 col-12">
-							<div class="shop-sidebar">
-                                <!-- Single Widget -->
-                                <div class="single-widget category">
-                                    <h3 class="title">Categories</h3>
-                                    <ul class="categor-list">
-										@php
-											// $category = new Category();
-											$menu=App\Models\Category::getAllParentWithChild();
-										@endphp
-										@if($menu)
-										<li>
-											@foreach($menu as $cat_info)
-													@if($cat_info->child_cat->count()>0)
-														<li><a href="{{route('product-cat',$cat_info->slug)}}">{{$cat_info->title}}</a>
-															<ul>
-																@foreach($cat_info->child_cat as $sub_menu)
-																	<li><a href="{{route('product-sub-cat',[$cat_info->slug,$sub_menu->slug])}}">{{$sub_menu->title}}</a></li>
-																@endforeach
-															</ul>
-														</li>
-													@else
-														<li><a href="{{route('product-cat',$cat_info->slug)}}">{{$cat_info->title}}</a></li>
-													@endif
-											@endforeach
-										</li>
-										@endif
-                                        {{-- @foreach(Helper::productCategoryList('products') as $cat)
-                                            @if($cat->is_parent==1)
-												<li><a href="{{route('product-cat',$cat->slug)}}">{{$cat->title}}</a></li>
-											@endif
-                                        @endforeach --}}
-                                    </ul>
+<!-- Page Header Start -->
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Cửa hàng của chúng tôi</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="{{ route('home') }}" class="text-dark">Trang chủ</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Cửa hàng của chúng tôi</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+    <!-- Shop Start -->
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+<div class="col-lg-2 col-md-12 col-12">
+            <aside class="shop-sidebar">
+                {{-- Categories --}}
+                <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fa fa-list"></i> Loại sản phẩm
+                    </div>
+                    <ul class="list-group list-group-flush bg-secondary">
+                        @php $menu = App\Models\Category::getAllParentWithChild(); @endphp
+                        @if($menu)
+                            @foreach($menu as $cat_info)
+                                @if($cat_info->child_cat->count() > 0)
+                                    <li class="list-group-item bg-secondary border-0">
+                                        <a href="{{ route('product-lists-cat', $cat_info->slug) }}" class="nav-link font-weight-bold d-block">{{ $cat_info->title }}</a>
+                                        <ul class="pl-3 mt-1">
+                                            @foreach($cat_info->child_cat as $sub_menu)
+                                                <li>
+                                                    <a href="{{ route('product-lists-sub-cat', [$cat_info->slug, $sub_menu->slug]) }}" class="nav-link font-weight-bold d-block">{{ $sub_menu->title }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @else
+                                    <li class="list-group-item bg-secondary border-0">
+                                        <a href="{{ route('product-lists-cat', $cat_info->slug) }}" class="nav-link font-weight-bold d-block">{{ $cat_info->title }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+                        @endif
+                    </ul>
+                </div>
+
+                {{-- Brands --}}
+                <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fa fa-tags"></i> Thương hiệu
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @php
+                            $brands = DB::table('brands')->where('status', 'active')->orderBy('title')->get();
+                            $currentBrands = request()->has('brand') ? explode(',', request()->brand) : [];
+                            $currentQuery = request()->except('brand');
+                        @endphp
+                        @foreach($brands as $brand)
+                            @php
+                                $updatedBrands = $currentBrands;
+                                if (in_array($brand->slug, $currentBrands)) {
+                                    $updatedBrands = array_diff($currentBrands, [$brand->slug]); 
+                                } else {
+                                    $updatedBrands[] = $brand->slug;
+                                }
+
+                                // Chỉ thêm brand vào mà không thay đổi thứ tự
+                                $query = array_merge($currentQuery, ['brand' => implode(',', $updatedBrands)]);
+                            @endphp
+                            <li class="list-group-item bg-secondary border-0">
+                                <a href="{{ url()->current() . '?' . http_build_query($query) }}"
+                                    class="{{ in_array($brand->slug, $currentBrands) ? 'font-weight-bold text-info' : '' }}">
+                                    {{ $brand->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="card mb-4 shadow-sm border-0" style="border-radius: 20px;">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fa fa-tags"></i> Giá
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @php
+                            // Lấy các mức giá lọc
+                            $priceRanges = [
+                                '0-10000' => 'Under 10.000đ',
+                                '10000-50000' => '10.000đ - 50.000đ',
+                                '50000-100000' => '50.000đ - 100.000đ',
+                                '100000-500000' => '100.000đ - 500.000đ',
+                                '500000-1000000' => '500.000đ - 1.000.000đ'
+                            ];
+                            // Lấy mức giá hiện tại từ URL
+                            $currentPrice = request()->has('price') ? request()->price : null;
+                            $currentQuery = request()->except('price');
+                        @endphp
+
+                        @foreach($priceRanges as $range => $label)
+                            @php
+                                // Lấy phạm vi giá để lọc
+                                $priceFilter = $currentPrice == $range ? null : $range;
+                                // Cập nhật URL query string
+                                $query = array_merge($currentQuery, ['price' => $priceFilter]);
+                            @endphp
+                            <li class="list-group-item bg-secondary border-0">
+                                <a href="{{ url()->current() . '?' . http_build_query($query) }}"
+                                class="nav-link {{ $currentPrice == $range ? 'font-weight-bold text-info' : '' }}">
+                                    {{ $label }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                {{-- Recently Added --}}
+                <div class="card mb-4 shadow-sm border-0 rounded" style="border-radius: 20px;">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fa fa-clock"></i> Sản phẩm thêm gần đây
+                    </div>
+                    <div class="card-body bg-secondary">
+                        @foreach($recent_products as $product)
+                            @php 
+                                $photo = explode(',', $product->photo);
+                                $org = ($product->price - ($product->price * $product->discount) / 100);
+                            @endphp
+                            <div class="media mb-3 border-bottom pb-2">
+                                <img src="{{ $photo[0] }}" alt="{{ $product->title }}" class="mr-3" style="width: 60px;">
+                                <div class="media-body">
+                                    <h6 class="mt-0 mb-1"><a href="{{ route('product-detail', $product->slug) }}" class="nav-link p-0">{{ $product->title }}</a></h6>
+                                    <small>
+                                        <del class="text-muted">{{ number_format($product->price) }} đ</del>
+                                        <span class="text-danger">{{ number_format($org) }} đ</span>
+                                    </small>
                                 </div>
-                                <!--/ End Single Widget -->
-                                <!-- Shop By Price -->
-								<div class="single-widget range">
-									<h3 class="title">Shop by Price</h3>
-									<div class="price-filter">
-										<div class="price-filter-inner">
-											{{-- <div id="slider-range" data-min="10" data-max="2000" data-currency="%"></div>
-												<div class="price_slider_amount">
-												<div class="label-input">
-													<span>Range:</span>
-													<input type="text" id="amount" name="price_range" value='@if(!empty($_GET['price'])) {{$_GET['price']}} @endif' placeholder="Add Your Price"/>
-												</div>
-											</div> --}}
-											@php
-												$max=DB::table('products')->max('price');
-												// dd($max);
-											@endphp
-											<div id="slider-range" data-min="0" data-max="{{$max}}"></div>
-											<div class="product_filter">
-											<button type="submit" class="filter_button">Filter</button>
-											<div class="label-input">
-												<span>Range:</span>
-												<input style="" type="text" id="amount" readonly/>
-												<input type="hidden" name="price_range" id="price_range" value="@if(!empty($_GET['price'])){{$_GET['price']}}@endif"/>
-											</div>
-											</div>
-										</div>
-									</div>
-									{{-- <ul class="check-box-list">
-										<li>
-											<label class="checkbox-inline" for="1"><input name="news" id="1" type="checkbox">$20 - $50<span class="count">(3)</span></label>
-										</li>
-										<li>
-											<label class="checkbox-inline" for="2"><input name="news" id="2" type="checkbox">$50 - $100<span class="count">(5)</span></label>
-										</li>
-										<li>
-											<label class="checkbox-inline" for="3"><input name="news" id="3" type="checkbox">$100 - $250<span class="count">(8)</span></label>
-										</li>
-									</ul> --}}
-								</div>
-								<!--/ End Shop By Price -->
-                                <!-- Single Widget -->
-                                <div class="single-widget recent-post">
-                                    <h3 class="title">Recently Added</h3>
-                                    {{-- {{dd($recent_products)}} --}}
-                                    @foreach($recent_products as $product)
-                                        <!-- Single Post -->
-                                        @php 
-                                            $photo=explode(',',$product->photo);
-                                        @endphp
-                                        <div class="single-post first">
-                                            <div class="image">
-                                                <img src="{{$photo[0]}}" alt="{{$photo[0]}}">
-                                            </div>
-                                            <div class="content">
-                                                <h5><a href="{{route('product-detail',$product->slug)}}">{{$product->title}}</a></h5>
-                                                @php
-                                                    $org=($product->price-($product->price*$product->discount)/100);
-                                                @endphp
-                                                <p class="price"><del class="text-muted">${{number_format($product->price,2)}}</del>   ${{number_format($org,2)}}  </p>                                                
-                                            </div>
-                                        </div>
-                                        <!-- End Single Post -->
-                                    @endforeach
-                                </div>
-                                <!--/ End Single Widget -->
-                                <!-- Single Widget -->
-                                <div class="single-widget category">
-                                    <h3 class="title">Brands</h3>
-                                    <ul class="categor-list">
-                                        @php
-                                            $brands=DB::table('brands')->orderBy('title','ASC')->where('status','active')->get();
-                                        @endphp
-                                        @foreach($brands as $brand)
-                                            <li><a href="{{route('product-brand',$brand->slug)}}">{{$brand->title}}</a></li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <!--/ End Single Widget -->
-                        	</div>
-						</div>
-						<div class="col-lg-9 col-md-8 col-12">
-							<div class="row">
-								<div class="col-12">
-									<!-- Shop Top -->
-									<div class="shop-top">
-										<div class="shop-shorter">
-											<div class="single-shorter">
-												<label>Show :</label>
-												<select class="show" name="show" onchange="this.form.submit();">
-													<option value="">Default</option>
-													<option value="9" @if(!empty($_GET['show']) && $_GET['show']=='9') selected @endif>09</option>
-													<option value="15" @if(!empty($_GET['show']) && $_GET['show']=='15') selected @endif>15</option>
-													<option value="21" @if(!empty($_GET['show']) && $_GET['show']=='21') selected @endif>21</option>
-													<option value="30" @if(!empty($_GET['show']) && $_GET['show']=='30') selected @endif>30</option>
-												</select>
-											</div>
-											<div class="single-shorter">
-												<label>Sort By :</label>
-												<select class='sortBy' name='sortBy' onchange="this.form.submit();">
-													<option value="">Default</option>
-													<option value="title" @if(!empty($_GET['sortBy']) && $_GET['sortBy']=='title') selected @endif>Name</option>
-													<option value="price" @if(!empty($_GET['sortBy']) && $_GET['sortBy']=='price') selected @endif>Price</option>
-													<option value="category" @if(!empty($_GET['sortBy']) && $_GET['sortBy']=='category') selected @endif>Category</option>
-													<option value="brand" @if(!empty($_GET['sortBy']) && $_GET['sortBy']=='brand') selected @endif>Brand</option>
-												</select>
-											</div>
-										</div>
-										<ul class="view-mode">
-											<li><a href="{{route('product-grids')}}"><i class="fa fa-th-large"></i></a></li>
-											<li class="active"><a href="javascript:void(0)"><i class="fa fa-th-list"></i></a></li>
-										</ul>
-									</div>
-									<!--/ End Shop Top -->
-								</div>
-							</div>
-							<div class="row">
-								@if(count($products))
-									@foreach($products as $product)
-									 	{{-- {{$product}} --}}
-										<!-- Start Single List -->
-										<div class="col-12">
-											<div class="row">
-												<div class="col-lg-4 col-md-6 col-sm-6">
-													<div class="single-product">
-														<div class="product-img">
-															<a href="{{route('product-detail',$product->slug)}}">
-															@php 
-																$photo=explode(',',$product->photo);
-															@endphp
-															<img class="default-img" src="{{$photo[0]}}" alt="{{$photo[0]}}">
-															<img class="hover-img" src="{{$photo[0]}}" alt="{{$photo[0]}}">
-															</a>
-															<div class="button-head">
-																<div class="product-action">
-																	<a data-toggle="modal" data-target="#{{$product->id}}" title="Quick View" href="#"><i class=" ti-eye"></i><span>Quick Shop</span></a>
-																	<a title="Wishlist" href="{{route('add-to-wishlist',$product->slug)}}" class="wishlist" data-id="{{$product->id}}"><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
-																</div>
-																<div class="product-action-2">
-																	<a title="Add to cart" href="{{route('add-to-cart',$product->slug)}}">Add to cart</a>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="col-lg-8 col-md-6 col-12">
-													<div class="list-content">
-														<div class="product-content">
-															<div class="product-price">
-																@php
-																	$after_discount=($product->price-($product->price*$product->discount)/100);
-																@endphp
-																<span>${{number_format($after_discount,2)}}</span>
-																<del>${{number_format($product->price,2)}}</del>
-															</div>
-															<h3 class="title"><a href="{{route('product-detail',$product->slug)}}">{{$product->title}}</a></h3>
-														{{-- <p>{!! html_entity_decode($product->summary) !!}</p> --}}
-														</div>
-														<p class="des pt-2">{!! html_entity_decode($product->summary) !!}</p>
-														<a href="javascript:void(0)" class="btn cart" data-id="{{$product->id}}">Buy Now!</a>
-													</div>
-												</div>
-											</div>
-										</div>
-										<!-- End Single List -->
-									@endforeach
-								@else
-									<h4 class="text-danger" style="margin:100px auto;">Sorry, there are no products according to the range given. Try selecting different one to see more results.</h4>
-								@endif
-							</div>
-							 <div class="row">
-                            <div class="col-md-12 justify-content-center d-flex">
-                                {{-- {{$products->appends($_GET)->links()}}  --}}
                             </div>
-                          </div>
-						</div>
-					</div>
-				</div>
-			</section>
-			<!--/ End Product Style 1  -->	
-		</form>
-		<!-- Modal -->
-		@if($products)
-			@foreach($products as $key=>$product)
-				<div class="modal fade" id="{{$product->id}}" tabindex="-1" role="dialog">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="ti-close" aria-hidden="true"></span></button>
-								</div>
-								<div class="modal-body">
-									<div class="row no-gutters">
-										<div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-											<!-- Product Slider -->
-												<div class="product-gallery">
-													<div class="quickview-slider-active">
-														@php 
-															$photo=explode(',',$product->photo);
-														// dd($photo);
-														@endphp
-														@foreach($photo as $data)
-															<div class="single-slider">
-																<img src="{{$data}}" alt="{{$data}}">
-															</div>
-														@endforeach
-													</div>
-												</div>
-											<!-- End Product slider -->
-										</div>
-										<div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-											<div class="quickview-content">
-												<h2>{{$product->title}}</h2>
-												<div class="quickview-ratting-review">
-													<div class="quickview-ratting-wrap">
-														<div class="quickview-ratting">
-															{{-- <i class="yellow fa fa-star"></i>
-															<i class="yellow fa fa-star"></i>
-															<i class="yellow fa fa-star"></i>
-															<i class="yellow fa fa-star"></i>
-															<i class="fa fa-star"></i> --}}
-															@php
-																$rate=DB::table('product_reviews')->where('product_id',$product->id)->avg('rate');
-																$rate_count=DB::table('product_reviews')->where('product_id',$product->id)->count();
-															@endphp
-															@for($i=1; $i<=5; $i++)
-																@if($rate>=$i)
-																	<i class="yellow fa fa-star"></i>
-																@else 
-																<i class="fa fa-star"></i>
-																@endif
-															@endfor
-														</div>
-														<a href="#"> ({{$rate_count}} customer review)</a>
-													</div>
-													<div class="quickview-stock">
-														@if($product->stock >0)
-														<span><i class="fa fa-check-circle-o"></i> {{$product->stock}} in stock</span>
-														@else 
-														<span><i class="fa fa-times-circle-o text-danger"></i> {{$product->stock}} out stock</span>
-														@endif
-													</div>
-												</div>
-												@php
-													$after_discount=($product->price-($product->price*$product->discount)/100);
-												@endphp
-												<h3><small><del class="text-muted">${{number_format($product->price,2)}}</del></small>    ${{number_format($after_discount,2)}}  </h3>
-												<div class="quickview-peragraph">
-													<p>{!! html_entity_decode($product->summary) !!}</p>
-												</div>
-												@if($product->size)
-													<div class="size">
-														<h4>Size</h4>
-														<ul>
-															@php 
-																$sizes=explode(',',$product->size);
-																// dd($sizes);
-															@endphp
-															@foreach($sizes as $size)
-															<li><a href="#" class="one">{{$size}}</a></li>
-															@endforeach
-														</ul>
-													</div>
-												@endif
-												<form action="{{route('single-add-to-cart')}}" method="POST">
-													@csrf 
-													<div class="quantity">
-														<!-- Input Order -->
-														<div class="input-group">
-															<div class="button minus">
-																<button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-																	<i class="ti-minus"></i>
-																</button>
-															</div>
-															<input type="hidden" name="slug" value="{{$product->slug}}">
-															<input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1">
-															<div class="button plus">
-																<button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
-																	<i class="ti-plus"></i>
-																</button>
-															</div>
-														</div>
-														<!--/ End Input Order -->
-													</div>
-													<div class="add-to-cart">
-														<button type="submit" class="btn">Add to cart</button>
-														<a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a>
-													</div>
-												</form>
-												<div class="default-social">
-												<!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons"></div><!-- ShareThis END -->
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-				</div>
-			@endforeach
-		@endif
-			<!-- Modal end -->
+                        @endforeach
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <div class="col-lg-10 col-md-12 col-12">
+            <form method="GET" action="{{ url()->current() }}">
+                <div class="row mb-4">
+                    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
+                        <div class="form-inline mb-2 mb-md-0">
+                            <label class="mr-2">Hiển thị:</label>
+                            <select class="form-control form-control-sm mr-3" name="show" onchange="this.form.submit();">
+                                <option value="">Mặc định</option>
+                                <option value="9" {{ request('show') == '9' ? 'selected' : '' }}>09</option>
+                                <option value="15" {{ request('show') == '15' ? 'selected' : '' }}>15</option>
+                                <option value="21" {{ request('show') == '21' ? 'selected' : '' }}>21</option>
+                                <option value="30" {{ request('show') == '30' ? 'selected' : '' }}>30</option>
+                            </select>
+
+                            <label class="mr-2">Sắp xếp theo:</label>
+                            <select class="form-control form-control-sm" name="sortBy" onchange="this.form.submit();">
+                                <option value="">Mặc định</option>
+                                <option value="title" {{ request('sortBy') == 'title' ? 'selected' : '' }}>Tên</option>
+                                <option value="price" {{ request('sortBy') == 'price' ? 'selected' : '' }}>Giá</option>
+                                <option value="category" {{ request('sortBy') == 'category' ? 'selected' : '' }}>Danh mục</option>
+                                <option value="brand" {{ request('sortBy') == 'brand' ? 'selected' : '' }}>Thương hiệu</option>
+                            </select>
+                        </div>
+                        @php
+                            $currentPath = request()->path();
+                            $gridPath = str_replace('product-lists', 'product-grids', $currentPath);
+                            $fullGridUrl = url($gridPath) . '?' . http_build_query(request()->query());
+                        @endphp
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a href="{{ $fullGridUrl }}" class="nav-link">
+                                    <i class="fa fa-th-large"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item active">
+                                <a href="javascript:void(0)" class="nav-link">
+                                    <i class="fa fa-th-list"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Thêm các tham số khác vào form để giữ lại chúng -->
+                <input type="hidden" name="brand" value="{{ request('brand') }}">
+                <button type="submit" style="display: none;"></button>          
+            </form>
+            <div class="row">
+                @if(count($products))
+                    @foreach($products as $product)
+                        <div class="col-12 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="row no-gutters">
+                                    <div class="col-md-4 position-relative">
+                                        {{-- Badge Giảm giá --}}
+                                        @if($product->discount > 0)
+                                            <span class="position-absolute bg-danger text-white px-3 py-2 rounded-pill shadow"
+                                                style="top: 15px; left: 15px; font-size: 1rem; font-weight: bold; z-index: 10;">
+                                                -{{ $product->discount }}%
+                                            </span>
+                                        @endif
+                                        <a href="{{ route('product-detail', $product->slug) }}">
+                                            @php $photo = explode(',', $product->photo); @endphp
+                                            <img src="{{ $photo[0] }}" alt="{{ $product->title }}"
+                                                class="img-fluid w-100"
+                                                style="height: 426px; object-fit: cover;">
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-8 d-flex flex-column justify-content-between p-3">
+                                        <div>
+                                            <h5>
+                                                <a href="{{ route('product-detail', $product->slug) }}" class="nav-link p-0 font-weight-bold d-block">
+                                                    {{ $product->title }}
+                                                </a>
+                                            </h5>
+
+                                            @php
+                                                $after_discount = $product->price - ($product->price * $product->discount / 100);
+                                                $rate = DB::table('product_reviews')->where('product_id', $product->id)->avg('rate');
+                                            @endphp
+
+                                            <div class="mb-2">
+                                                <span class="text-primary h6">
+                                                    {{ number_format($after_discount) }} đ
+                                                </span>
+                                                <del class="text-muted ml-2">
+                                                    {{ number_format($product->price) }} đ
+                                                </del>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fa fa-star {{ $rate >= $i ? 'text-warning' : 'text-muted' }}"></i>
+                                                @endfor
+                                                <small class="ml-2 text-muted">({{ number_format($rate, 1) }}/5)</small>
+                                            </div>
+
+                                            <p class="text-muted">
+                                                {!! Str::limit(strip_tags($product->summary), 100) !!}
+                                            </p>
+                                        </div>
+
+                                        <div class="d-flex flex-wrap mt-3">
+                                            <a href="{{ route('add-to-wishlist', $product->slug) }}"
+                                            class="btn btn-outline-danger btn-sm mr-2 mb-2">
+                                                <i class="ti-heart"></i> Yêu thích
+                                            </a>
+                                            <a href="{{ route('add-to-cart', $product->slug) }}"
+                                            class="btn btn-outline-primary btn-sm mr-2 mb-2">
+                                                <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
+                                            </a>
+                                            <a data-toggle="modal" data-target="#quickView{{ $product->id }}"
+                                            class="btn btn-outline-primary btn-sm mb-2">
+                                                <i class="ti-eye"></i> Xem nhanh
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-center">
+                        <h4 class="text-danger my-5">
+                            Rất tiếc, không tìm thấy sản phẩm nào phù hợp.
+                        </h4>
+                    </div>
+                @endif
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12 d-flex justify-content-center">
+                    {{-- {{ $products->appends($_GET)->links() }} --}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Shop End -->
+<!-- Phần modal tách riêng sau danh sách sản phẩm -->
+@foreach($products as $product)
+    <!-- Quick View Modal -->
+    <div class="modal fade" id="quickView{{ $product->id }}" tabindex="-1" role="dialog" aria-labelledby="quickViewLabel{{ $product->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="quickViewLabel{{ $product->id }}">{{ $product->title }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        {{-- Image --}}
+                        <div class="col-md-6">
+                            @php $photo = explode(',', $product->photo); @endphp
+                            <img src="{{ $photo[0] }}" class="img-fluid w-100" style="height: 400px; object-fit: cover;" alt="{{ $product->title }}">
+                        </div>
+
+                        {{-- Product Info --}}
+                        <div class="col-md-6">
+                            <h4>{{ $product->title }}</h4>
+
+                            {{-- Giá sau khi giảm --}}
+                            @php $after_discount = $product->price - ($product->price * $product->discount / 100); @endphp
+                            <h5 class="text-primary">{{ number_format($after_discount, 0, ',', '.') }}đ
+                                @if ($product->discount > 0)
+                                    <del class="text-muted ml-2">{{ number_format($product->price, 0, ',', '.') }}đ</del>
+                                @endif
+                            </h5>
+
+                            {{-- Đánh giá sao --}}
+                            @php
+                                $rate = DB::table('product_reviews')->where('product_id', $product->id)->avg('rate');
+                            @endphp
+                            <div class="rating mb-3">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($rate >= $i)
+                                        <i class="fa fa-star text-warning"></i>
+                                    @else
+                                        <i class="fa fa-star text-secondary"></i>
+                                    @endif
+                                @endfor
+                                <small class="ml-2 text-muted">({{ number_format($rate, 1) }}/5)</small>
+                            </div>
+
+                            {{-- Mô tả --}}
+                            <p>{!! $product->summary !!}</p>
+
+                            {{-- Nút mua --}}
+                            <form action="{{ route('single-add-to-cart') }}" method="POST" class="mt-3">
+                                @csrf
+                                <input type="hidden" name="slug" value="{{ $product->slug }}">
+                                <input type="hidden" name="quant[1]" value="1">
+                                <button type="submit" class="btn btn-outline-success">
+                                    <i class="fa fa-shopping-cart mr-1"></i> Thêm vào giỏ
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+@endforeach
+
 @endsection
 @push ('styles')
 <style>

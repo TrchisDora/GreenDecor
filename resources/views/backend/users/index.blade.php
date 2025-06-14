@@ -61,13 +61,7 @@
                           <a href="{{route('users.edit', $user->id)}}" class="btn btn-primary btn-sm float-left mr-1"
                             style="height:30px; width:30px" data-toggle="tooltip" title="Chỉnh sửa"
                             data-placement="bottom"><i class="fas fa-edit"></i></a>
-                          <form method="POST" action="{{route('users.destroy', [$user->id])}}">
-                            @csrf
-                            @method('delete')
-                            <button class="btn btn-danger btn-sm dltBtn" data-id={{$user->id}}
-                              style="height:30px; width:30px" data-toggle="tooltip" data-placement="bottom"
-                              title="Xóa"><i class="fas fa-trash-alt"></i></button>
-                          </form>
+                          
                         </td>
                       </tr>
                     @endforeach

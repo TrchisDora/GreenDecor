@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Coupon;
 use Illuminate\Http\Request;
 use App\Models\Cart;
+use Illuminate\Support\Facades\DB;
 class CouponController extends Controller
 {
     /**
@@ -109,8 +110,7 @@ class CouponController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
+     ** @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -133,23 +133,26 @@ class CouponController extends Controller
     }
 
     public function couponStore(Request $request){
-        // return $request->all();
-        $coupon=Coupon::where('code',$request->code)->first();
-        // dd($coupon);
-        if(!$coupon){
-            request()->session()->flash('error','Invalid coupon code, Please try again');
+        $coupon = Coupon::where('code', $request->code)->first();
+        
+        if (!$coupon) {
+            request()->session()->flash('error', 'Invalid coupon code, Please try again');
             return back();
         }
-        if($coupon){
-            $total_price=Cart::where('user_id',auth()->user()->id)->where('order_id',null)->sum('price');
-            // dd($total_price);
-            session()->put('coupon',[
-                'id'=>$coupon->id,
-                'code'=>$coupon->code,
-                'value'=>$coupon->discount($total_price)
-            ]);
-            request()->session()->flash('success','Coupon successfully applied');
-            return redirect()->back();
-        }
+    
+        // Tính tổng đơn hàng (theo giá * số lượng)
+        $total_price = Cart::where('user_id', auth()->user()->id)
+            ->where('order_id', null)
+            ->select(DB::raw('SUM(price * quantity) as total'))
+            ->value('total');
+    
+        session()->put('coupon', [
+            'id'    => $coupon->id,
+            'code'  => $coupon->code,
+            'value' => $coupon->discount($total_price) // giảm theo đơn hàng
+        ]);
+    
+        request()->session()->flash('success', 'Coupon successfully applied');
+        return redirect()->back();
     }
 }
